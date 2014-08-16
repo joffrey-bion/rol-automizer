@@ -13,9 +13,13 @@ public class GoldImageOCR {
         Tesseract ocr = Tesseract.getInstance();
         try {
             String str = ocr.doOCR(img);
+            if (str.equals("")) {
+                System.err.println("OCR failed to recognize anything");
+                return -1;
+            }
             return Integer.valueOf(str.replace(".", ""));
         } catch (TesseractException e) {
-            System.out.println("OCR failed");
+            System.err.println("OCR error");
             return -1;
         }
     }
