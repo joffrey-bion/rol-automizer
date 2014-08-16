@@ -1,69 +1,101 @@
 package com.jbion.riseoflords;
 
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.HashMap;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 
 import com.jbion.riseoflords.model.User;
-import com.jbion.riseoflords.network.HttpRequestor;
-import com.jbion.riseoflords.network.exceptions.WebserviceException;
-import com.jbion.riseoflords.util.Log;
+import com.jbion.riseoflords.network.parsers.Parser;
 
 public class WSAdapter {
-    private static final String LOG_TAG = WSAdapter.class.getSimpleName();
+    private static final String FAKE_USER_AGENT = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.143 Safari/537.36";
 
-    private static final String UTF8 = "UTF-8";
-    private static final String BASE_URL = "http://www.riseoflords.com/jeu.php";
+    private static final String BASE_URL_INDEX = "http://www.riseoflords.com/index.php";
+    private static final String BASE_URL_GAME = "http://www.riseoflords.com/jeu.php";
 
+    private static final String PAGE_LOGIN = "verifpass";
     private static final String PAGE_USERS_LIST = "main/conseil_de_guerre";
     private static final String PAGE_USER_DETAILS = "main/fiche";
     private static final String PAGE_ATTACK = "main/combats";
+    private static final String PAGE_CHEST = "main/tresor";
 
     private static final String PARAM_USERS_LIST_BEGINNING = "Debut";
     private static final String PARAM_USER_DETAILS_LOGIN = "voirpseudo";
     private static final String PARAM_ATTACK = "a";
     private static final String PARAM_ATTACK_VALUE = "ok";
 
+    private static final String POST_LOGIN_USER = "LogPseudo";
+    private static final String POST_LOGIN_PASSWORD = "LogPassword";
     private static final String POST_ATTACK_USER = "PseudoDefenseur";
     private static final String POST_ATTACK_TURNS = "NbToursToUse";
+    private static final String POST_CHEST_AMOUNT = "ArgentAPlacer";
+    private static final String POST_CHEST_X = "x";
+    private static final String POST_CHEST_Y = "y";
 
-    private final HttpRequestor http = new HttpRequestor();
+    private final CloseableHttpClient http;
 
-    private static URL getUrl(String page, String paramKey, String paramValue) {
-        Map<String, String> query = new HashMap<>();
-        query.put(paramKey, paramValue);
-        return getPageUrl(page, query);
+    private final ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
+        @Override
+        public String handleResponse(final HttpResponse response) throws ClientProtocolException, IOException {
+            int status = response.getStatusLine().getStatusCode();
+            if (status >= 200 && status < 300) {
+                HttpEntity entity = response.getEntity();
+                return entity != null ? EntityUtils.toString(entity) : null;
+            } else {
+                throw new ClientProtocolException("Unexpected response status: " + status);
+            }
+        }
+    };
+
+    public WSAdapter() {
+        BasicCookieStore cookieStore = new BasicCookieStore();
+        http = HttpClients.custom().setDefaultCookieStore(cookieStore).setUserAgent(FAKE_USER_AGENT).build();
     }
 
     /**
-     * Builds and returns an URL pointing to the specified page, with the specified
-     * query parameters.
+     * Builds and returns a RequestBuilder for a GET request on the specified page.
      * 
      * @param page
      *            the page to point to
-     * @param query
-     *            the query parameters to include in the URL query
      * @return the built URL
      */
-    private static URL getPageUrl(String page, Map<String, String> query) {
+    private static RequestBuilder getRequest(String page) {
+        return RequestBuilder.get().setUri(BASE_URL_GAME).addParameter("p", page);
+    }
+
+    public boolean login(String username, String password) {
+        HttpPost request = new HttpPost(BASE_URL_INDEX + "?p=" + PAGE_LOGIN);
         try {
-            String url = BASE_URL + "?p=" + page;
-            for (Entry<String, String> entry : query.entrySet()) {
-                String key = URLEncoder.encode(entry.getKey(), UTF8);
-                String value = URLEncoder.encode(entry.getValue(), UTF8);
-                url += "&" + key + "=" + value;
+            List<NameValuePair> params = new ArrayList<>();
+            params.add(new BasicNameValuePair(POST_LOGIN_USER, username));
+            params.add(new BasicNameValuePair(POST_LOGIN_PASSWORD, password));
+            UrlEncodedFormEntity postContent = new UrlEncodedFormEntity(params);
+            request.setEntity(postContent);
+
+            String response = http.execute(request, responseHandler);
+            boolean success = response.contains("Identification réussie!");
+            if (!success) {
+                System.err.println(response);
             }
-            Log.v(LOG_TAG, "getPageUrl url=" + url);
-            return new URL(url);
-        } catch (MalformedURLException e) {
-            throw new IllegalArgumentException("the provided page is malformed", e);
-        } catch (UnsupportedEncodingException e) {
-            throw new AssertionError("unsupported encoding UTF-8...", e);
+            return success;
+        } catch (IOException e) {
+            // TODO
+            throw new IllegalStateException("Exception not handled yet.", e);
         }
     }
 
@@ -73,41 +105,124 @@ public class WSAdapter {
      * @param startRank
      *            the rank of the first user to return
      * @return 99 users at most, starting at the specified rank.
-     * @throws WebserviceException
-     *             if an error occurred
      */
-    public List<User> listUsers(int startRank) throws WebserviceException {
-        http.doGet(getUrl(PAGE_USERS_LIST, PARAM_USERS_LIST_BEGINNING, String.valueOf(startRank)));
-        // TODO parse user list
-        return null;
+    public List<User> listUsers(int startRank) {
+        RequestBuilder builder = getRequest(PAGE_USERS_LIST);
+        builder.addParameter(PARAM_USERS_LIST_BEGINNING, String.valueOf(startRank + 1));
+        HttpUriRequest request = builder.build();
+        try {
+            String response = http.execute(request, responseHandler);
+            return Parser.parseUserList(response);
+        } catch (IOException e) {
+            // TODO
+            throw new IllegalStateException("Exception not handled yet.", e);
+        }
     }
 
     /**
-     * Used to fake a user detail page access on the server. THe result does not
+     * Used to fake a user detail page access on the server. The result does not
      * matter.
      * 
-     * @param user
+     * @param username
      *            the user to lookup
-     * @throws WebserviceException
-     *             if an error occurred
+     * @return true if the request succeeded, false otherwise
      */
-    public void getUserPage(User user) throws WebserviceException {
-        http.doGet(getUrl(PAGE_USER_DETAILS, PARAM_USER_DETAILS_LOGIN, user.getName()));
+    public boolean displayUserPage(String username) {
+        RequestBuilder builder = getRequest(PAGE_USER_DETAILS);
+        builder.addParameter(PARAM_USER_DETAILS_LOGIN, username);
+        HttpUriRequest request = builder.build();
+        try {
+            String response = http.execute(request, responseHandler);
+            boolean success = response.contains("Seigneur " + username);
+            if (!success) {
+                System.err.println(response);
+            }
+            return success;
+        } catch (IOException e) {
+            // TODO
+            throw new IllegalStateException("Exception not handled yet.", e);
+        }
     }
 
-    public void attack(String username) {
+    /**
+     * Attacks the specified user with one game turn.
+     * 
+     * @param username
+     *            the name of the user to attack
+     * @return true if the request succeeded, false otherwise
+     */
+    public boolean attack(String username) {
+        HttpPost request = new HttpPost(BASE_URL_GAME + "?p=" + PAGE_ATTACK + "&" + PARAM_ATTACK + "="
+                + PARAM_ATTACK_VALUE);
+        try {
+            List<NameValuePair> params = new ArrayList<>();
+            params.add(new BasicNameValuePair(POST_ATTACK_USER, username));
+            params.add(new BasicNameValuePair(POST_ATTACK_TURNS, "1"));
+            UrlEncodedFormEntity postContent = new UrlEncodedFormEntity(params);
+            request.setEntity(postContent);
 
-        Map<String, String> query = new HashMap<>();
-        query.put(PARAM_ATTACK, PARAM_ATTACK_VALUE);
-        URL url = getPageUrl(PAGE_ATTACK, query);
+            String response = http.execute(request, responseHandler);
+            boolean success = response.contains("remporte le combat!");
+            if (!success) {
+                System.err.println(response);
+            }
+            return success;
+        } catch (IOException e) {
+            // TODO
+            throw new IllegalStateException("Exception not handled yet.", e);
+        }
+    }
 
-        Map<String, String> post = new HashMap<>();
-        post.put(POST_ATTACK_USER, username);
-        post.put(POST_ATTACK_TURNS, "1");
+    /**
+     * Gets the chest page from the server, and returns the amount of money that
+     * could be stored in the chest.
+     * 
+     * @return the amount of money that could be stored in the chest, which is the
+     *         current amount of gold of the player
+     */
+    public int getCurrentGoldFromChestPage() {
+        try {
+            String response = http.execute(getRequest(PAGE_CHEST).build(), responseHandler);
+            if (response.contains("ArgentAPlacer")) {
+                return Parser.parseGoldAmount(response);
+            } else {
+                System.err.println(response);
+                throw new IllegalStateException("Chest page failed");
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException("Exception not handled yet.", e);
+        }
+    }
 
-        // TODO POST request with form-urlencoded content
-        
-        //http.doPost(url, post);
+    /**
+     * Stores the specified amount of gold into the chest. The amount has to match
+     * the current gold of the user, which should first be retrieved by calling
+     * {@link #getCurrentGoldFromChestPage()}.
+     * 
+     * @param amount
+     *            the amount of gold to store into the chest
+     * @return true if the request succeeded, false otherwise
+     */
+    public boolean storeInChest(int amount) {
+        HttpPost request = new HttpPost(BASE_URL_GAME + "?p=" + PAGE_CHEST);
+        try {
+            List<NameValuePair> params = new ArrayList<>();
+            params.add(new BasicNameValuePair(POST_CHEST_AMOUNT, String.valueOf(amount)));
+            params.add(new BasicNameValuePair(POST_CHEST_X, "32"));
+            params.add(new BasicNameValuePair(POST_CHEST_Y, "12"));
+            UrlEncodedFormEntity postContent = new UrlEncodedFormEntity(params);
+            request.setEntity(postContent);
+
+            String response = http.execute(request, responseHandler);
+            boolean success = Parser.parseGoldAmount(response) == 0;
+            if (!success) {
+                System.err.println(response);
+            }
+            return success;
+        } catch (IOException e) {
+            // TODO
+            throw new IllegalStateException("Exception not handled yet.", e);
+        }
     }
 
 }

@@ -48,4 +48,8 @@ public class User {
         this.alignment = alignment;
     }
 
+    @Override
+    public String toString() {
+        return "{rank=" + rank + ", name=" + name + ", gold=" + gold + ", army=" + army + ", align=" + alignment + "}";
+    }
 }
