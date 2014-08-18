@@ -8,9 +8,9 @@ public enum Alignment {
     JUSTE("Jus."),
     NEUTRE("Neu."),
     SANS_SCRUPULES("SsS."),
-    VIL("Vil"),
+    VIL("Vil."),
     ABOMINABLE("Abo."),
-    DEMONIAQUE("Dem.");
+    DEMONIAQUE("Dém.");
 
     // for efficiency
     private static final Alignment[] ALIGNMENTS = values();
