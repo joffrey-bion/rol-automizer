@@ -38,7 +38,7 @@ public class Parser {
     public static List<Player> parseUserList(String userListPageResponse) {
         Element body = Jsoup.parse(userListPageResponse).body();
         Elements elts = body.getElementsByAttributeValueContaining("href", "main/fiche&voirpseudo=");
-        List<Player> list = new LinkedList<Player>();
+        List<Player> list = new LinkedList<>();
         for (Element elt : elts) {
             Element usernameCell = elt.parent();
             assert usernameCell.tagName().equals("td");
