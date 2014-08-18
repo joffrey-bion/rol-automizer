@@ -11,7 +11,7 @@ public class Sequencer {
     private static final String TAG = Sequencer.class.getSimpleName();
 
     private Log log = Log.get();
-    private Sleeper sleeper = new Sleeper();
+    private Sleeper fakeTime = new Sleeper();
     private WSAdapter rol = new WSAdapter();
 
     public static void main(String[] args) {
@@ -21,7 +21,7 @@ public class Sequencer {
     private void start() {
         login("darklink", "kili");
         AttackParams params = new AttackParams();
-        params.start(2500).end(3500).goldThreshold(450000);
+        params.start(2300).end(3500).goldThreshold(450000);
         attackSeries(params);
     }
 
@@ -42,7 +42,7 @@ public class Sequencer {
         } else {
             throw new RuntimeException("Login failure.");
         }
-        sleeper.sleep(6000, 7000);
+        fakeTime.sleep(6000, 7000);
         log.deindent(1);
     }
 
@@ -60,7 +60,7 @@ public class Sequencer {
             totalTurnsUsed += nTurnsUsed;
             params.decrementTurns(nTurnsUsed);
             params.nextPage();
-            sleeper.sleep(1500, 2000);
+            fakeTime.sleep(1500, 2000);
         }
         return totalTurnsUsed;
     }
@@ -79,34 +79,35 @@ public class Sequencer {
         List<Player> richPlayers = players.stream().filter(u -> u.getGold() > params.getGoldThreshold())
                 .limit(params.getNbTurns()).collect(Collectors.toList());
         log.i(TAG, richPlayers.size(), " players have more than ", params.getGoldThreshold(), " gold");
-        sleeper.sleep(1000, 1200);
+        fakeTime.readPage();
         int nbUsersBeforeRepairing = 0;
         int nbUsersBeforeStoring = 0;
         for (Player player : richPlayers) {
             // attack player
             attack(player);
-            sleeper.sleep(800, 1000);
             nbUsersBeforeRepairing++;
             nbUsersBeforeStoring++;
             // repair weapons as specified
             if (nbUsersBeforeRepairing >= params.getRepairFrequency()) {
-                sleeper.sleep(500, 1000);
+                fakeTime.changePage();
                 repairWeapons();
-                sleeper.sleep(1000, 1200);
+                fakeTime.changePage();
                 nbUsersBeforeRepairing = 0;
             }
             // store gold as specified
             if (nbUsersBeforeStoring >= params.getStoringFrequency()) {
-                sleeper.sleep(500, 800);
+                fakeTime.changePage();
                 storeGold();
-                sleeper.sleep(1000, 1200);
+                fakeTime.pauseWhenSafe();
                 nbUsersBeforeStoring = 0;
             }
+            fakeTime.sleep(1000, 3000);
         }
         // store remaining gold
         if (nbUsersBeforeStoring > 0) {
-            sleeper.sleep(500, 800);
+            fakeTime.changePage();
             storeGold();
+            fakeTime.pauseWhenSafe();
         }
         return richPlayers.size();
     }
@@ -123,7 +124,7 @@ public class Sequencer {
         }
         log.deindent(1);
 
-        sleeper.sleep(500, 1000);
+        fakeTime.actionInPage();
 
         log.v(TAG, "Attacking...");
         success = rol.attack(player.getName());
@@ -142,7 +143,9 @@ public class Sequencer {
         log.v(TAG, "Displaying chest page...");
         int amount = rol.getCurrentGoldFromChestPage();
         log.v(TAG, amount + " gold to store");
-        sleeper.sleep(500, 1000);
+        
+        fakeTime.actionInPage();
+        
         log.v(TAG, "Storing everything...");
         log.indent();
         boolean success = rol.storeInChest(amount);
@@ -162,7 +165,9 @@ public class Sequencer {
         log.v(TAG, "Displaying weapons page...");
         int wornness = rol.displayWeaponsPage();
         log.v(TAG, "Weapons worn at ", wornness, "%");
-        sleeper.sleep(500, 1000);
+        
+        fakeTime.actionInPage();
+        
         log.v(TAG, "Repair request...");
         boolean success = rol.repairWeapons();
         log.deindent(1);

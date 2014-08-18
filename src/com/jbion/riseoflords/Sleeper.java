@@ -24,4 +24,20 @@ public class Sleeper {
         int duration = rand.nextInt(maxMillis - minMillis + 1) + minMillis;
         sleep(duration);
     }
+    
+    public void readPage() {
+        sleep(1500, 3000);
+    }
+    
+    public void actionInPage() {
+        sleep(600, 1000);
+    }
+    
+    public void changePage() {
+        sleep(900, 1500);
+    }
+    
+    public void pauseWhenSafe() {
+        sleep(2000, 4000);
+    }
 }
