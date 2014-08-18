@@ -14,7 +14,7 @@ import org.jsoup.select.Elements;
 
 import com.jbion.riseoflords.model.Alignment;
 import com.jbion.riseoflords.model.Army;
-import com.jbion.riseoflords.model.User;
+import com.jbion.riseoflords.model.Player;
 
 public class Parser {
 
@@ -35,10 +35,10 @@ public class Parser {
         return Integer.valueOf(value);
     }
     
-    public static List<User> parseUserList(String userListPageResponse) {
+    public static List<Player> parseUserList(String userListPageResponse) {
         Element body = Jsoup.parse(userListPageResponse).body();
         Elements elts = body.getElementsByAttributeValueContaining("href", "main/fiche&voirpseudo=");
-        List<User> list = new LinkedList<User>();
+        List<Player> list = new LinkedList<Player>();
         for (Element elt : elts) {
             Element usernameCell = elt.parent();
             assert usernameCell.tagName().equals("td");
@@ -49,27 +49,27 @@ public class Parser {
         return list;
     }
     
-    private static User parseUser(Element userRow) {
+    private static Player parseUser(Element userRow) {
         assert userRow.tagName().equals("tr");
         Elements fields = userRow.getElementsByTag("td");
-        User user = new User();
+        Player player = new Player();
         
         // rank
         Element rankElt = fields.get(0);
         String rankStr = rankElt.text().trim();
-        user.setRank(Integer.valueOf(rankStr));
+        player.setRank(Integer.valueOf(rankStr));
         
         // name
         Element nameElt = fields.get(2).child(0);
         String name = nameElt.text().trim();
-        user.setName(name);
+        player.setName(name);
         
         // gold
         Element goldElt = fields.get(3);
         if (goldElt.hasText()) {
             // gold amount is textual
             String gold = goldElt.text().trim();
-            user.setGold(Integer.valueOf(gold.replace(".", "")));
+            player.setGold(Integer.valueOf(gold.replace(".", "")));
         } else {
             // gold amount is an image
             Element goldImgElt = goldElt.child(0);
@@ -83,19 +83,38 @@ public class Parser {
             } catch (IOException e) {
                 System.err.println("error downloading image from url=" + goldImgUrl);
             }
-            user.setGold(goldAmount);
+            player.setGold(goldAmount);
         }
         
         // army
         Element armyElt = fields.get(4);
         String army = armyElt.text().trim();
-        user.setArmy(Army.get(army));
+        player.setArmy(Army.get(army));
         
         // alignment
         Element alignmentElt = fields.get(5).child(0);
         String alignment = alignmentElt.text().trim();
-        user.setAlignment(Alignment.get(alignment));
+        player.setAlignment(Alignment.get(alignment));
         
-        return user;
+        return player;
+    }
+
+    /**
+     * Parses the weapons page response to return the current state of the weapons.
+     * 
+     * @param weaponsPageResponse
+     *            weapons page response
+     * @return the current percentage of wornness of the weapons
+     */
+    public static int parseWeaponsWornness(String weaponsPageResponse) {
+        Element body = Jsoup.parse(weaponsPageResponse).body();
+        Elements elts = body.getElementsByAttributeValueContaining("title", "Armes endommagées");
+        Element input = elts.get(0);
+        String value = input.text().trim();
+        if (value.endsWith("%")){
+            return Integer.valueOf(value.substring(0, value.length() - 1));
+        } else {
+            return -1;
+        }
     }
 }

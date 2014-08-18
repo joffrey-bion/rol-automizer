@@ -4,7 +4,15 @@ public class Log {
 
     private static final Level LEVEL = Level.VERBOSE;
 
-    public enum Level {
+    private static final String INDENT = "   ";
+    
+    private static final Log log = new Log();
+    
+    public static Log get() {
+        return log;
+    }
+
+    public static enum Level {
         WTF("WTF", true),
         ERROR("E", true),
         WARN("W", true),
@@ -28,44 +36,63 @@ public class Log {
             return isError;
         }
     }
+    
+    private int logIndent = 0;
 
-    public static void log(Level level, String tag, String... message) {
+    public void indent() {
+        logIndent ++;
+    }
+
+    public void deindent(int i) {
+        logIndent -= i;
+    }
+
+    private String indent(String msg) {
+        String res = "";
+        for (int i = 0; i < logIndent; i++) {
+            res += INDENT;
+        }
+        return res + msg;
+    }
+
+    public void log(Level level, String tag, Object... message) {
         if (LEVEL.compareTo(level) < 0) {
             return;
         }
         StringBuilder sb = new StringBuilder(level.getShortName());
-        sb.append(" [").append(tag).append("]");
-        for (String msg : message) {
+        sb.append(" [").append(tag).append("] ");
+        for (Object msg : message) {
             sb.append(msg);
         }
+        String msg = indent(sb.toString());
         if (level.isError()) {
-            System.err.println(sb.toString());
+            System.err.println(msg);
         } else {
-            System.out.println(sb.toString());
+            System.out.println(msg);
         }
     }
 
-    public static void v(String tag, String... message) {
-        log(Level.WARN, tag, message);
+    public void v(String tag, Object... message) {
+        log(Level.VERBOSE, tag, message);
     }
 
-    public static void d(String tag, String... message) {
+    public void d(String tag, Object... message) {
         log(Level.DEBUG, tag, message);
     }
 
-    public static void i(String tag, String... message) {
+    public void i(String tag, Object... message) {
         log(Level.INFO, tag, message);
     }
 
-    public static void w(String tag, String... message) {
+    public void w(String tag, Object... message) {
         log(Level.WARN, tag, message);
     }
 
-    public static void e(String tag, String... message) {
+    public void e(String tag, Object... message) {
         log(Level.ERROR, tag, message);
     }
 
-    public static void wtf(String tag, String... message) {
+    public void wtf(String tag, Object... message) {
         log(Level.WTF, tag, message);
     }
 

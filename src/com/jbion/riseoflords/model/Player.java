@@ -1,6 +1,6 @@
 package com.jbion.riseoflords.model;
 
-public class User {
+public class Player {
 
     private int rank;
     private String name;

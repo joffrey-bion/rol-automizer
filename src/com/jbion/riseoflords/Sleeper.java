@@ -2,13 +2,18 @@ package com.jbion.riseoflords;
 
 import java.util.Random;
 
-public class Sleeper {
+import com.jbion.riseoflords.util.Log;
 
+public class Sleeper {
+    
+    private static final String TAG = Sleeper.class.getSimpleName();
+
+    private final Log log = Log.get();
     private final Random rand = new Random(System.currentTimeMillis());
 
-    public static void sleep(String prefix, long millis) {
+    public void sleep(long millis) {
         try {
-            System.out.println(prefix + "Sleeping " + millis + " ms...");
+            log.d(TAG, "Sleeping ", millis, " ms...");
             Thread.sleep(millis);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -16,11 +21,7 @@ public class Sleeper {
     }
 
     public void sleep(int minMillis, int maxMillis) {
-        sleep("", minMillis, maxMillis);
-    }
-
-    public void sleep(String prefix, int minMillis, int maxMillis) {
         int duration = rand.nextInt(maxMillis - minMillis + 1) + minMillis;
-        sleep(prefix, duration);
+        sleep(duration);
     }
 }

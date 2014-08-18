@@ -1,83 +1,175 @@
 package com.jbion.riseoflords;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import com.jbion.riseoflords.model.User;
+import com.jbion.riseoflords.model.Player;
+import com.jbion.riseoflords.util.Log;
 
 public class Sequencer {
 
-    private static final String INDENT = "   ";
+    private static final String TAG = Sequencer.class.getSimpleName();
 
+    private Log log = Log.get();
     private Sleeper sleeper = new Sleeper();
     private WSAdapter rol = new WSAdapter();
 
     public static void main(String[] args) {
-
         new Sequencer().start();
-        // rol.attack("klamberg");
     }
 
     private void start() {
-        login();
-
-        sleeper.sleep(6000, 8000);
-
-        List<User> users = rol.listUsers(3000);
-        printUsers(users);
-        
-        //attack(user);
-        //sleeper.sleep(500, 1000);
-        //storeGold();
+        login("darklink", "kili");
+        AttackParams params = new AttackParams();
+        params.start(2500).end(3500).goldThreshold(450000);
+        attackSeries(params);
     }
 
-    private void login() {
-        System.out.println("Logging in...");
-        boolean success = rol.login("darklink", "kili");
+    /**
+     * Logs in with the specified credentials, and wait for standard time.
+     * 
+     * @param username
+     *            the username to connect with
+     * @param password
+     *            the password to connect with
+     */
+    private void login(String username, String password) {
+        log.d(TAG, "Logging in with username: " + username);
+        boolean success = rol.login(username, password);
+        log.indent();
         if (success) {
-            System.out.println(INDENT + "Success!");
+            log.i(TAG, "Logged in with username: " + username);
         } else {
             throw new RuntimeException("Login failure.");
         }
-    }
-    
-    private void attack(User user) {
-        System.out.println("Starting attack against user " + user.getName());
-        System.out.println(INDENT + "Displaying user page...");
-        boolean success = rol.displayUserPage(user.getName());
-        if (!success) {
-            System.err.println(INDENT + INDENT + "Something's wrong...");
-            return;
-        }
-        
-        sleeper.sleep(INDENT, 500, 1000);
-        
-        System.out.println(INDENT + "Attacking user...");
-        success = rol.attack(user.getName());
-        if (success) {
-            System.out.println(INDENT + INDENT + "Victory!");
-        } else {
-            System.err.println(INDENT + INDENT + "Defeat!");
-        }
+        sleeper.sleep(6000, 7000);
+        log.deindent(1);
     }
 
-    private void storeGold() {
-        System.out.println("Storing gold in chest...");
-        System.out.println(INDENT + "Displaying chest page...");
+    /**
+     * Attacks as many pages of players as necessary to meet the parameters.
+     * 
+     * @param params
+     *            the parameters for the attacks
+     * @return the number of players attacked
+     */
+    private int attackSeries(AttackParams params) {
+        int totalTurnsUsed = 0;
+        while (params.getNbTurns() > 0) {
+            int nTurnsUsed = attackPage(params);
+            totalTurnsUsed += nTurnsUsed;
+            params.decrementTurns(nTurnsUsed);
+            params.nextPage();
+            sleeper.sleep(1500, 2000);
+        }
+        return totalTurnsUsed;
+    }
+
+    /**
+     * Attacks one page of players.
+     * 
+     * @param params
+     *            the parameters for the attacks
+     * @return the number of players attacked
+     */
+    private int attackPage(AttackParams params) {
+        int start = params.getStartRank();
+        log.i(TAG, "Robbing players in ranks ", start, " to ", start + 98);
+        List<Player> players = rol.getPlayers(start);
+        List<Player> richPlayers = players.stream().filter(u -> u.getGold() > params.getGoldThreshold())
+                .limit(params.getNbTurns()).collect(Collectors.toList());
+        log.i(TAG, richPlayers.size(), " players have more than ", params.getGoldThreshold(), " gold");
+        sleeper.sleep(1000, 1200);
+        int nbUsersBeforeRepairing = 0;
+        int nbUsersBeforeStoring = 0;
+        for (Player player : richPlayers) {
+            // attack player
+            attack(player);
+            sleeper.sleep(800, 1000);
+            nbUsersBeforeRepairing++;
+            nbUsersBeforeStoring++;
+            // repair weapons as specified
+            if (nbUsersBeforeRepairing >= params.getRepairFrequency()) {
+                sleeper.sleep(500, 1000);
+                repairWeapons();
+                sleeper.sleep(1000, 1200);
+                nbUsersBeforeRepairing = 0;
+            }
+            // store gold as specified
+            if (nbUsersBeforeStoring >= params.getStoringFrequency()) {
+                sleeper.sleep(500, 800);
+                storeGold();
+                sleeper.sleep(1000, 1200);
+                nbUsersBeforeStoring = 0;
+            }
+        }
+        // store remaining gold
+        if (nbUsersBeforeStoring > 0) {
+            sleeper.sleep(500, 800);
+            storeGold();
+        }
+        return richPlayers.size();
+    }
+
+    private void attack(Player player) {
+        log.d(TAG, "Attacking player ", player.getName(), "...");
+        log.indent();
+        log.v(TAG, "Displaying player page...");
+        boolean success = rol.displayUserPage(player.getName());
+        log.indent();
+        if (!success) {
+            log.e(TAG, "Something's wrong...");
+            return;
+        }
+        log.deindent(1);
+
+        sleeper.sleep(500, 1000);
+
+        log.v(TAG, "Attacking...");
+        success = rol.attack(player.getName());
+        log.indent();
+        if (success) {
+            log.v(TAG, "Victory!");
+        } else {
+            log.v(TAG, "Defeat!");
+        }
+        log.deindent(2);
+    }
+
+    private int storeGold() {
+        log.v(TAG, "Storing gold in chest...");
+        log.indent();
+        log.v(TAG, "Displaying chest page...");
         int amount = rol.getCurrentGoldFromChestPage();
-        System.out.println(INDENT + amount + " gold to store");
-        sleeper.sleep(INDENT, 500, 1000);
-        System.out.println(INDENT + "Storing everything...");
+        log.v(TAG, amount + " gold to store");
+        sleeper.sleep(500, 1000);
+        log.v(TAG, "Storing everything...");
+        log.indent();
         boolean success = rol.storeInChest(amount);
         if (success) {
-            System.out.println(INDENT + INDENT + "The gold is safe!");
+            log.v(TAG, "The gold is safe!");
         } else {
-            System.err.println(INDENT + INDENT + "Something went wrong!");
+            log.v(TAG, "Something went wrong!");
         }
+        log.deindent(2);
+        log.i(TAG, amount, " gold stored in chest");
+        return amount;
     }
     
-    private static void printUsers(List<User> users) {
-        for (User user : users) {
-            System.out.println(user);
+    private void repairWeapons() {
+        log.v(TAG, "Repairing weapons...");
+        log.indent();
+        log.v(TAG, "Displaying weapons page...");
+        int wornness = rol.displayWeaponsPage();
+        log.v(TAG, "Weapons worn at ", wornness, "%");
+        sleeper.sleep(500, 1000);
+        log.v(TAG, "Repair request...");
+        boolean success = rol.repairWeapons();
+        log.deindent(1);
+        if (!success) {
+            log.e(TAG, "Couldn't repair weapons, is there enough gold?");
+        } else {
+            log.i(TAG, "Weapons repaired");    
         }
     }
 }

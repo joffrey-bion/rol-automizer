@@ -19,7 +19,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
-import com.jbion.riseoflords.model.User;
+import com.jbion.riseoflords.model.Player;
 import com.jbion.riseoflords.network.parsers.Parser;
 
 public class WSAdapter {
@@ -33,19 +33,7 @@ public class WSAdapter {
     private static final String PAGE_USER_DETAILS = "main/fiche";
     private static final String PAGE_ATTACK = "main/combats";
     private static final String PAGE_CHEST = "main/tresor";
-
-    private static final String PARAM_USERS_LIST_BEGINNING = "Debut";
-    private static final String PARAM_USER_DETAILS_LOGIN = "voirpseudo";
-    private static final String PARAM_ATTACK = "a";
-    private static final String PARAM_ATTACK_VALUE = "ok";
-
-    private static final String POST_LOGIN_USER = "LogPseudo";
-    private static final String POST_LOGIN_PASSWORD = "LogPassword";
-    private static final String POST_ATTACK_USER = "PseudoDefenseur";
-    private static final String POST_ATTACK_TURNS = "NbToursToUse";
-    private static final String POST_CHEST_AMOUNT = "ArgentAPlacer";
-    private static final String POST_CHEST_X = "x";
-    private static final String POST_CHEST_Y = "y";
+    private static final String PAGE_WEAPONS = "main/arsenal";
 
     private final CloseableHttpClient http;
 
@@ -78,12 +66,22 @@ public class WSAdapter {
         return RequestBuilder.get().setUri(BASE_URL_GAME).addParameter("p", page);
     }
 
+    /**
+     * Performs the login request with the specified credentials. One needs to wait
+     * at least 5-6 seconds to fake real login.
+     * 
+     * @param username
+     *            the username to use
+     * @param password
+     *            the password to use
+     * @return true for successful login, false otherwise
+     */
     public boolean login(String username, String password) {
         HttpPost request = new HttpPost(BASE_URL_INDEX + "?p=" + PAGE_LOGIN);
         try {
             List<NameValuePair> params = new ArrayList<>();
-            params.add(new BasicNameValuePair(POST_LOGIN_USER, username));
-            params.add(new BasicNameValuePair(POST_LOGIN_PASSWORD, password));
+            params.add(new BasicNameValuePair("LogPseudo", username));
+            params.add(new BasicNameValuePair("LogPassword", password));
             UrlEncodedFormEntity postContent = new UrlEncodedFormEntity(params);
             request.setEntity(postContent);
 
@@ -94,7 +92,6 @@ public class WSAdapter {
             }
             return success;
         } catch (IOException e) {
-            // TODO
             throw new IllegalStateException("Exception not handled yet.", e);
         }
     }
@@ -106,22 +103,23 @@ public class WSAdapter {
      *            the rank of the first user to return
      * @return 99 users at most, starting at the specified rank.
      */
-    public List<User> listUsers(int startRank) {
+    public List<Player> getPlayers(int startRank) {
         RequestBuilder builder = getRequest(PAGE_USERS_LIST);
-        builder.addParameter(PARAM_USERS_LIST_BEGINNING, String.valueOf(startRank + 1));
+        builder.addParameter("Debut", String.valueOf(startRank + 1));
+        builder.addParameter("x", "10");
+        builder.addParameter("y", "10");
         HttpUriRequest request = builder.build();
         try {
             String response = http.execute(request, responseHandler);
             return Parser.parseUserList(response);
         } catch (IOException e) {
-            // TODO
             throw new IllegalStateException("Exception not handled yet.", e);
         }
     }
 
     /**
-     * Used to fake a user detail page access on the server. The result does not
-     * matter.
+     * Displays the specified user's detail page. Used to fake a visit on the user
+     * detail page before an attack. The result does not matter.
      * 
      * @param username
      *            the user to lookup
@@ -129,7 +127,7 @@ public class WSAdapter {
      */
     public boolean displayUserPage(String username) {
         RequestBuilder builder = getRequest(PAGE_USER_DETAILS);
-        builder.addParameter(PARAM_USER_DETAILS_LOGIN, username);
+        builder.addParameter("voirpseudo", username);
         HttpUriRequest request = builder.build();
         try {
             String response = http.execute(request, responseHandler);
@@ -139,7 +137,6 @@ public class WSAdapter {
             }
             return success;
         } catch (IOException e) {
-            // TODO
             throw new IllegalStateException("Exception not handled yet.", e);
         }
     }
@@ -152,15 +149,16 @@ public class WSAdapter {
      * @return true if the request succeeded, false otherwise
      */
     public boolean attack(String username) {
-        HttpPost request = new HttpPost(BASE_URL_GAME + "?p=" + PAGE_ATTACK + "&" + PARAM_ATTACK + "="
-                + PARAM_ATTACK_VALUE);
+        HttpPost request = new HttpPost(BASE_URL_GAME + "?p=" + PAGE_ATTACK + "&" + "a" + "="
+                + "ok");
         try {
             List<NameValuePair> params = new ArrayList<>();
-            params.add(new BasicNameValuePair(POST_ATTACK_USER, username));
-            params.add(new BasicNameValuePair(POST_ATTACK_TURNS, "1"));
+            params.add(new BasicNameValuePair("PseudoDefenseur", username));
+            params.add(new BasicNameValuePair("NbToursToUse", "1"));
             UrlEncodedFormEntity postContent = new UrlEncodedFormEntity(params);
             request.setEntity(postContent);
 
+            // TODO parse gold earned
             String response = http.execute(request, responseHandler);
             boolean success = response.contains("remporte le combat!");
             if (!success) {
@@ -168,7 +166,6 @@ public class WSAdapter {
             }
             return success;
         } catch (IOException e) {
-            // TODO
             throw new IllegalStateException("Exception not handled yet.", e);
         }
     }
@@ -207,9 +204,9 @@ public class WSAdapter {
         HttpPost request = new HttpPost(BASE_URL_GAME + "?p=" + PAGE_CHEST);
         try {
             List<NameValuePair> params = new ArrayList<>();
-            params.add(new BasicNameValuePair(POST_CHEST_AMOUNT, String.valueOf(amount)));
-            params.add(new BasicNameValuePair(POST_CHEST_X, "32"));
-            params.add(new BasicNameValuePair(POST_CHEST_Y, "12"));
+            params.add(new BasicNameValuePair("ArgentAPlacer", String.valueOf(amount)));
+            params.add(new BasicNameValuePair("x", "32"));
+            params.add(new BasicNameValuePair("y", "12"));
             UrlEncodedFormEntity postContent = new UrlEncodedFormEntity(params);
             request.setEntity(postContent);
 
@@ -220,7 +217,49 @@ public class WSAdapter {
             }
             return success;
         } catch (IOException e) {
-            // TODO
+            throw new IllegalStateException("Exception not handled yet.", e);
+        }
+    }
+
+    /**
+     * Displays the weapons page. Used to fake a visit on the weapons page before
+     * repairing or buying weapons and equipment. The result does not matter.
+     * 
+     * @return the percentage of wornness of the weapons
+     */
+    public int displayWeaponsPage() {
+        RequestBuilder builder = getRequest(PAGE_WEAPONS);
+        HttpUriRequest request = builder.build();
+        try {
+            String response = http.execute(request, responseHandler);
+            boolean success = response.contains("Faites votre choix");
+            if (!success) {
+                System.err.println(response);
+            }
+            return Parser.parseWeaponsWornness(response);
+        } catch (IOException e) {
+            throw new IllegalStateException("Exception not handled yet.", e);
+        }
+    }
+
+    /**
+     * Repairs weapons.
+     * 
+     * @return true if the repair succeeded, false otherwise
+     */
+    public boolean repairWeapons() {
+        RequestBuilder builder = getRequest(PAGE_WEAPONS);
+        builder.addParameter("a", "repair");
+        builder.addParameter("onglet", "");
+        HttpUriRequest request = builder.build();
+        try {
+            String response = http.execute(request, responseHandler);
+            boolean success = response.contains("Faites votre choix");
+            if (!success) {
+                System.err.println(response);
+            }
+            return Parser.parseWeaponsWornness(response) == 0;
+        } catch (IOException e) {
             throw new IllegalStateException("Exception not handled yet.", e);
         }
     }
