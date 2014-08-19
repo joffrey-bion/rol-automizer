@@ -27,11 +27,11 @@ public class Sequencer {
     private void start() {
         log.i(TAG, "Starting sequence...");
         login("darklink", "kili");
-        AttackParams params = new AttackParams(5, 3);
-        PlayerFilter filter = new PlayerFilter(2000, 4000, 50, 400000);
+        AttackParams params = new AttackParams(5, 2);
+        PlayerFilter filter = new PlayerFilter(2500, 5000, 200, 300000);
         attackSession(filter, params);
         fakeTime.changePageLong();
-        rol.logout();
+        logout();
         log.i(TAG, "End of sequence.");
     }
 
@@ -39,21 +39,32 @@ public class Sequencer {
      * Logs in with the specified credentials, and wait for standard time.
      * 
      * @param username
-     *            the username to connect with
+     *            the login to connect with
      * @param password
      *            the password to connect with
      */
     private void login(String username, String password) {
-        log.d(TAG, "Logging in with username: " + username);
+        log.d(TAG, "Logging in with username ", username, "...");
         boolean success = rol.login(username, password);
-        log.indent();
         if (success) {
-            log.i(TAG, "Logged in with username: " + username);
+            log.i(TAG, "Logged in with username: ", username);
         } else {
             throw new RuntimeException("Login failure.");
         }
         fakeTime.waitAfterLogin();
-        log.deindent(1);
+    }
+
+    /**
+     * Logs out. 
+     */
+    private void logout() {
+        log.d(TAG, "Logging out...");
+        boolean success = rol.logout();
+        if (success) {
+            log.i(TAG, "Logout successful");
+        } else {
+            log.e(TAG, "Logout failure");
+        }
     }
 
     /**
@@ -71,7 +82,7 @@ public class Sequencer {
         List<Player> players = new ArrayList<>();
         int startRank = filter.getMinRank();
         while (startRank < filter.getMaxRank()) {
-            log.d(TAG, "Reading page of players ranked ", startRank, " to ", startRank + 98, "...");
+            log.i(TAG, "Reading page of players ranked ", startRank, " to ", startRank + 98, "...");
             List<Player> filteredPage = rol.getPlayers(startRank).stream() // stream players
                     .filter(p -> p.getGold() >= filter.getGoldThreshold()) // above gold threshold
                     .filter(p -> p.getRank() <= filter.getMaxRank()) // below max rank
@@ -82,8 +93,8 @@ public class Sequencer {
             fakeTime.readPage();
             startRank += 98;
         }
-        log.i(TAG, players.size(), " players matching rank and gold criterias");
         if (players.size() > filter.getMaxTurns()) {
+            log.i(TAG, "Too many players matching rank and gold criterias, filtering only the richest of them...");
             // too many players, select only the richest
             List<Player> playersToAttack = players.stream() // stream players
                     .sorted(richestFirst) // richest first
@@ -107,6 +118,7 @@ public class Sequencer {
      * @return the total gold stolen
      */
     private int attack(List<Player> playersToAttack, AttackParams params) {
+        log.i(TAG, playersToAttack.size(), " players matching rank and gold criterias");
         int totalGoldStolen = 0;
         int nbAttackedPlayers = 0;
         for (Player player : playersToAttack) {
@@ -138,6 +150,7 @@ public class Sequencer {
             storeGoldIntoChest();
             fakeTime.pauseWhenSafe();
         }
+        log.i(TAG, totalGoldStolen, " total gold stolen from ", nbAttackedPlayers, " players");
         return totalGoldStolen;
     }
 
@@ -164,13 +177,12 @@ public class Sequencer {
 
         log.v(TAG, "Attacking...");
         int goldStolen = rol.attack(player.getName());
-        log.indent();
+        log.deindent(1);
         if (goldStolen > 0) {
-            log.v(TAG, "Victory!");
+            log.i(TAG, "*Victory* ", goldStolen, " gold stolen from player ", player.getName());
         } else {
-            log.v(TAG, "Defeat!");
+            log.w(TAG, "Defeat! Player ", player.getName(), " was too sronk!");
         }
-        log.deindent(2);
         return goldStolen;
     }
 

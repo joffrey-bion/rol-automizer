@@ -187,7 +187,7 @@ public class RoLAdapter {
             request.setEntity(postContent);
 
             String response = http.execute(request, responseHandler);
-            boolean success = response.contains("remporte le combat!");
+            boolean success = response.contains("remporte le combat!") || response.contains("perd cette bataille!");
             if (!success) {
                 System.err.println(response);
             }

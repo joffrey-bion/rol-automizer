@@ -4,7 +4,7 @@ public class Log {
 
     private static final boolean DISPLAY_LEVEL = false;
     private static final boolean DISPLAY_TAG = false;
-    private static final Level LEVEL = Level.VERBOSE;
+    private static final Level LEVEL = Level.INFO;
 
     private static final String INDENT = "   ";
 

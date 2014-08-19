@@ -35,7 +35,7 @@ public class Sleeper {
     private void sleep(int millis) {
         try {
             int affectedMillis = speed.affect(millis);
-            log.d(TAG, "Sleeping ", affectedMillis, " ms...");
+            log.d(TAG, "    ...  ", affectedMillis, " ms  ...");
             Thread.sleep(affectedMillis);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
