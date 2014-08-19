@@ -82,16 +82,17 @@ public class Sequencer {
         List<Player> players = new ArrayList<>();
         int startRank = filter.getMinRank();
         while (startRank < filter.getMaxRank()) {
-            log.i(TAG, "Reading page of players ranked ", startRank, " to ", startRank + 98, "...");
+            log.d(TAG, "Reading page of players ranked ", startRank, " to ", startRank + 98, "...");
             List<Player> filteredPage = rol.getPlayers(startRank).stream() // stream players
                     .filter(p -> p.getGold() >= filter.getGoldThreshold()) // above gold threshold
                     .filter(p -> p.getRank() <= filter.getMaxRank()) // below max rank
                     .sorted(richestFirst) // richest first
                     .limit(filter.getMaxTurns()) // limit to max turns
                     .collect(Collectors.toList());
+            log.i(TAG, filteredPage.size(), " matching players ranked ", startRank, " to ", startRank + 98);
             players.addAll(filteredPage);
             fakeTime.readPage();
-            startRank += 98;
+            startRank += 99;
         }
         if (players.size() > filter.getMaxTurns()) {
             log.i(TAG, "Too many players matching rank and gold criterias, filtering only the richest of them...");
