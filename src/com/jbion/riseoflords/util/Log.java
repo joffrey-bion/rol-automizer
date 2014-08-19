@@ -2,12 +2,14 @@ package com.jbion.riseoflords.util;
 
 public class Log {
 
+    private static final boolean DISPLAY_LEVEL = false;
+    private static final boolean DISPLAY_TAG = false;
     private static final Level LEVEL = Level.VERBOSE;
 
     private static final String INDENT = "   ";
-    
+
     private static final Log log = new Log();
-    
+
     public static Log get() {
         return log;
     }
@@ -36,11 +38,11 @@ public class Log {
             return isError;
         }
     }
-    
+
     private int logIndent = 0;
 
     public void indent() {
-        logIndent ++;
+        logIndent++;
     }
 
     public void deindent(int i) {
@@ -59,8 +61,13 @@ public class Log {
         if (LEVEL.compareTo(level) < 0) {
             return;
         }
-        StringBuilder sb = new StringBuilder(level.getShortName());
-        sb.append(" [").append(tag).append("] ");
+        StringBuilder sb = new StringBuilder();
+        if (DISPLAY_LEVEL) {
+            sb.append(level.getShortName()).append(" ");
+        }
+        if (DISPLAY_TAG) {
+            sb.append("[").append(tag).append("] ");
+        }
         for (Object msg : message) {
             sb.append(msg);
         }

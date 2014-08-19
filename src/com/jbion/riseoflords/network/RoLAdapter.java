@@ -1,8 +1,9 @@
-package com.jbion.riseoflords;
+package com.jbion.riseoflords.network;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -10,6 +11,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
@@ -22,19 +24,21 @@ import org.apache.http.util.EntityUtils;
 import com.jbion.riseoflords.model.Player;
 import com.jbion.riseoflords.network.parsers.Parser;
 
-public class WSAdapter {
+public class RoLAdapter {
     private static final String FAKE_USER_AGENT = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.143 Safari/537.36";
 
     private static final String BASE_URL_INDEX = "http://www.riseoflords.com/index.php";
     private static final String BASE_URL_GAME = "http://www.riseoflords.com/jeu.php";
 
     private static final String PAGE_LOGIN = "verifpass";
+    private static final String PAGE_LOGOUT = "logout";
     private static final String PAGE_USERS_LIST = "main/conseil_de_guerre";
     private static final String PAGE_USER_DETAILS = "main/fiche";
     private static final String PAGE_ATTACK = "main/combats";
     private static final String PAGE_CHEST = "main/tresor";
     private static final String PAGE_WEAPONS = "main/arsenal";
 
+    private final Random rand = new Random();
     private final CloseableHttpClient http;
 
     private final ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
@@ -50,9 +54,13 @@ public class WSAdapter {
         }
     };
 
-    public WSAdapter() {
+    public RoLAdapter() {
         BasicCookieStore cookieStore = new BasicCookieStore();
         http = HttpClients.custom().setDefaultCookieStore(cookieStore).setUserAgent(FAKE_USER_AGENT).build();
+    }
+
+    private String randomCoord(int min, int max) {
+        return String.valueOf(rand.nextInt(max - min + 1) + min);
     }
 
     /**
@@ -97,6 +105,25 @@ public class WSAdapter {
     }
 
     /**
+     * Logs the current user out.
+     * 
+     * @return true if the request succeeded, false otherwise
+     */
+    public boolean logout() {
+        HttpGet request = new HttpGet(BASE_URL_INDEX + "?p=" + PAGE_LOGOUT);
+        try {
+            String response = http.execute(request, responseHandler);
+            boolean success = response.contains("Déjà inscrit? Connectez-vous");
+            if (!success) {
+                System.err.println(response);
+            }
+            return success;
+        } catch (IOException e) {
+            throw new IllegalStateException("Exception not handled yet.", e);
+        }
+    }
+
+    /**
      * Returns the list of users starting at the specified rank.
      * 
      * @param startRank
@@ -106,8 +133,10 @@ public class WSAdapter {
     public List<Player> getPlayers(int startRank) {
         RequestBuilder builder = getRequest(PAGE_USERS_LIST);
         builder.addParameter("Debut", String.valueOf(startRank + 1));
-        builder.addParameter("x", "10");
-        builder.addParameter("y", "10");
+        if (rand.nextBoolean()) {
+            builder.addParameter("x", randomCoord(5, 35));
+            builder.addParameter("y", randomCoord(5, 25));
+        }
         HttpUriRequest request = builder.build();
         try {
             String response = http.execute(request, responseHandler);
@@ -146,11 +175,10 @@ public class WSAdapter {
      * 
      * @param username
      *            the name of the user to attack
-     * @return true if the request succeeded, false otherwise
+     * @return the gold stolen during the attack
      */
-    public boolean attack(String username) {
-        HttpPost request = new HttpPost(BASE_URL_GAME + "?p=" + PAGE_ATTACK + "&" + "a" + "="
-                + "ok");
+    public int attack(String username) {
+        HttpPost request = new HttpPost(BASE_URL_GAME + "?p=" + PAGE_ATTACK + "&" + "a" + "=" + "ok");
         try {
             List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair("PseudoDefenseur", username));
@@ -158,13 +186,12 @@ public class WSAdapter {
             UrlEncodedFormEntity postContent = new UrlEncodedFormEntity(params);
             request.setEntity(postContent);
 
-            // TODO parse gold earned
             String response = http.execute(request, responseHandler);
             boolean success = response.contains("remporte le combat!");
             if (!success) {
                 System.err.println(response);
             }
-            return success;
+            return Parser.parseGoldStolen(response);
         } catch (IOException e) {
             throw new IllegalStateException("Exception not handled yet.", e);
         }
@@ -205,8 +232,8 @@ public class WSAdapter {
         try {
             List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair("ArgentAPlacer", String.valueOf(amount)));
-            params.add(new BasicNameValuePair("x", "32"));
-            params.add(new BasicNameValuePair("y", "12"));
+            params.add(new BasicNameValuePair("x", randomCoord(10, 60)));
+            params.add(new BasicNameValuePair("y", randomCoord(10, 60)));
             UrlEncodedFormEntity postContent = new UrlEncodedFormEntity(params);
             request.setEntity(postContent);
 

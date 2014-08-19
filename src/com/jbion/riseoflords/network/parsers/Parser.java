@@ -34,6 +34,17 @@ public class Parser {
         String value = input.attr("value");
         return Integer.valueOf(value);
     }
+
+    public static int parseGoldStolen(String attackReportResponse) {
+        Element body = Jsoup.parse(attackReportResponse).body();
+        Elements elts = body.getElementsByAttributeValue("class", "combat_gagne");
+        if (elts.size() == 0) {
+            return 0;
+        }
+        Element divVictory = elts.get(0).parent().parent();
+        String gold = divVictory.getElementsByTag("b").get(0).text();
+        return Integer.valueOf(gold.replace(".", ""));
+    }
     
     public static List<Player> parseUserList(String userListPageResponse) {
         Element body = Jsoup.parse(userListPageResponse).body();
