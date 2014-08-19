@@ -1,4 +1,4 @@
-package com.jbion.riseoflords;
+package com.jbion.riseoflords.config;
 
 /**
  * Parameters to choose players.
@@ -8,11 +8,8 @@ public class PlayerFilter {
     /** The minimum rank to attack. */
     private final int minRank;
 
-    /** The minimum rank to attack. */
+    /** The maximum rank to attack. */
     private final int maxRank;
-
-    /** The maximum number of turns to spend. */
-    private final int maxTurns;
 
     /** Only players with at least this much gold will be attacked. */
     private final int goldThreshold;
@@ -21,7 +18,7 @@ public class PlayerFilter {
      * Creates a new {@link PlayerFilter} with default values.
      */
     public PlayerFilter() {
-        this(2500, 4500, 50, 450000);
+        this(2500, 4500, 450000);
     }
 
     /**
@@ -31,31 +28,38 @@ public class PlayerFilter {
      *            lower limit for players rank
      * @param maxRank
      *            upper limit for players rank
-     * @param maxTurns
-     *            the maximum number of players to attack
      * @param goldThreshold
      *            lower limit for players gold
      */
-    public PlayerFilter(int minRank, int maxRank, int maxTurns, int goldThreshold) {
+    public PlayerFilter(int minRank, int maxRank, int goldThreshold) {
         this.minRank = minRank;
         this.maxRank = maxRank;
-        this.maxTurns = maxTurns;
         this.goldThreshold = goldThreshold;
     }
 
+    /**
+     * Gets the smallest accepted rank.
+     */
     public int getMinRank() {
         return minRank;
     }
 
+    /**
+     * Gets the largest accepted rank.
+     */
     public int getMaxRank() {
         return maxRank;
     }
 
-    public int getMaxTurns() {
-        return maxTurns;
-    }
-
+    /**
+     * Gets the minimum accepted amount of gold.
+     */
     public int getGoldThreshold() {
         return goldThreshold;
+    }
+
+    @Override
+    public String toString() {
+        return "Player filter:\n   ranks: " + minRank + "-" + maxRank + "\n   min gold: " + goldThreshold;
     }
 }

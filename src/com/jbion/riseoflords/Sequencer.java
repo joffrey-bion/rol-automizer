@@ -5,31 +5,37 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.jbion.riseoflords.Sleeper.Speed;
+import com.jbion.riseoflords.config.Account;
+import com.jbion.riseoflords.config.AttackParams;
+import com.jbion.riseoflords.config.Config;
+import com.jbion.riseoflords.config.PlayerFilter;
 import com.jbion.riseoflords.model.Player;
 import com.jbion.riseoflords.network.RoLAdapter;
 import com.jbion.riseoflords.util.Log;
+import com.jbion.riseoflords.util.Sleeper;
+import com.jbion.riseoflords.util.Sleeper.Speed;
 
 public class Sequencer {
 
     private static final String TAG = Sequencer.class.getSimpleName();
 
+    private static final Comparator<Player> richestFirst = Comparator.comparingInt(Player::getGold).reversed();
+
     private final Log log = Log.get();
     private final Sleeper fakeTime = new Sleeper(Speed.REALLY_SLOW);
     private final RoLAdapter rol = new RoLAdapter();
-
-    private static final Comparator<Player> richestFirst = Comparator.comparingInt(Player::getGold).reversed();
-
-    public static void main(String[] args) {
-        new Sequencer().start();
+    
+    private final Config config;
+    
+    public Sequencer(Config config) {
+        this.config = config;
     }
 
-    private void start() {
+    public void start() {
         log.i(TAG, "Starting sequence...");
-        login("darklink", "kili");
-        AttackParams params = new AttackParams(5, 2);
-        PlayerFilter filter = new PlayerFilter(2500, 5000, 200, 300000);
-        attackSession(filter, params);
+        Account account = config.getAccount();
+        login(account.getLogin(), account.getPassword());
+        attackSession(config.getPlayerFilter(), config.getAttackParams());
         fakeTime.changePageLong();
         logout();
         log.i(TAG, "End of sequence.");
@@ -77,29 +83,31 @@ public class Sequencer {
      * @return the total gold stolen
      */
     private int attackSession(PlayerFilter filter, AttackParams params) {
-        log.i(TAG, "Starting massive attack on players ranked ", filter.getMinRank(), " to ", filter.getMaxRank(),
-                " richer than ", filter.getGoldThreshold(), " gold (", filter.getMaxTurns(), " attacks max)");
+        final int maxRank = filter.getMaxRank();
+        final int maxTurns = params.getMaxTurns();
+        log.i(TAG, "Starting massive attack on players ranked ", filter.getMinRank(), " to ", maxRank,
+                " richer than ", filter.getGoldThreshold(), " gold (", maxTurns, " attacks max)");
         List<Player> players = new ArrayList<>();
         int startRank = filter.getMinRank();
-        while (startRank < filter.getMaxRank()) {
+        while (startRank < maxRank) {
             log.d(TAG, "Reading page of players ranked ", startRank, " to ", startRank + 98, "...");
             List<Player> filteredPage = rol.getPlayers(startRank).stream() // stream players
                     .filter(p -> p.getGold() >= filter.getGoldThreshold()) // above gold threshold
-                    .filter(p -> p.getRank() <= filter.getMaxRank()) // below max rank
+                    .filter(p -> p.getRank() <= maxTurns) // below max rank
                     .sorted(richestFirst) // richest first
-                    .limit(filter.getMaxTurns()) // limit to max turns
+                    .limit(params.getMaxTurns()) // limit to max turns
                     .collect(Collectors.toList());
             log.i(TAG, filteredPage.size(), " matching players ranked ", startRank, " to ", startRank + 98);
             players.addAll(filteredPage);
             fakeTime.readPage();
             startRank += 99;
         }
-        if (players.size() > filter.getMaxTurns()) {
+        if (players.size() > maxTurns) {
             log.i(TAG, "Too many players matching rank and gold criterias, filtering only the richest of them...");
             // too many players, select only the richest
             List<Player> playersToAttack = players.stream() // stream players
                     .sorted(richestFirst) // richest first
-                    .limit(filter.getMaxTurns()) // limit to max turns
+                    .limit(params.getMaxTurns()) // limit to max turns
                     .collect(Collectors.toList());
             return attack(playersToAttack, params);
         } else {

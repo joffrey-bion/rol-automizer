@@ -1,8 +1,6 @@
-package com.jbion.riseoflords;
+package com.jbion.riseoflords.util;
 
 import java.util.Random;
-
-import com.jbion.riseoflords.util.Log;
 
 public class Sleeper {
     

@@ -102,5 +102,4 @@ public class Log {
     public void wtf(String tag, Object... message) {
         log(Level.WTF, tag, message);
     }
-
 }
