@@ -54,6 +54,9 @@ public class Sequencer {
         boolean success = rol.login(username, password);
         if (success) {
             log.i(TAG, "Logged in with username: ", username);
+            log.i(TAG, "");
+            log.i(TAG, "Faking redirection page delay... (this takes a few seconds)");
+            log.i(TAG, "");
         } else {
             throw new RuntimeException("Login failure.");
         }
@@ -87,6 +90,7 @@ public class Sequencer {
         final int maxTurns = params.getMaxTurns();
         log.i(TAG, "Starting massive attack on players ranked ", filter.getMinRank(), " to ", maxRank,
                 " richer than ", filter.getGoldThreshold(), " gold (", maxTurns, " attacks max)");
+        log.i(TAG, "Searching players matching the config filter...");
         List<Player> players = new ArrayList<>();
         int startRank = filter.getMinRank();
         while (startRank < maxRank) {
@@ -102,6 +106,7 @@ public class Sequencer {
             fakeTime.readPage();
             startRank += 99;
         }
+        log.i(TAG, "");
         if (players.size() > maxTurns) {
             log.i(TAG, "Too many players matching rank and gold criterias, filtering only the richest of them...");
             // too many players, select only the richest
@@ -188,7 +193,7 @@ public class Sequencer {
         int goldStolen = rol.attack(player.getName());
         log.deindent(1);
         if (goldStolen > 0) {
-            log.i(TAG, "*Victory* ", goldStolen, " gold stolen from player ", player.getName());
+            log.i(TAG, "Victory! ", goldStolen, " gold stolen from player ", player.getName());
         } else {
             log.w(TAG, "Defeat! Player ", player.getName(), " was too sronk!");
         }

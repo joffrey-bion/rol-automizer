@@ -1,7 +1,6 @@
 package com.jbion.riseoflords.network.parsers;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +11,7 @@ import com.jbion.riseoflords.util.Log;
 
 public class GoldImageOCR {
 
-    private static final String DIGITS_DIR = "img";
+    private static final String DIGITS_DIR = "/img";
 
     private static final BufferedImage[] DIGITS = { loadImage(DIGITS_DIR + "/0.png"), loadImage(DIGITS_DIR + "/1.png"),
             loadImage(DIGITS_DIR + "/2.png"), loadImage(DIGITS_DIR + "/3.png"), loadImage(DIGITS_DIR + "/4.png"),
@@ -44,10 +43,10 @@ public class GoldImageOCR {
 
     private static BufferedImage loadImage(String filename) {
         try {
-            BufferedImage img = ImageIO.read(new File(filename));
+            BufferedImage img = ImageIO.read(GoldImageOCR.class.getResourceAsStream(filename));
             return img;
         } catch (IOException e) {
-            throw new RuntimeException("image couldn't be read");
+            throw new RuntimeException("image couldn't be loaded");
         }
     }
 

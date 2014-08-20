@@ -8,13 +8,15 @@ import com.jbion.riseoflords.util.Log;
 
 public class Main {
     
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     private static final String TAG = Main.class.getSimpleName();
         
-    private static final String PROP_FILE = DEBUG ? "internal-bot.properties" : "bot.properties";
+    private static final String PROP_FILE = DEBUG ? "/internal-bot.properties" : "/bot.properties";
 
     public static void main(String[] args) {
+        System.out.println();
+        
         Config config;
         try {
             config = Config.load(PROP_FILE);

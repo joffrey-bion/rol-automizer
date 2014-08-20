@@ -35,7 +35,7 @@ public class Config {
         Properties prop = new Properties();
         InputStream input = Main.class.getResourceAsStream(filename);
         if (input == null) {
-            throw new FileNotFoundException("config file " + filename + " not found");
+            throw new FileNotFoundException("file " + filename + " not found");
         }
         prop.load(input);
 
@@ -60,7 +60,10 @@ public class Config {
     private static String getMandatoryProperty(Properties prop, String key) throws BadConfigException {
         String strValue = prop.getProperty(key);
         if (strValue == null) {
-            throw new BadConfigException("missing key '" + key + "' in config file, can't continue");
+            throw new BadConfigException("missing key '" + key + "', can't continue");
+        }
+        if (strValue.length() == 0) {
+            throw new BadConfigException("no value for '" + key + "', can't continue");
         }
         return strValue;
     }
@@ -68,7 +71,7 @@ public class Config {
     private static int getIntProperty(Properties prop, String key, int defaultValue) throws BadConfigException {
         String strValue = prop.getProperty(key);
         if (strValue == null) {
-            Log.get().w(TAG, "missing key '", key, "' in config file, using default (", defaultValue, ")");
+            Log.get().w(TAG, "missing key '", key, "', using default value (", defaultValue, ")");
             return defaultValue;
         }
         try {
