@@ -39,6 +39,8 @@ public class PlayerFilter {
 
     /**
      * Gets the smallest accepted rank.
+     * 
+     * @return the smallest accepted rank
      */
     public int getMinRank() {
         return minRank;
@@ -46,6 +48,8 @@ public class PlayerFilter {
 
     /**
      * Gets the largest accepted rank.
+     * 
+     * @return the largest accepted rank
      */
     public int getMaxRank() {
         return maxRank;
@@ -53,6 +57,8 @@ public class PlayerFilter {
 
     /**
      * Gets the minimum accepted amount of gold.
+     * 
+     * @return the minimum accepted amount of gold
      */
     public int getGoldThreshold() {
         return goldThreshold;

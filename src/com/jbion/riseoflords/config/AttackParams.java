@@ -29,6 +29,8 @@ public class AttackParams {
 
     /**
      * Gets the max number of turns to use for the attack.
+     * 
+     * @return the max number of turns to use for the attack
      */
     public int getMaxTurns() {
         return maxTurns;
@@ -36,6 +38,8 @@ public class AttackParams {
 
     /**
      * Gets the number of attacks between each weapon reparation.
+     * 
+     * @return the number of attacks between each weapon reparation
      */
     public int getRepairFrequency() {
         return repairFrequency;
@@ -43,6 +47,8 @@ public class AttackParams {
 
     /**
      * Gets the number of attacks between each gold storage.
+     * 
+     * @return the number of attacks between each gold storage
      */
     public int getStoringFrequency() {
         return storingFrequency;

@@ -7,13 +7,17 @@ import com.jbion.riseoflords.config.Config.BadConfigException;
 import com.jbion.riseoflords.util.Log;
 
 public class Main {
+    
+    private static final boolean DEBUG = true;
 
     private static final String TAG = Main.class.getSimpleName();
+        
+    private static final String PROP_FILE = DEBUG ? "internal-bot.properties" : "bot.properties";
 
     public static void main(String[] args) {
         Config config;
         try {
-            config = Config.load("bot.properties");
+            config = Config.load(PROP_FILE);
         } catch (IOException | BadConfigException e) {
             Log.get().e(TAG, "Error reading config file: ", e.getMessage());
             return;
