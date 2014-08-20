@@ -22,7 +22,7 @@ public class Sequencer {
     private static final Comparator<Player> richestFirst = Comparator.comparingInt(Player::getGold).reversed();
 
     private final Log log = Log.get();
-    private final Sleeper fakeTime = new Sleeper(Speed.REALLY_SLOW);
+    private final Sleeper fakeTime = new Sleeper(Speed.SLOW);
     private final RoLAdapter rol = new RoLAdapter();
     
     private final Config config;
@@ -86,18 +86,16 @@ public class Sequencer {
      * @return the total gold stolen
      */
     private int attackSession(PlayerFilter filter, AttackParams params) {
-        final int maxRank = filter.getMaxRank();
-        final int maxTurns = params.getMaxTurns();
-        log.i(TAG, "Starting massive attack on players ranked ", filter.getMinRank(), " to ", maxRank,
-                " richer than ", filter.getGoldThreshold(), " gold (", maxTurns, " attacks max)");
+        log.i(TAG, "Starting massive attack on players ranked ", filter.getMinRank(), " to ", filter.getMaxRank(),
+                " richer than ", filter.getGoldThreshold(), " gold (", params.getMaxTurns(), " attacks max)");
         log.i(TAG, "Searching players matching the config filter...");
         List<Player> players = new ArrayList<>();
         int startRank = filter.getMinRank();
-        while (startRank < maxRank) {
+        while (startRank < filter.getMaxRank()) {
             log.d(TAG, "Reading page of players ranked ", startRank, " to ", startRank + 98, "...");
             List<Player> filteredPage = rol.getPlayers(startRank).stream() // stream players
                     .filter(p -> p.getGold() >= filter.getGoldThreshold()) // above gold threshold
-                    .filter(p -> p.getRank() <= maxTurns) // below max rank
+                    .filter(p -> p.getRank() <= filter.getMaxRank()) // below max rank
                     .sorted(richestFirst) // richest first
                     .limit(params.getMaxTurns()) // limit to max turns
                     .collect(Collectors.toList());
@@ -107,7 +105,7 @@ public class Sequencer {
             startRank += 99;
         }
         log.i(TAG, "");
-        if (players.size() > maxTurns) {
+        if (players.size() > params.getMaxTurns()) {
             log.i(TAG, "Too many players matching rank and gold criterias, filtering only the richest of them...");
             // too many players, select only the richest
             List<Player> playersToAttack = players.stream() // stream players
@@ -148,19 +146,18 @@ public class Sequencer {
             if (nbAttackedPlayers % params.getRepairFrequency() == 0) {
                 fakeTime.changePage();
                 repairWeapons();
-                fakeTime.changePage();
             }
             // store gold as specified
             if (nbAttackedPlayers % params.getStoringFrequency() == 0) {
                 fakeTime.changePage();
                 storeGoldIntoChest();
                 fakeTime.pauseWhenSafe();
+            } else {
+                fakeTime.changePageLong();
             }
-            fakeTime.changePageLong();
         }
         // store remaining gold
         if (nbAttackedPlayers % params.getStoringFrequency() != 0) {
-            fakeTime.changePage();
             storeGoldIntoChest();
             fakeTime.pauseWhenSafe();
         }

@@ -8,7 +8,7 @@ import com.jbion.riseoflords.util.Log;
 
 public class Main {
     
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private static final String TAG = Main.class.getSimpleName();
         
