@@ -99,7 +99,7 @@ public class Sequencer {
                     .sorted(richestFirst) // richest first
                     .limit(params.getMaxTurns()) // limit to max turns
                     .collect(Collectors.toList());
-            log.i(TAG, filteredPage.size(), " matching players ranked ", startRank, " to ", startRank + 98);
+            log.i(TAG, filteredPage.size(), " matching player(s) ranked ", startRank, " to ", startRank + 98);
             players.addAll(filteredPage);
             fakeTime.readPage();
             startRank += 99;
@@ -155,6 +155,11 @@ public class Sequencer {
             } else {
                 fakeTime.changePageLong();
             }
+        }
+        // repair weapons for last players attacked
+        if (nbAttackedPlayers % params.getRepairFrequency() != 0) {
+            fakeTime.changePage();
+            repairWeapons();
         }
         // store remaining gold
         if (nbAttackedPlayers % params.getStoringFrequency() != 0) {
