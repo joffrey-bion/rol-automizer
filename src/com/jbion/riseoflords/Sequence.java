@@ -37,16 +37,8 @@ public class Sequence {
         log.i(TAG, "Starting sequence...");
         Account account = config.getAccount();
         login(account.getLogin(), account.getPassword());
-        if (state.turns == 0) {
-            log.e(TAG, "No turns available, impossible to attack.");
-            return;
-        } else {
-            if (state.turns < config.getAttackParams().getMaxTurns()) {
-                log.w(TAG, "Warning: the turns limit exceeds the number of available turns");
-            }
-            attackRichest(config.getPlayerFilter(), config.getAttackParams());
-            fakeTime.changePageLong();
-        }
+        attackRichest(config.getPlayerFilter(), config.getAttackParams());
+        fakeTime.changePageLong();
         logout();
         log.i(TAG, "End of sequence.");
     }
@@ -143,6 +135,13 @@ public class Sequence {
      */
     private int attackAll(List<Player> playersToAttack, AttackParams params) {
         log.i(TAG, playersToAttack.size(), " players matching rank and gold criterias");
+        if (state.turns == 0) {
+            log.e(TAG, "No turns available, impossible to attack.");
+            return 0;
+        } else if (state.turns < playersToAttack.size()) {
+            log.e(TAG, "Not enough turns to attack this many players, attack aborted.");
+            return 0;
+        }
         int totalGoldStolen = 0;
         int nbAttackedPlayers = 0;
         for (Player player : playersToAttack) {
