@@ -1,9 +1,11 @@
 package com.jbion.riseoflords.network;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Predicate;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -11,7 +13,6 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
@@ -21,6 +22,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
+import com.jbion.riseoflords.model.AccountState;
 import com.jbion.riseoflords.model.Player;
 import com.jbion.riseoflords.network.parsers.Parser;
 
@@ -40,6 +42,7 @@ public class RoLAdapter {
 
     private final Random rand = new Random();
     private final CloseableHttpClient http;
+    private final AccountState state;
 
     private final ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
         @Override
@@ -54,7 +57,8 @@ public class RoLAdapter {
         }
     };
 
-    public RoLAdapter() {
+    public RoLAdapter(AccountState state) {
+        this.state = state;
         BasicCookieStore cookieStore = new BasicCookieStore();
         http = HttpClients.custom().setDefaultCookieStore(cookieStore).setUserAgent(FAKE_USER_AGENT).build();
     }
@@ -64,19 +68,32 @@ public class RoLAdapter {
     }
 
     /**
-     * Builds and returns a RequestBuilder for a GET request on the specified page.
+     * Builds and returns a RequestBuilder for a GET request on the specified page, based on
+     * {@link #BASE_URL_GAME}.
      * 
      * @param page
      *            the page to point to
      * @return the built URL
      */
-    private static RequestBuilder getRequest(String page) {
+    private static RequestBuilder getGameRequest(String page) {
         return RequestBuilder.get().setUri(BASE_URL_GAME).addParameter("p", page);
     }
 
     /**
-     * Performs the login request with the specified credentials. One needs to wait
-     * at least 5-6 seconds to fake real login.
+     * Builds and returns a RequestBuilder for a GET request on the specified page, based on
+     * {@link #BASE_URL_INDEX}.
+     * 
+     * @param page
+     *            the page to point to
+     * @return the built URL
+     */
+    private static RequestBuilder getIndexRequest(String page) {
+        return RequestBuilder.get().setUri(BASE_URL_INDEX).addParameter("p", page);
+    }
+
+    /**
+     * Performs the login request with the specified credentials. One needs to wait at least 5-6
+     * seconds to fake real login.
      * 
      * @param username
      *            the username to use
@@ -110,17 +127,8 @@ public class RoLAdapter {
      * @return true if the request succeeded, false otherwise
      */
     public boolean logout() {
-        HttpGet request = new HttpGet(BASE_URL_INDEX + "?p=" + PAGE_LOGOUT);
-        try {
-            String response = http.execute(request, responseHandler);
-            boolean success = response.contains("Déjà inscrit? Connectez-vous");
-            if (!success) {
-                System.err.println(response);
-            }
-            return success;
-        } catch (IOException e) {
-            throw new IllegalStateException("Exception not handled yet.", e);
-        }
+        HttpUriRequest request = getIndexRequest(PAGE_LOGOUT).build();
+        return executeForSuccess(request, r -> r.contains("Déjà inscrit? Connectez-vous"), false);
     }
 
     /**
@@ -131,43 +139,30 @@ public class RoLAdapter {
      * @return 99 users at most, starting at the specified rank.
      */
     public List<Player> getPlayers(int startRank) {
-        RequestBuilder builder = getRequest(PAGE_USERS_LIST);
+        RequestBuilder builder = getGameRequest(PAGE_USERS_LIST);
         builder.addParameter("Debut", String.valueOf(startRank + 1));
         if (rand.nextBoolean()) {
             builder.addParameter("x", randomCoord(5, 35));
             builder.addParameter("y", randomCoord(5, 25));
         }
         HttpUriRequest request = builder.build();
-        try {
-            String response = http.execute(request, responseHandler);
-            return Parser.parseUserList(response);
-        } catch (IOException e) {
-            throw new IllegalStateException("Exception not handled yet.", e);
-        }
+        String response = executeForResponse(request, r -> r.contains("Recherche pseudo:"));
+        return Parser.parseUserList(response);
     }
 
     /**
-     * Displays the specified user's detail page. Used to fake a visit on the user
-     * detail page before an attack. The result does not matter.
+     * Displays the specified player's detail page. Used to fake a visit on the user detail page
+     * before an attack. The result does not matter.
      * 
      * @param username
      *            the user to lookup
      * @return true if the request succeeded, false otherwise
      */
-    public boolean displayUserPage(String username) {
-        RequestBuilder builder = getRequest(PAGE_USER_DETAILS);
+    public boolean displayPlayerPage(String username) {
+        RequestBuilder builder = getGameRequest(PAGE_USER_DETAILS);
         builder.addParameter("voirpseudo", username);
         HttpUriRequest request = builder.build();
-        try {
-            String response = http.execute(request, responseHandler);
-            boolean success = response.contains("Seigneur " + username);
-            if (!success) {
-                System.err.println(response);
-            }
-            return success;
-        } catch (IOException e) {
-            throw new IllegalStateException("Exception not handled yet.", e);
-        }
+        return executeForSuccess(request, r -> r.contains("Seigneur " + username));
     }
 
     /**
@@ -178,50 +173,32 @@ public class RoLAdapter {
      * @return the gold stolen during the attack
      */
     public int attack(String username) {
-        HttpPost request = new HttpPost(BASE_URL_GAME + "?p=" + PAGE_ATTACK + "&" + "a" + "=" + "ok");
-        try {
-            List<NameValuePair> params = new ArrayList<>();
-            params.add(new BasicNameValuePair("PseudoDefenseur", username));
-            params.add(new BasicNameValuePair("NbToursToUse", "1"));
-            UrlEncodedFormEntity postContent = new UrlEncodedFormEntity(params);
-            request.setEntity(postContent);
-
-            String response = http.execute(request, responseHandler);
-            boolean success = response.contains("remporte le combat!") || response.contains("perd cette bataille!");
-            if (!success) {
-                System.err.println(response);
-            }
-            return Parser.parseGoldStolen(response);
-        } catch (IOException e) {
-            throw new IllegalStateException("Exception not handled yet.", e);
-        }
+        HttpPost request = new HttpPost(BASE_URL_GAME + "?p=" + PAGE_ATTACK + "&a=ok");
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("PseudoDefenseur", username));
+        params.add(new BasicNameValuePair("NbToursToUse", "1"));
+        setPostData(request, params);
+        String response = executeForResponse(request,
+                r -> r.contains("remporte le combat!") || r.contains("perd cette bataille!"));
+        return Parser.parseGoldStolen(response);
     }
 
     /**
-     * Gets the chest page from the server, and returns the amount of money that
-     * could be stored in the chest.
+     * Gets the chest page from the server, and returns the amount of money that could be stored in
+     * the chest.
      * 
-     * @return the amount of money that could be stored in the chest, which is the
-     *         current amount of gold of the player
+     * @return the amount of money that could be stored in the chest, which is the current amount of
+     *         gold of the player
      */
-    public int getCurrentGoldFromChestPage() {
-        try {
-            String response = http.execute(getRequest(PAGE_CHEST).build(), responseHandler);
-            if (response.contains("ArgentAPlacer")) {
-                return Parser.parseGoldAmount(response);
-            } else {
-                System.err.println(response);
-                throw new IllegalStateException("Chest page failed");
-            }
-        } catch (IOException e) {
-            throw new IllegalStateException("Exception not handled yet.", e);
-        }
+    public int displayChestPage() {
+        HttpUriRequest request = getGameRequest(PAGE_CHEST).build();
+        String response = executeForResponse(request, r -> r.contains("ArgentAPlacer"));
+        return Parser.parseGoldAmount(response);
     }
 
     /**
-     * Stores the specified amount of gold into the chest. The amount has to match
-     * the current gold of the user, which should first be retrieved by calling
-     * {@link #getCurrentGoldFromChestPage()}.
+     * Stores the specified amount of gold into the chest. The amount has to match the current gold
+     * of the user, which should first be retrieved by calling {@link #displayChestPage()}.
      * 
      * @param amount
      *            the amount of gold to store into the chest
@@ -229,44 +206,24 @@ public class RoLAdapter {
      */
     public boolean storeInChest(int amount) {
         HttpPost request = new HttpPost(BASE_URL_GAME + "?p=" + PAGE_CHEST);
-        try {
-            List<NameValuePair> params = new ArrayList<>();
-            params.add(new BasicNameValuePair("ArgentAPlacer", String.valueOf(amount)));
-            params.add(new BasicNameValuePair("x", randomCoord(10, 60)));
-            params.add(new BasicNameValuePair("y", randomCoord(10, 60)));
-            UrlEncodedFormEntity postContent = new UrlEncodedFormEntity(params);
-            request.setEntity(postContent);
-
-            String response = http.execute(request, responseHandler);
-            boolean success = Parser.parseGoldAmount(response) == 0;
-            if (!success) {
-                System.err.println(response);
-            }
-            return success;
-        } catch (IOException e) {
-            throw new IllegalStateException("Exception not handled yet.", e);
-        }
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("ArgentAPlacer", String.valueOf(amount)));
+        params.add(new BasicNameValuePair("x", randomCoord(10, 60)));
+        params.add(new BasicNameValuePair("y", randomCoord(10, 60)));
+        setPostData(request, params);
+        return executeForSuccess(request, r -> Parser.parseGoldAmount(r) == 0);
     }
 
     /**
-     * Displays the weapons page. Used to fake a visit on the weapons page before
-     * repairing or buying weapons and equipment. The result does not matter.
+     * Displays the weapons page. Used to fake a visit on the weapons page before repairing or
+     * buying weapons and equipment.
      * 
      * @return the percentage of wornness of the weapons
      */
     public int displayWeaponsPage() {
-        RequestBuilder builder = getRequest(PAGE_WEAPONS);
-        HttpUriRequest request = builder.build();
-        try {
-            String response = http.execute(request, responseHandler);
-            boolean success = response.contains("Faites votre choix");
-            if (!success) {
-                System.err.println(response);
-            }
-            return Parser.parseWeaponsWornness(response);
-        } catch (IOException e) {
-            throw new IllegalStateException("Exception not handled yet.", e);
-        }
+        HttpUriRequest request = getGameRequest(PAGE_WEAPONS).build();
+        String response = executeForResponse(request, r -> r.contains("Faites votre choix"));
+        return Parser.parseWeaponsWornness(response);
     }
 
     /**
@@ -275,20 +232,53 @@ public class RoLAdapter {
      * @return true if the repair succeeded, false otherwise
      */
     public boolean repairWeapons() {
-        RequestBuilder builder = getRequest(PAGE_WEAPONS);
+        RequestBuilder builder = getGameRequest(PAGE_WEAPONS);
         builder.addParameter("a", "repair");
         builder.addParameter("onglet", "");
         HttpUriRequest request = builder.build();
+        String response = executeForResponse(request, r -> r.contains("Faites votre choix"));
+        return Parser.parseWeaponsWornness(response) == 0;
+    }
+
+    private static void setPostData(HttpPost postRequest, List<NameValuePair> params) {
+        try {
+            UrlEncodedFormEntity postContent = new UrlEncodedFormEntity(params);
+            postRequest.setEntity(postContent);
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException("Exception not handled yet.", e);
+        }
+    }
+
+    private boolean executeForSuccess(HttpUriRequest request, Predicate<String> responseSuccessful) {
+        return executeForSuccess(request, responseSuccessful, true);
+    }
+
+    private boolean executeForSuccess(HttpUriRequest request, Predicate<String> responseSuccessful, boolean updateState) {
         try {
             String response = http.execute(request, responseHandler);
-            boolean success = response.contains("Faites votre choix");
+            boolean success = responseSuccessful.test(response);
             if (!success) {
                 System.err.println(response);
+            } else if (updateState) {
+                Parser.updateState(state, response);
             }
-            return Parser.parseWeaponsWornness(response) == 0;
+            return success;
         } catch (IOException e) {
             throw new IllegalStateException("Exception not handled yet.", e);
         }
     }
 
+    private String executeForResponse(HttpUriRequest request, Predicate<String> responseSuccessful) {
+        try {
+            String response = http.execute(request, responseHandler);
+            if (!responseSuccessful.test(response)) {
+                System.err.println(response);
+            } else {
+                Parser.updateState(state, response);
+            }
+            return response;
+        } catch (IOException e) {
+            throw new IllegalStateException("Exception not handled yet.", e);
+        }
+    }
 }

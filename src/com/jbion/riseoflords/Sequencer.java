@@ -9,6 +9,7 @@ import com.jbion.riseoflords.config.Account;
 import com.jbion.riseoflords.config.AttackParams;
 import com.jbion.riseoflords.config.Config;
 import com.jbion.riseoflords.config.PlayerFilter;
+import com.jbion.riseoflords.model.AccountState;
 import com.jbion.riseoflords.model.Player;
 import com.jbion.riseoflords.network.RoLAdapter;
 import com.jbion.riseoflords.util.Log;
@@ -23,7 +24,8 @@ public class Sequencer {
 
     private final Log log = Log.get();
     private final Sleeper fakeTime = new Sleeper(Speed.SLOW);
-    private final RoLAdapter rol = new RoLAdapter();
+    private final AccountState state = new AccountState();
+    private final RoLAdapter rol = new RoLAdapter(state);
     
     private final Config config;
     
@@ -35,7 +37,7 @@ public class Sequencer {
         log.i(TAG, "Starting sequence...");
         Account account = config.getAccount();
         login(account.getLogin(), account.getPassword());
-        attackSession(config.getPlayerFilter(), config.getAttackParams());
+        attackRichest(config.getPlayerFilter(), config.getAttackParams());
         fakeTime.changePageLong();
         logout();
         log.i(TAG, "End of sequence.");
@@ -85,7 +87,7 @@ public class Sequencer {
      *            the {@link AttackParams} to use for attacks/actions sequencing
      * @return the total gold stolen
      */
-    private int attackSession(PlayerFilter filter, AttackParams params) {
+    private int attackRichest(PlayerFilter filter, AttackParams params) {
         log.i(TAG, "Starting massive attack on players ranked ", filter.getMinRank(), " to ", filter.getMaxRank(),
                 " richer than ", filter.getGoldThreshold(), " gold (", params.getMaxTurns(), " attacks max)");
         log.i(TAG, "Searching players matching the config filter...");
@@ -112,9 +114,9 @@ public class Sequencer {
                     .sorted(richestFirst) // richest first
                     .limit(params.getMaxTurns()) // limit to max turns
                     .collect(Collectors.toList());
-            return attack(playersToAttack, params);
+            return attackAll(playersToAttack, params);
         } else {
-            return attack(players, params);
+            return attackAll(players, params);
         }
     }
 
@@ -129,7 +131,7 @@ public class Sequencer {
      *            used.
      * @return the total gold stolen
      */
-    private int attack(List<Player> playersToAttack, AttackParams params) {
+    private int attackAll(List<Player> playersToAttack, AttackParams params) {
         log.i(TAG, playersToAttack.size(), " players matching rank and gold criterias");
         int totalGoldStolen = 0;
         int nbAttackedPlayers = 0;
@@ -181,7 +183,7 @@ public class Sequencer {
         log.d(TAG, "Attacking player ", player.getName(), "...");
         log.indent();
         log.v(TAG, "Displaying player page...");
-        boolean success = rol.displayUserPage(player.getName());
+        boolean success = rol.displayPlayerPage(player.getName());
         log.indent();
         if (!success) {
             log.e(TAG, "Something's wrong...");
@@ -206,7 +208,7 @@ public class Sequencer {
         log.v(TAG, "Storing gold into the chest...");
         log.indent();
         log.v(TAG, "Displaying chest page...");
-        int amount = rol.getCurrentGoldFromChestPage();
+        int amount = rol.displayChestPage();
         log.v(TAG, amount + " gold to store");
 
         fakeTime.actionInPage();

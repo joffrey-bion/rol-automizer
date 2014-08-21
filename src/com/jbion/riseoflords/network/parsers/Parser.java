@@ -12,6 +12,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.jbion.riseoflords.model.AccountState;
 import com.jbion.riseoflords.model.Alignment;
 import com.jbion.riseoflords.model.Army;
 import com.jbion.riseoflords.model.Player;
@@ -42,8 +43,7 @@ public class Parser {
             return 0;
         }
         Element divVictory = elts.get(0).parent().parent();
-        String gold = divVictory.getElementsByTag("b").get(0).text();
-        return Integer.valueOf(gold.replace(".", ""));
+        return getTextAsNumber(divVictory.getElementsByTag("b").get(0));
     }
     
     public static List<Player> parseUserList(String userListPageResponse) {
@@ -67,20 +67,17 @@ public class Parser {
         
         // rank
         Element rankElt = fields.get(0);
-        String rankStr = rankElt.text().trim();
-        player.setRank(Integer.valueOf(rankStr));
+        player.setRank(getTextAsNumber(rankElt));
         
         // name
         Element nameElt = fields.get(2).child(0);
-        String name = nameElt.text().trim();
-        player.setName(name);
+        player.setName(nameElt.text().trim());
         
         // gold
         Element goldElt = fields.get(3);
         if (goldElt.hasText()) {
             // gold amount is textual
-            String gold = goldElt.text().trim();
-            player.setGold(Integer.valueOf(gold.replace(".", "")));
+            player.setGold(getTextAsNumber(goldElt));
         } else {
             // gold amount is an image
             Element goldImgElt = goldElt.child(0);
@@ -126,6 +123,39 @@ public class Parser {
             return Integer.valueOf(value.substring(0, value.length() - 1));
         } else {
             return -1;
+        }
+    }
+    
+    private static int getTextAsNumber(Element numberElement) {
+        String number = numberElement.text().trim();
+        return Integer.valueOf(number.replace(".", ""));
+    }
+
+    public static void updateState(AccountState state, String response) {
+        Element body = Jsoup.parse(response).body();
+        state.gold = findValueInTag(body, "onmouseover", "A chaque tour de jeu");
+        state.chestGold = findValueInTag(body, "onmouseover", "Votre coffre magique");
+        state.mana = findValueInTag(body, "onmouseover", "Votre mana représente");
+        state.turns = findValueInTag(body, "onmouseover", "Un nouveau tour de jeu");
+        state.adventurins = findValueInTag(body, "href", "main/aventurines_detail");
+    }
+    
+    private static int findValueInTag(Element root, String attrKey, String attrContains) {
+        Elements elts = root.getElementsByAttributeValueContaining(attrKey, attrContains);
+        String imgSrc = elts.get(0).child(0).attr("src");
+        // get num param
+        int position = imgSrc.indexOf("num=");
+        if (position != -1) {
+            String num = imgSrc.substring(position + 4);
+            // remove other params
+            int andPosition = num.indexOf("&");
+            if (andPosition != -1) {
+                num = num.substring(0, andPosition);
+            }
+            
+            return Integer.valueOf(num.replace(".", ""));
+        } else {
+            return 0;
         }
     }
 }
