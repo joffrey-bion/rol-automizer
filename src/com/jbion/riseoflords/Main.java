@@ -26,6 +26,6 @@ public class Main {
         }
         Log.get().i(TAG, config);
         System.out.println();
-        new Sequencer(config).start();
+        new Sequence(config).start();
     }
 }

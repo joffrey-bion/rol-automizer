@@ -16,9 +16,9 @@ import com.jbion.riseoflords.util.Log;
 import com.jbion.riseoflords.util.Sleeper;
 import com.jbion.riseoflords.util.Sleeper.Speed;
 
-public class Sequencer {
+public class Sequence {
 
-    private static final String TAG = Sequencer.class.getSimpleName();
+    private static final String TAG = Sequence.class.getSimpleName();
 
     private static final Comparator<Player> richestFirst = Comparator.comparingInt(Player::getGold).reversed();
 
@@ -26,10 +26,10 @@ public class Sequencer {
     private final Sleeper fakeTime = new Sleeper(Speed.SLOW);
     private final AccountState state = new AccountState();
     private final RoLAdapter rol = new RoLAdapter(state);
-    
+
     private final Config config;
-    
-    public Sequencer(Config config) {
+
+    public Sequence(Config config) {
         this.config = config;
     }
 
@@ -37,8 +37,16 @@ public class Sequencer {
         log.i(TAG, "Starting sequence...");
         Account account = config.getAccount();
         login(account.getLogin(), account.getPassword());
-        attackRichest(config.getPlayerFilter(), config.getAttackParams());
-        fakeTime.changePageLong();
+        if (state.turns == 0) {
+            log.e(TAG, "No turns available, impossible to attack.");
+            return;
+        } else {
+            if (state.turns < config.getAttackParams().getMaxTurns()) {
+                log.w(TAG, "Warning: the turns limit exceeds the number of available turns");
+            }
+            attackRichest(config.getPlayerFilter(), config.getAttackParams());
+            fakeTime.changePageLong();
+        }
         logout();
         log.i(TAG, "End of sequence.");
     }
@@ -66,7 +74,7 @@ public class Sequencer {
     }
 
     /**
-     * Logs out. 
+     * Logs out.
      */
     private void logout() {
         log.d(TAG, "Logging out...");
@@ -76,10 +84,6 @@ public class Sequencer {
         } else {
             log.e(TAG, "Logout failure");
         }
-    }
-    
-    private static int max(AttackParams params, AccountState state) {
-        return Math.max(params.getMaxTurns(), state.turns);
     }
 
     /**
@@ -204,7 +208,8 @@ public class Sequencer {
         int goldStolen = rol.attack(player.getName());
         log.deindent(1);
         if (goldStolen > 0) {
-            log.i(TAG, "Victory! ", goldStolen, " gold stolen from player ", player.getName(), ", current gold: ", state.gold);
+            log.i(TAG, "Victory! ", goldStolen, " gold stolen from player ", player.getName(), ", current gold: ",
+                    state.gold);
         } else {
             log.w(TAG, "Defeat! Player ", player.getName(), " was too sronk! Current gold: ", state.gold);
         }
