@@ -77,6 +77,10 @@ public class Sequencer {
             log.e(TAG, "Logout failure");
         }
     }
+    
+    private static int max(AttackParams params, AccountState state) {
+        return Math.max(params.getMaxTurns(), state.turns);
+    }
 
     /**
      * Attacks the richest players matching the filter.
@@ -100,6 +104,7 @@ public class Sequencer {
                     .filter(p -> p.getRank() <= filter.getMaxRank()) // below max rank
                     .sorted(richestFirst) // richest first
                     .limit(params.getMaxTurns()) // limit to max turns
+                    .limit(state.turns) // limit to available turns
                     .collect(Collectors.toList());
             log.i(TAG, filteredPage.size(), " matching player(s) ranked ", startRank, " to ", startRank + 98);
             players.addAll(filteredPage);
@@ -113,6 +118,7 @@ public class Sequencer {
             List<Player> playersToAttack = players.stream() // stream players
                     .sorted(richestFirst) // richest first
                     .limit(params.getMaxTurns()) // limit to max turns
+                    .limit(state.turns) // limit to available turns
                     .collect(Collectors.toList());
             return attackAll(playersToAttack, params);
         } else {
@@ -169,6 +175,7 @@ public class Sequencer {
             fakeTime.pauseWhenSafe();
         }
         log.i(TAG, totalGoldStolen, " total gold stolen from ", nbAttackedPlayers, " players");
+        log.i(TAG, "The chest now contains ", state.chestGold, " gold.");
         return totalGoldStolen;
     }
 
@@ -197,9 +204,9 @@ public class Sequencer {
         int goldStolen = rol.attack(player.getName());
         log.deindent(1);
         if (goldStolen > 0) {
-            log.i(TAG, "Victory! ", goldStolen, " gold stolen from player ", player.getName());
+            log.i(TAG, "Victory! ", goldStolen, " gold stolen from player ", player.getName(), ", current gold: ", state.gold);
         } else {
-            log.w(TAG, "Defeat! Player ", player.getName(), " was too sronk!");
+            log.w(TAG, "Defeat! Player ", player.getName(), " was too sronk! Current gold: ", state.gold);
         }
         return goldStolen;
     }
@@ -222,7 +229,7 @@ public class Sequencer {
             log.v(TAG, "Something went wrong!");
         }
         log.deindent(2);
-        log.i(TAG, amount, " gold stored in chest");
+        log.i(TAG, amount, " gold stored in chest, total: " + state.chestGold);
         return amount;
     }
 
