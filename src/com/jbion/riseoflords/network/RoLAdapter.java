@@ -85,7 +85,7 @@ public class RoLAdapter {
         String response = http.execute(builder.get());
         if (response.contains("Recherche pseudo:")) {
             Parser.updateState(state, response);
-            return Parser.parseUserList(response);
+            return Parser.parsePlayerList(response);
         } else {
             return new ArrayList<>();
         }
