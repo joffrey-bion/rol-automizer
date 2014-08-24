@@ -80,18 +80,7 @@ public class Parser {
             player.setGold(getTextAsNumber(goldElt));
         } else {
             // gold amount is an image
-            Element goldImgElt = goldElt.child(0);
-            assert goldImgElt.tagName().equals("img");
-            String goldImgUrl = goldImgElt.attr("src");
-            assert goldImgUrl.length() > 0 : "emtpy gold image url";
-            int goldAmount = -1;
-            try {
-                BufferedImage img = ImageIO.read(new URL(BASE_URL + goldImgUrl));
-                goldAmount = GoldImageOCR.readAmount(img);
-            } catch (IOException e) {
-                System.err.println("error downloading image from url=" + goldImgUrl);
-            }
-            player.setGold(goldAmount);
+            player.setGold(getGoldFromImgElement(goldElt.child(0)));
         }
         
         // army
@@ -151,11 +140,30 @@ public class Parser {
             int andPosition = num.indexOf("&");
             if (andPosition != -1) {
                 num = num.substring(0, andPosition);
-            }
-            
+            }            
             return Integer.valueOf(num.replace(".", ""));
         } else {
             return 0;
         }
+    }
+
+    public static int parsePlayerGold(String playerPageResponse) {
+        Element body = Jsoup.parse(playerPageResponse).body();
+        Elements elts = body.getElementsByAttributeValueContaining("src", "aff_montant");
+        Element img = elts.get(0);
+        return getGoldFromImgElement(img);
+    }
+    
+    private static int getGoldFromImgElement(Element goldImageElement) {
+        assert goldImageElement.tagName().equals("img");
+        String goldImgUrl = goldImageElement.attr("src");
+        assert goldImgUrl.length() > 0 : "emtpy gold image url";
+        try {
+            BufferedImage img = ImageIO.read(new URL(BASE_URL + goldImgUrl));
+            return GoldImageOCR.readAmount(img);
+        } catch (IOException e) {
+            System.err.println("error downloading image from url=" + goldImgUrl);
+        }
+        return -1;
     }
 }

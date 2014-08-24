@@ -102,13 +102,15 @@ public class Sequence {
                     .limit(params.getMaxTurns()) // limit to max turns
                     .limit(state.turns) // limit to available turns
                     .collect(Collectors.toList());
-            log.i(TAG, filteredPage.size(), " matching player(s) ranked ", startRank, " to ", startRank + 98);
+            log.i(TAG, filteredPage.size(), " matching player(s) ranked ", startRank, " to ",
+                    Math.min(startRank + 98, filter.getMaxRank()));
             players.addAll(filteredPage);
             fakeTime.readPage();
             startRank += 99;
         }
         log.i(TAG, "");
-        if (players.size() > params.getMaxTurns()) {
+        int nbMatchingPlayers = players.size();
+        if (nbMatchingPlayers > params.getMaxTurns() || nbMatchingPlayers > state.turns) {
             log.i(TAG, "Too many players matching rank and gold criterias, filtering only the richest of them...");
             // too many players, select only the richest
             List<Player> playersToAttack = players.stream() // stream players
@@ -193,10 +195,13 @@ public class Sequence {
         log.d(TAG, "Attacking player ", player.getName(), "...");
         log.indent();
         log.v(TAG, "Displaying player page...");
-        boolean success = rol.displayPlayerPage(player.getName());
+        int playerGold = rol.displayPlayerPage(player.getName());
         log.indent();
-        if (!success) {
-            log.e(TAG, "Something's wrong...");
+        if (playerGold == -1) {
+            log.e(TAG, "Something's wrong: request failed");
+            return -1;
+        } else if (playerGold != player.getGold()) {
+            log.w(TAG, "Something's wrong: the player does not have the expected gold");
             return -1;
         }
         log.deindent(1);
@@ -209,8 +214,10 @@ public class Sequence {
         if (goldStolen > 0) {
             log.i(TAG, "Victory! ", goldStolen, " gold stolen from player ", player.getName(), ", current gold: ",
                     state.gold);
+        } else if (goldStolen == -1) {
+            log.e(TAG, "Attack request failed!");
         } else {
-            log.w(TAG, "Defeat! Player ", player.getName(), " was too sronk! Current gold: ", state.gold);
+            log.w(TAG, "Defeat! Ach, player ", player.getName(), " was too sronk! Current gold: ", state.gold);
         }
         return goldStolen;
     }
