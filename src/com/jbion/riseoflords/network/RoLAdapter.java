@@ -30,13 +30,17 @@ public class RoLAdapter {
     private final RequestSender http;
     private final AccountState state;
 
-    public RoLAdapter(AccountState state) {
-        this.state = state;
+    public RoLAdapter() {
+        this.state = new AccountState();
         http = new RequestSender();
     }
 
     private String randomCoord(int min, int max) {
         return String.valueOf(rand.nextInt(max - min + 1) + min);
+    }
+    
+    public AccountState getCurrentState() {
+        return state;
     }
 
     /**
@@ -68,13 +72,13 @@ public class RoLAdapter {
     }
 
     /**
-     * Returns the list of users starting at the specified rank.
+     * Returns a list of 99 users, starting at the specified rank.
      * 
      * @param startRank
      *            the rank of the first user to return
      * @return 99 users at most, starting at the specified rank.
      */
-    public List<Player> getPlayers(int startRank) {
+    public List<Player> listPlayers(int startRank) {
         RequestWrapper builder = new RequestWrapper(URL_GAME, PAGE_USERS_LIST);
         builder.addParameter("Debut", String.valueOf(startRank + 1));
         if (rand.nextBoolean()) {
@@ -99,7 +103,7 @@ public class RoLAdapter {
      *            the name of the player to lookup
      * @return the specified player's current gold, or -1 if the request failed
      */
-    public int displayPlayerPage(String playerName) {
+    public int displayPlayer(String playerName) {
         HttpGet request = new RequestWrapper(URL_GAME, PAGE_USER_DETAILS) //
                 .addParameter("voirpseudo", playerName) //
                 .get();

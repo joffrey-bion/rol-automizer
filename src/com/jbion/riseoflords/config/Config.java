@@ -30,6 +30,8 @@ public class Config {
     private Account account;
     private PlayerFilter filter;
     private AttackParams params;
+    private int nbOfAttacks;
+    private long timeBetweenAttacks;
 
     public static Config load(String filename) throws IOException, BadConfigException {
         Properties prop = new Properties();
@@ -53,6 +55,9 @@ public class Config {
         int storingFrequency = getIntProperty(prop, "attack.storingFrequency", 2);
         int repairFrequency = getIntProperty(prop, "attack.repairFrequency", 5);
         config.params = new AttackParams(maxTurns, repairFrequency, storingFrequency);
+        
+        config.timeBetweenAttacks = getIntProperty(prop, "sequence.hoursBetweenAttacks", 1) * 3600 * 1000;
+        config.nbOfAttacks = getIntProperty(prop, "sequence.nbOfAttacks", 1);
         
         return config;
     }
@@ -91,6 +96,14 @@ public class Config {
 
     public AttackParams getAttackParams() {
         return params;
+    }
+
+    public int getNbOfAttacks() {
+        return nbOfAttacks;
+    }
+
+    public long getTimeBetweenAttacks() {
+        return timeBetweenAttacks;
     }
 
     @Override

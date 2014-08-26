@@ -78,6 +78,12 @@ public class Log {
             System.out.println(msg);
         }
     }
+    
+    public void title(String tag, String message) {
+        System.out.println();
+        i(tag, "*** ", message, " ***");
+        System.out.println();
+    }
 
     public void v(String tag, Object... message) {
         log(Level.VERBOSE, tag, message);
