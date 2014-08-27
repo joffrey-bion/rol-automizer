@@ -10,7 +10,7 @@ public class Main {
 
     private static final String TAG = Main.class.getSimpleName();
 
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private static final String PROP_FILE = DEBUG ? "/internal-bot.properties" : "/bot.properties";
 
     private static final long ONE_SECOND_IN_MILLIS = 1000;
@@ -35,10 +35,6 @@ public class Main {
         for (int i = 0; i < config.getNbOfAttacks(); i++) {
             Log.get().title(TAG, String.format("ATTACK SESSION %d/%d", i + 1, config.getNbOfAttacks()));
             sequence.start();
-            if (sequence.getCurrentState().turns == 0) {
-                Log.get().w(TAG, "No more turns to spend, next attacks aborted.");
-                return;
-            }
             if (i + 1 < config.getNbOfAttacks()) {
                 // more attacks are waiting
                 System.out.println();

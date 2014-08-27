@@ -109,7 +109,7 @@ public class Sequence {
                     .limit(rol.getCurrentState().turns) // limit to available turns
                     .collect(Collectors.toList());
             log.i(TAG,
-                    String.format("% 2d matching player(s) ranked %d to %d", filteredPage.size(), startRank,
+                    String.format("%2d matching player(s) ranked %d to %d", filteredPage.size(), startRank,
                             Math.min(startRank + 98, filter.getMaxRank())));
             players.addAll(filteredPage);
             fakeTime.readPage();
