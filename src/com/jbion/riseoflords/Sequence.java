@@ -205,7 +205,7 @@ public class Sequence {
         log.v(TAG, "Displaying player page...");
         int playerGold = rol.displayPlayer(player.getName());
         log.indent();
-        if (playerGold == -1) {
+        if (playerGold == RoLAdapter.ERROR_REQUEST) {
             log.e(TAG, "Something's wrong: request failed");
             log.deindent(2);
             return -1;
@@ -224,8 +224,10 @@ public class Sequence {
         if (goldStolen > 0) {
             log.i(TAG, "Victory! ", goldStolen, " gold stolen from player ", player.getName(), ", current gold: ",
                     rol.getCurrentState().gold);
-        } else if (goldStolen == -1) {
-            log.e(TAG, "Attack request failed!");
+        } else if (goldStolen == RoLAdapter.ERROR_STORM_ACTIVE) {
+            log.e(TAG, "Cannot attack: a storm is raging upon your kingdom!");
+        } else if (goldStolen == RoLAdapter.ERROR_REQUEST) {
+            log.e(TAG, "Attack request failed, something went wrong");
         } else {
             log.w(TAG, "Defeat! Ach, player ", player.getName(), " was too sronk! Current gold: ",
                     rol.getCurrentState().gold);

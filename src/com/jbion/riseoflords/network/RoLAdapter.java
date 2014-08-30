@@ -25,6 +25,9 @@ public class RoLAdapter {
     private static final String PAGE_CHEST = "main/tresor";
     private static final String PAGE_WEAPONS = "main/arsenal";
     private static final String PAGE_SORCERY = "main/autel_sorciers";
+    
+    public static final int ERROR_REQUEST = -1;    
+    public static final int ERROR_STORM_ACTIVE = -2;
 
     private final Random rand = new Random();
     private final RequestSender http;
@@ -101,7 +104,7 @@ public class RoLAdapter {
      * 
      * @param playerName
      *            the name of the player to lookup
-     * @return the specified player's current gold, or -1 if the request failed
+     * @return the specified player's current gold, or {@link #ERROR_REQUEST} if the request failed
      */
     public int displayPlayer(String playerName) {
         HttpGet request = new RequestWrapper(URL_GAME, PAGE_USER_DETAILS) //
@@ -112,7 +115,7 @@ public class RoLAdapter {
             Parser.updateState(state, response);
             return Parser.parsePlayerGold(response);
         } else {
-            return -1;
+            return ERROR_REQUEST;
         }
     }
 
@@ -121,7 +124,7 @@ public class RoLAdapter {
      * 
      * @param username
      *            the name of the user to attack
-     * @return the gold stolen during the attack, or -1 if the request failed
+     * @return the gold stolen during the attack, or {@link #ERROR_REQUEST} if the request failed
      */
     public int attack(String username) {
         HttpPost request = new RequestWrapper(URL_GAME, PAGE_ATTACK) //
@@ -133,8 +136,11 @@ public class RoLAdapter {
         if (response.contains("remporte le combat!") || response.contains("perd cette bataille!")) {
             Parser.updateState(state, response);
             return Parser.parseGoldStolen(response);
+        } else if (response.contains("tempête magique s'abat")) {
+            Parser.updateState(state, response);
+            return ERROR_STORM_ACTIVE;
         } else {
-            return -1;
+            return ERROR_REQUEST;
         }
     }
 
@@ -143,7 +149,7 @@ public class RoLAdapter {
      * the chest.
      * 
      * @return the amount of money that could be stored in the chest, which is the current amount of
-     *         gold of the player, or -1 if the request failed
+     *         gold of the player, or {@link #ERROR_REQUEST} if the request failed
      */
     public int displayChestPage() {
         HttpGet request = new RequestWrapper(URL_GAME, PAGE_CHEST).get();
@@ -152,7 +158,7 @@ public class RoLAdapter {
             Parser.updateState(state, response);
             return state.gold;
         } else {
-            return -1;
+            return ERROR_REQUEST;
         }
     }
 
@@ -179,7 +185,7 @@ public class RoLAdapter {
      * Displays the weapons page. Used to fake a visit on the weapons page before repairing or
      * buying weapons and equipment.
      * 
-     * @return the percentage of wornness of the weapons, or -1 if the request failed
+     * @return the percentage of wornness of the weapons, or {@link #ERROR_REQUEST} if the request failed
      */
     public int displayWeaponsPage() {
         HttpGet request = new RequestWrapper(URL_GAME, PAGE_WEAPONS).get();
@@ -187,7 +193,7 @@ public class RoLAdapter {
         if (response.contains("Faites votre choix")) {
             return Parser.parseWeaponsWornness(response);
         } else {
-            return -1;
+            return ERROR_REQUEST;
         }
     }
 
@@ -212,7 +218,7 @@ public class RoLAdapter {
     /**
      * Displays the sorcery page. Used to fake a visit on the sorcery page before casting a spell.
      * 
-     * @return the available mana, or -1 if the request failed
+     * @return the available mana, or {@link #ERROR_REQUEST} if the request failed
      */
     public int displaySorceryPage() {
         HttpUriRequest request = new RequestWrapper(URL_GAME, PAGE_SORCERY).get();
@@ -220,7 +226,7 @@ public class RoLAdapter {
         if (response.contains("Niveau de vos sorciers")) {
             return state.mana;
         } else {
-            return -1;
+            return ERROR_REQUEST;
         }
     }
 
