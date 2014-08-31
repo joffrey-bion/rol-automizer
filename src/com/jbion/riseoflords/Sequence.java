@@ -97,7 +97,7 @@ public class Sequence {
                 " richer than ", filter.getGoldThreshold(), " gold (", params.getMaxTurns(), " attacks max)");
         log.i(TAG, "Searching players matching the config filter...");
         log.indent();
-        List<Player> players = new ArrayList<>();
+        List<Player> matchingPlayers = new ArrayList<>();
         int startRank = filter.getMinRank();
         while (startRank < filter.getMaxRank()) {
             log.d(TAG, "Reading page of players ranked ", startRank, " to ", startRank + 98, "...");
@@ -111,24 +111,25 @@ public class Sequence {
             log.i(TAG,
                     String.format("%2d matching player(s) ranked %d to %d", filteredPage.size(), startRank,
                             Math.min(startRank + 98, filter.getMaxRank())));
-            players.addAll(filteredPage);
+            matchingPlayers.addAll(filteredPage);
             fakeTime.readPage();
             startRank += 99;
         }
         log.deindent(1);
         log.i(TAG, "");
-        int nbMatchingPlayers = players.size();
+        int nbMatchingPlayers = matchingPlayers.size();
         if (nbMatchingPlayers > params.getMaxTurns() || nbMatchingPlayers > rol.getCurrentState().turns) {
-            log.i(TAG, "Too many players matching rank and gold criterias, filtering only the richest of them...");
+            log.i(TAG, matchingPlayers.size(),
+                    " players matching rank and gold criterias, filtering only the richest of them...");
             // too many players, select only the richest
-            List<Player> playersToAttack = players.stream() // stream players
+            List<Player> playersToAttack = matchingPlayers.stream() // stream players
                     .sorted(richestFirst) // richest first
                     .limit(params.getMaxTurns()) // limit to max turns
                     .limit(rol.getCurrentState().turns) // limit to available turns
                     .collect(Collectors.toList());
             return attackAll(playersToAttack, params);
         } else {
-            return attackAll(players, params);
+            return attackAll(matchingPlayers, params);
         }
     }
 
@@ -144,7 +145,7 @@ public class Sequence {
      * @return the total gold stolen
      */
     private int attackAll(List<Player> playersToAttack, AttackParams params) {
-        log.i(TAG, playersToAttack.size(), " players matching rank and gold criterias");
+        log.i(TAG, playersToAttack.size(), " players to attack");
         if (rol.getCurrentState().turns == 0) {
             log.e(TAG, "No turns available, impossible to attack.");
             return 0;
@@ -153,8 +154,10 @@ public class Sequence {
             return 0;
         }
         int totalGoldStolen = 0;
+        int nbConsideredPlayers = 0;
         int nbAttackedPlayers = 0;
         for (Player player : playersToAttack) {
+            nbConsideredPlayers++;
             // attack player
             int goldStolen = attack(player);
             if (goldStolen < 0) {
@@ -163,29 +166,20 @@ public class Sequence {
             }
             totalGoldStolen += goldStolen;
             nbAttackedPlayers++;
+            boolean isLastPlayer = nbConsideredPlayers == playersToAttack.size();
             // repair weapons as specified
-            if (nbAttackedPlayers % params.getRepairFrequency() == 0) {
+            if (nbAttackedPlayers % params.getRepairFrequency() == 0 || isLastPlayer) {
                 fakeTime.changePage();
                 repairWeapons();
             }
             // store gold as specified
-            if (nbAttackedPlayers % params.getStoringFrequency() == 0) {
+            if (nbAttackedPlayers % params.getStoringFrequency() == 0 || isLastPlayer) {
                 fakeTime.changePage();
                 storeGoldIntoChest();
                 fakeTime.pauseWhenSafe();
             } else {
                 fakeTime.changePageLong();
             }
-        }
-        // repair weapons for last players attacked
-        if (nbAttackedPlayers % params.getRepairFrequency() != 0) {
-            fakeTime.changePage();
-            repairWeapons();
-        }
-        // store remaining gold
-        if (nbAttackedPlayers % params.getStoringFrequency() != 0) {
-            storeGoldIntoChest();
-            fakeTime.pauseWhenSafe();
         }
         log.i(TAG, totalGoldStolen, " total gold stolen from ", nbAttackedPlayers, " players");
         log.i(TAG, "The chest now contains ", rol.getCurrentState().chestGold, " gold.");
