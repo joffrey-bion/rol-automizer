@@ -23,7 +23,7 @@ public class Sequence {
     private static final Comparator<Player> richestFirst = Comparator.comparingInt(Player::getGold).reversed();
 
     private final Log log = Log.get();
-    private final Sleeper fakeTime = new Sleeper(Speed.SLOW);
+    private final Sleeper fakeTime = new Sleeper(Speed.NORMAL);
 
     private final RoLAdapter rol;
 
