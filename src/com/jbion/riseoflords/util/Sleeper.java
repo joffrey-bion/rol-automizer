@@ -7,6 +7,7 @@ public class Sleeper {
     private static final String TAG = Sleeper.class.getSimpleName();
     
     public static enum Speed {
+        FAST(700),
         NORMAL(1000),
         SLOW(1500),
         REALLY_SLOW(2000);
@@ -30,9 +31,9 @@ public class Sleeper {
         this.speed = speed;
     }
     
-    private void sleep(int millis) {
+    private void sleep(int millis, boolean scaleDuration) {
         try {
-            int affectedMillis = speed.affect(millis);
+            int affectedMillis = scaleDuration ? speed.affect(millis) : millis;
             log.d(TAG, "    ...  ", affectedMillis, " ms  ...");
             Thread.sleep(affectedMillis);
         } catch (InterruptedException e) {
@@ -40,9 +41,13 @@ public class Sleeper {
         }
     }
 
-    private void sleep(int minMillis, int maxMillis) {
+    private void sleep(int minMillis, int maxMillis, boolean scaleDuration) {
         int duration = rand.nextInt(maxMillis - minMillis + 1) + minMillis;
-        sleep(duration);
+        sleep(duration, scaleDuration);
+    }
+
+    private void sleep(int minMillis, int maxMillis) {
+        sleep(minMillis, maxMillis, true);
     }
     
     public void actionInPage() {
@@ -66,6 +71,6 @@ public class Sleeper {
     }
     
     public void waitAfterLogin() {
-        sleep(6000, 7000);
+        sleep(6000, 7000, false);
     }
 }
