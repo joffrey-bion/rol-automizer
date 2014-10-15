@@ -7,6 +7,7 @@ public class Sleeper {
     private static final String TAG = Sleeper.class.getSimpleName();
     
     public static enum Speed {
+        INHUMAN(500),
         FAST(700),
         NORMAL(1000),
         SLOW(1500),
@@ -59,15 +60,15 @@ public class Sleeper {
     }
     
     public void changePageLong() {
-        sleep(1500, 2000);
+        sleep(1000, 2000);
     }
     
     public void readPage() {
-        sleep(1500, 3000);
+        sleep(1200, 2500);
     }
     
     public void pauseWhenSafe() {
-        sleep(2000, 4000);
+        sleep(2000, 3000);
     }
     
     public void waitAfterLogin() {
