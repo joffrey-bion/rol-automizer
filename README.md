@@ -8,6 +8,7 @@ Get started in 3 minutes:
 -----------
 1. Download the [JAR of the sequencer here](https://github.com/joffrey-bion/RiseOfLords/blob/master/dist/RiseOfLords.jar?raw=true)
 2. Create a `bot.properties` file, similar to the following one ([download here](https://raw.githubusercontent.com/joffrey-bion/RiseOfLords/master/dist/bot.properties)), customize the settings and put it next to the JAR archive:
+
         # credentials for connection
         account.login=myLogin
         account.password=myPassword
@@ -29,7 +30,9 @@ Get started in 3 minutes:
         sequence.hoursBetweenAttacks=1
         # number of attack sessions to perform
         sequence.nbOfAttacks=5
+
 3. Finally, for convenience, use [this tiny script](https://raw.githubusercontent.com/joffrey-bion/RiseOfLords/master/dist/launcher.cmd) to launch the program on Windows, or launch the JAR directly from the command line yourself:
+
        java -jar RiseOfLords.jar
 4. Enjoy the gold
 
