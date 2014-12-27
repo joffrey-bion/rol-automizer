@@ -57,7 +57,7 @@ public class RoLAdapter {
      * @return true for successful login, false otherwise
      */
     public boolean login(String username, String password) {
-        HttpPost postRequest = new RequestWrapper(URL_INDEX, PAGE_LOGIN) //
+        HttpPost postRequest = Request.from(URL_INDEX, PAGE_LOGIN) //
                 .addPostData("LogPseudo", username) //
                 .addPostData("LogPassword", password) //
                 .post();
@@ -70,7 +70,7 @@ public class RoLAdapter {
      * @return true if the request succeeded, false otherwise
      */
     public boolean logout() {
-        HttpGet getRequest = new RequestWrapper(URL_INDEX, PAGE_LOGOUT).get();
+        HttpGet getRequest = Request.from(URL_INDEX, PAGE_LOGOUT).get();
         return http.execute(getRequest, r -> r.contains("Déjà inscrit? Connectez-vous"));
     }
 
@@ -82,7 +82,7 @@ public class RoLAdapter {
      * @return 99 users at most, starting at the specified rank.
      */
     public List<Player> listPlayers(int startRank) {
-        RequestWrapper builder = new RequestWrapper(URL_GAME, PAGE_USERS_LIST);
+        Request builder = Request.from(URL_GAME, PAGE_USERS_LIST);
         builder.addParameter("Debut", String.valueOf(startRank + 1));
         if (rand.nextBoolean()) {
             builder.addParameter("x", randomCoord(5, 35));
@@ -107,7 +107,7 @@ public class RoLAdapter {
      * @return the specified player's current gold, or {@link #ERROR_REQUEST} if the request failed
      */
     public int displayPlayer(String playerName) {
-        HttpGet request = new RequestWrapper(URL_GAME, PAGE_USER_DETAILS) //
+        HttpGet request = Request.from(URL_GAME, PAGE_USER_DETAILS) //
                 .addParameter("voirpseudo", playerName) //
                 .get();
         String response = http.execute(request);
@@ -127,7 +127,7 @@ public class RoLAdapter {
      * @return the gold stolen during the attack, or {@link #ERROR_REQUEST} if the request failed
      */
     public int attack(String username) {
-        HttpPost request = new RequestWrapper(URL_GAME, PAGE_ATTACK) //
+        HttpPost request = Request.from(URL_GAME, PAGE_ATTACK) //
                 .addParameter("a", "ok") //
                 .addPostData("PseudoDefenseur", username) //
                 .addPostData("NbToursToUse", "1") //
@@ -152,7 +152,7 @@ public class RoLAdapter {
      *         gold of the player, or {@link #ERROR_REQUEST} if the request failed
      */
     public int displayChestPage() {
-        HttpGet request = new RequestWrapper(URL_GAME, PAGE_CHEST).get();
+        HttpGet request = Request.from(URL_GAME, PAGE_CHEST).get();
         String response = http.execute(request);
         if (response.contains("ArgentAPlacer")) {
             Parser.updateState(state, response);
@@ -171,7 +171,7 @@ public class RoLAdapter {
      * @return true if the request succeeded, false otherwise
      */
     public boolean storeInChest(int amount) {
-        HttpPost request = new RequestWrapper(URL_GAME, PAGE_CHEST) //
+        HttpPost request = Request.from(URL_GAME, PAGE_CHEST) //
                 .addPostData("ArgentAPlacer", String.valueOf(amount)) //
                 .addPostData("x", randomCoord(10, 60)) //
                 .addPostData("y", randomCoord(10, 60)) //
@@ -188,7 +188,7 @@ public class RoLAdapter {
      * @return the percentage of wornness of the weapons, or {@link #ERROR_REQUEST} if the request failed
      */
     public int displayWeaponsPage() {
-        HttpGet request = new RequestWrapper(URL_GAME, PAGE_WEAPONS).get();
+        HttpGet request = Request.from(URL_GAME, PAGE_WEAPONS).get();
         String response = http.execute(request);
         if (response.contains("Faites votre choix")) {
             return Parser.parseWeaponsWornness(response);
@@ -203,7 +203,7 @@ public class RoLAdapter {
      * @return true if the repair succeeded, false otherwise
      */
     public boolean repairWeapons() {
-        HttpGet request = new RequestWrapper(URL_GAME, PAGE_WEAPONS) //
+        HttpGet request = Request.from(URL_GAME, PAGE_WEAPONS) //
                 .addParameter("a", "repair") //
                 .addParameter("onglet", "") //
                 .get();
@@ -221,7 +221,7 @@ public class RoLAdapter {
      * @return the available mana, or {@link #ERROR_REQUEST} if the request failed
      */
     public int displaySorceryPage() {
-        HttpUriRequest request = new RequestWrapper(URL_GAME, PAGE_SORCERY).get();
+        HttpUriRequest request = Request.from(URL_GAME, PAGE_SORCERY).get();
         String response = http.execute(request);
         if (response.contains("Niveau de vos sorciers")) {
             return state.mana;
@@ -237,7 +237,7 @@ public class RoLAdapter {
      * @return true if the request succeeded, false otherwise
      */
     public boolean dissipateProtectiveAura() {
-        HttpGet request = new RequestWrapper(URL_GAME, PAGE_SORCERY) //
+        HttpGet request = Request.from(URL_GAME, PAGE_SORCERY) //
                 .addParameter("a", "lancer") //
                 .addParameter("idsort", "14") //
                 .get();
@@ -254,7 +254,7 @@ public class RoLAdapter {
      * @return true if the request succeeded, false otherwise
      */
     public boolean castMagicStorm(String playerName) {
-        HttpPost request = new RequestWrapper(URL_GAME, PAGE_SORCERY) //
+        HttpPost request = Request.from(URL_GAME, PAGE_SORCERY) //
                 .addParameter("a", "lancer") //
                 .addParameter("idsort", "5") //
                 .addPostData("tempete_pseudo_cible", playerName) //

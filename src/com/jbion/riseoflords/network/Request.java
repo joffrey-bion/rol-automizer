@@ -16,28 +16,34 @@ import org.apache.http.message.BasicNameValuePair;
  * A wrapper class for basic HTTP request creation. Several parameters can be added, then the
  * request can be built using {@link #get()} or {@link #post()}.
  */
-class RequestWrapper {
+class Request {
 
-    private final URIBuilder uriBuilder;
+    private URIBuilder uriBuilder;
 
     private boolean built = false;
     private List<NameValuePair> postData = null;
 
+    private Request() {
+    }
+
     /**
-     * Creates a new {@link RequestWrapper} initialized on the specified URL, with a preset page
+     * Creates a new {@link Request} initialized on the specified URL, with a preset page
      * parameter.
      * 
      * @param baseUrl
      *            the base URL to use
      * @param page
      *            the "p" parameter value, containing the page to request
+     * @return the created request
      */
-    public RequestWrapper(String baseUrl, String page) {
+    public static Request from(String baseUrl, String page) {
+        Request req = new Request();
         try {
-            uriBuilder = new URIBuilder(baseUrl).addParameter("p", page);
+            req.uriBuilder = new URIBuilder(baseUrl).addParameter("p", page);
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("incorrect URL");
         }
+        return req;
     }
 
     /**
@@ -47,9 +53,9 @@ class RequestWrapper {
      *            the parameter's key
      * @param value
      *            the parameter's value
-     * @return this {@link RequestWrapper}
+     * @return this {@link Request}
      */
-    public RequestWrapper addParameter(String key, String value) {
+    public Request addParameter(String key, String value) {
         if (built) {
             throw new IllegalStateException("request already built, can't add parameters");
         }
@@ -59,13 +65,13 @@ class RequestWrapper {
 
     /**
      * Adds the specified parameter to the request body. This forbids later use of {@link #get()} on
-     * this {@link RequestWrapper}, as this method should only be used for {@link #post()} requests.
+     * this {@link Request}, as this method should only be used for {@link #post()} requests.
      * 
      * @param key the key of the parameter to add
      * @param value the value of the parameter to add
-     * @return this {@link RequestWrapper}
+     * @return this {@link Request}
      */
-    public RequestWrapper addPostData(String key, String value) {
+    public Request addPostData(String key, String value) {
         if (built) {
             throw new IllegalStateException("request already built, can't add post data");
         }
