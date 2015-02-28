@@ -25,8 +25,8 @@ public class RoLAdapter {
     private static final String PAGE_CHEST = "main/tresor";
     private static final String PAGE_WEAPONS = "main/arsenal";
     private static final String PAGE_SORCERY = "main/autel_sorciers";
-    
-    public static final int ERROR_REQUEST = -1;    
+
+    public static final int ERROR_REQUEST = -1;
     public static final int ERROR_STORM_ACTIVE = -2;
 
     private final Random rand = new Random();
@@ -41,7 +41,7 @@ public class RoLAdapter {
     private String randomCoord(int min, int max) {
         return String.valueOf(rand.nextInt(max - min + 1) + min);
     }
-    
+
     public AccountState getCurrentState() {
         return state;
     }
@@ -49,7 +49,7 @@ public class RoLAdapter {
     /**
      * Performs the login request with the specified credentials. One needs to wait at least 5-6
      * seconds to fake real login.
-     * 
+     *
      * @param username
      *            the username to use
      * @param password
@@ -66,7 +66,7 @@ public class RoLAdapter {
 
     /**
      * Logs the current user out.
-     * 
+     *
      * @return true if the request succeeded, false otherwise
      */
     public boolean logout() {
@@ -76,7 +76,7 @@ public class RoLAdapter {
 
     /**
      * Returns a list of 99 users, starting at the specified rank.
-     * 
+     *
      * @param startRank
      *            the rank of the first user to return
      * @return 99 users at most, starting at the specified rank.
@@ -101,7 +101,7 @@ public class RoLAdapter {
     /**
      * Displays the specified player's detail page. Used to fake a visit on the user detail page
      * before an attack. The result does not matter.
-     * 
+     *
      * @param playerName
      *            the name of the player to lookup
      * @return the specified player's current gold, or {@link #ERROR_REQUEST} if the request failed
@@ -121,7 +121,7 @@ public class RoLAdapter {
 
     /**
      * Attacks the specified user with one game turn.
-     * 
+     *
      * @param username
      *            the name of the user to attack
      * @return the gold stolen during the attack, or {@link #ERROR_REQUEST} if the request failed
@@ -147,7 +147,7 @@ public class RoLAdapter {
     /**
      * Gets the chest page from the server, and returns the amount of money that could be stored in
      * the chest.
-     * 
+     *
      * @return the amount of money that could be stored in the chest, which is the current amount of
      *         gold of the player, or {@link #ERROR_REQUEST} if the request failed
      */
@@ -165,7 +165,7 @@ public class RoLAdapter {
     /**
      * Stores the specified amount of gold into the chest. The amount has to match the current gold
      * of the user, which should first be retrieved by calling {@link #displayChestPage()}.
-     * 
+     *
      * @param amount
      *            the amount of gold to store into the chest
      * @return true if the request succeeded, false otherwise
@@ -184,8 +184,9 @@ public class RoLAdapter {
     /**
      * Displays the weapons page. Used to fake a visit on the weapons page before repairing or
      * buying weapons and equipment.
-     * 
-     * @return the percentage of wornness of the weapons, or {@link #ERROR_REQUEST} if the request failed
+     *
+     * @return the percentage of wornness of the weapons, or {@link #ERROR_REQUEST} if the request
+     *         failed
      */
     public int displayWeaponsPage() {
         HttpGet request = Request.from(URL_GAME, PAGE_WEAPONS).get();
@@ -199,7 +200,7 @@ public class RoLAdapter {
 
     /**
      * Repairs weapons.
-     * 
+     *
      * @return true if the repair succeeded, false otherwise
      */
     public boolean repairWeapons() {
@@ -217,7 +218,7 @@ public class RoLAdapter {
 
     /**
      * Displays the sorcery page. Used to fake a visit on the sorcery page before casting a spell.
-     * 
+     *
      * @return the available mana, or {@link #ERROR_REQUEST} if the request failed
      */
     public int displaySorceryPage() {
@@ -233,7 +234,7 @@ public class RoLAdapter {
     /**
      * Casts the dissipation spell to get rid of the protective aura. Useful before self-casting a
      * storm.
-     * 
+     *
      * @return true if the request succeeded, false otherwise
      */
     public boolean dissipateProtectiveAura() {
@@ -248,7 +249,7 @@ public class RoLAdapter {
 
     /**
      * Casts a magic storm on the specified player.
-     * 
+     *
      * @param playerName
      *            the amount of gold to store into the chest
      * @return true if the request succeeded, false otherwise
