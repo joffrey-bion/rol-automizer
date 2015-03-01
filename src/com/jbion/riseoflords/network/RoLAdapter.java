@@ -19,6 +19,7 @@ public class RoLAdapter {
 
     private static final String PAGE_LOGIN = "verifpass";
     private static final String PAGE_LOGOUT = "logout";
+    private static final String PAGE_HOME = "main/carte_village";
     private static final String PAGE_USERS_LIST = "main/conseil_de_guerre";
     private static final String PAGE_USER_DETAILS = "main/fiche";
     private static final String PAGE_ATTACK = "main/combats";
@@ -72,6 +73,17 @@ public class RoLAdapter {
     public boolean logout() {
         HttpGet getRequest = Request.from(URL_INDEX, PAGE_LOGOUT).get();
         return http.execute(getRequest, r -> r.contains("Déjà inscrit? Connectez-vous"));
+    }
+
+    /**
+     * Displays the village page, and updates the state.
+     */
+    public void homePage() {
+        HttpGet getRequest = Request.from(URL_GAME, PAGE_HOME).get();
+        String response = http.execute(getRequest);
+        if (response.contains("images/layout2012/carte")) {
+            Parser.updateState(state, response);
+        }
     }
 
     /**

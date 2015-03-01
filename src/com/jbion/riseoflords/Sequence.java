@@ -12,6 +12,7 @@ import com.jbion.riseoflords.config.PlayerFilter;
 import com.jbion.riseoflords.model.AccountState;
 import com.jbion.riseoflords.model.Player;
 import com.jbion.riseoflords.network.RoLAdapter;
+import com.jbion.riseoflords.util.Format;
 import com.jbion.riseoflords.util.Log;
 import com.jbion.riseoflords.util.Sleeper;
 import com.jbion.riseoflords.util.Sleeper.Speed;
@@ -50,7 +51,7 @@ public class Sequence {
 
     /**
      * Logs in with the specified credentials, and wait for standard time.
-     * 
+     *
      * @param username
      *            the login to connect with
      * @param password
@@ -68,6 +69,8 @@ public class Sequence {
             throw new RuntimeException("Login failure.");
         }
         fakeTime.waitAfterLogin();
+        rol.homePage();
+        fakeTime.actionInPage();
     }
 
     /**
@@ -85,7 +88,7 @@ public class Sequence {
 
     /**
      * Attacks the richest players matching the filter.
-     * 
+     *
      * @param filter
      *            the {@link PlayerFilter} to use to choose players
      * @param params
@@ -93,8 +96,9 @@ public class Sequence {
      * @return the total gold stolen
      */
     private int attackRichest(PlayerFilter filter, AttackParams params) {
+        int maxTurns = Math.min(rol.getCurrentState().turns, params.getMaxTurns());
         log.i(TAG, "Starting massive attack on players ranked ", filter.getMinRank(), " to ", filter.getMaxRank(),
-                " richer than ", filter.getGoldThreshold(), " gold (", params.getMaxTurns(), " attacks max)");
+                " richer than ", Format.gold(filter.getGoldThreshold()), " gold (", maxTurns, " attacks max)");
         log.i(TAG, "Searching players matching the config filter...");
         log.indent();
         List<Player> matchingPlayers = new ArrayList<>();
@@ -135,7 +139,7 @@ public class Sequence {
 
     /**
      * Attacks all the specified players, following the given parameters.
-     * 
+     *
      * @param playersToAttack
      *            the filtered list of players to attack. They must verify the thresholds specified
      *            by the given {@link PlayerFilter}.
@@ -181,14 +185,14 @@ public class Sequence {
                 fakeTime.changePageLong();
             }
         }
-        log.i(TAG, totalGoldStolen, " total gold stolen from ", nbAttackedPlayers, " players");
-        log.i(TAG, "The chest now contains ", rol.getCurrentState().chestGold, " gold.");
+        log.i(TAG, Format.gold(totalGoldStolen), " total gold stolen from ", nbAttackedPlayers, " players");
+        log.i(TAG, "The chest now contains ", Format.gold(rol.getCurrentState().chestGold), " gold.");
         return totalGoldStolen;
     }
 
     /**
      * Attacks the specified player.
-     * 
+     *
      * @param player
      *            the player to attack
      * @return the gold stolen from that player
@@ -216,8 +220,8 @@ public class Sequence {
         int goldStolen = rol.attack(player.getName());
         log.deindent(1);
         if (goldStolen > 0) {
-            log.i(TAG, "Victory! ", goldStolen, " gold stolen from player ", player.getName(), ", current gold: ",
-                    rol.getCurrentState().gold);
+            log.i(TAG, "Victory! ", Format.gold(goldStolen), " gold stolen from player ", player.getName(),
+                    ", current gold: ", Format.gold(rol.getCurrentState().gold));
         } else if (goldStolen == RoLAdapter.ERROR_STORM_ACTIVE) {
             log.e(TAG, "Cannot attack: a storm is raging upon your kingdom!");
         } else if (goldStolen == RoLAdapter.ERROR_REQUEST) {
@@ -234,7 +238,7 @@ public class Sequence {
         log.indent();
         log.v(TAG, "Displaying chest page...");
         int amount = rol.displayChestPage();
-        log.v(TAG, amount + " gold to store");
+        log.v(TAG, Format.gold(amount) + " gold to store");
 
         fakeTime.actionInPage();
 
@@ -247,7 +251,7 @@ public class Sequence {
             log.v(TAG, "Something went wrong!");
         }
         log.deindent(2);
-        log.i(TAG, amount, " gold stored in chest, total: " + rol.getCurrentState().chestGold);
+        log.i(TAG, Format.gold(amount), " gold stored in chest, total: " + Format.gold(rol.getCurrentState().chestGold));
         return amount;
     }
 
