@@ -15,6 +15,14 @@ $RECYCLE.BIN/
 *.msp
 
 # =========================
+# Eclipse Files
+# =========================
+
+/.classpath
+/.project
+/.settings
+
+# =========================
 # Operating System Files
 # =========================
 
@@ -35,3 +43,4 @@ Icon
 .Spotlight-V100
 .Trashes
 /bin/
+/build/
