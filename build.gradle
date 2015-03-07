@@ -1,0 +1,24 @@
+apply plugin: 'java'
+
+// use 'gradle eclipse' to generate eclipse project files
+apply plugin: 'eclipse'
+
+// used to generate executable jar 
+apply plugin:'application'
+
+group = 'com.jbion.bots'
+version = '1.0.0'
+sourceCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.apache.httpcomponents:httpclient:4.3.6'
+    compile 'org.jsoup:jsoup:1.7.3'
+    testCompile 'junit:junit:4.+'
+}
+
+
+mainClassName = "com.jbion.riseoflords.Main"
