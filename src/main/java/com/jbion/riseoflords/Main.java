@@ -20,12 +20,23 @@ public class Main {
     public static void main(String[] args) {
         System.out.println();
 
+        String filename = args.length > 1 ? args[1] : PROP_FILE;
+
         Config config;
         try {
-            config = Config.load(PROP_FILE);
-        } catch (IOException | BadConfigException e) {
+            config = Config.loadFromFile(filename);
+        } catch (BadConfigException e) {
             Log.get().e(TAG, "Error reading config file: ", e.getMessage());
+            System.exit(1);
             return;
+        } catch (IOException e) {
+            try {
+                config = Config.loadFromResource(filename);
+            } catch (IOException | BadConfigException e2) {
+                Log.get().e(TAG, "Error reading config file: ", e.getMessage());
+                System.exit(1);
+                return;
+            }
         }
         Log.get().title(TAG, "CONFIG");
         Log.get().i(TAG, config);

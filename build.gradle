@@ -3,12 +3,13 @@ apply plugin: 'java'
 // use 'gradle eclipse' to generate eclipse project files
 apply plugin: 'eclipse'
 
-// used to generate executable jar 
-apply plugin:'application'
+apply plugin: 'application'
+apply plugin: 'launch4j'
 
 group = 'com.jbion.bots'
 version = '1.0.0'
 sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
 
 repositories {
     mavenCentral()
@@ -20,5 +21,24 @@ dependencies {
     testCompile 'junit:junit:4.+'
 }
 
-
 mainClassName = "com.jbion.riseoflords.Main"
+
+launch4j {
+    mainClassName = "com.jbion.riseoflords.Main"
+	cmdLine = true
+    headerType = "console"
+//    jar = 'lib/' + project.name + '-' + project.version + '.jar'
+    jar = 'lib/' + project.jar.archiveName
+    chdir = '.'
+    icon = '../resources/main/rol-bot.ico'
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'edu.sc.seis.gradle:launch4j:1.0.6'
+    }
+}

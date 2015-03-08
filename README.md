@@ -16,7 +16,7 @@ Then you only have to focus on the interesting part of the game: how to spend yo
 Get started in 3 minutes
 -----------
 1. Download the [JAR of the sequencer here](https://github.com/joffrey-bion/RiseOfLords/blob/master/dist/RiseOfLords.jar?raw=true)
-2. Create a `bot.properties` file, similar to the following one ([download here](https://raw.githubusercontent.com/joffrey-bion/RiseOfLords/master/dist/bot.properties)), customize the settings and put it **next to the JAR archive**:
+2. Create a `bot.properties` file, similar to the following one ([download here](https://raw.githubusercontent.com/joffrey-bion/RiseOfLords/master/src/dist/bot.properties)), customize the settings and put it **next to the JAR archive**:
 
         # credentials for connection
         account.login=myLogin

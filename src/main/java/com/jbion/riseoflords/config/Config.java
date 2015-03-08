@@ -1,5 +1,6 @@
 package com.jbion.riseoflords.config;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,13 +34,21 @@ public class Config {
     private int nbOfAttacks;
     private long timeBetweenAttacks;
 
-    public static Config load(String filename) throws IOException, BadConfigException {
-        Properties prop = new Properties();
+    public static Config loadFromResource(String filename) throws IOException, BadConfigException {
         InputStream input = Main.class.getResourceAsStream(filename);
         if (input == null) {
-            throw new FileNotFoundException("file " + filename + " not found");
+            throw new FileNotFoundException("file " + filename + " not found as resource");
         }
-        prop.load(input);
+        return load(input);
+    }
+
+    public static Config loadFromFile(String filename) throws IOException, BadConfigException {
+        return load(new FileInputStream(filename));
+    }
+
+    public static Config load(InputStream configFile) throws IOException, BadConfigException {
+        Properties prop = new Properties();
+        prop.load(configFile);
 
         Config config = new Config();
         String login = getMandatoryProperty(prop, "account.login");
@@ -55,10 +64,10 @@ public class Config {
         int storingFrequency = getIntProperty(prop, "attack.storingFrequency", 2);
         int repairFrequency = getIntProperty(prop, "attack.repairFrequency", 5);
         config.params = new AttackParams(maxTurns, repairFrequency, storingFrequency);
-        
+
         config.timeBetweenAttacks = getIntProperty(prop, "sequence.hoursBetweenAttacks", 1) * 3600 * 1000;
         config.nbOfAttacks = getIntProperty(prop, "sequence.nbOfAttacks", 1);
-        
+
         return config;
     }
 
