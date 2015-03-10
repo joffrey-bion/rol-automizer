@@ -1,5 +1,6 @@
 package com.jbion.riseoflords;
 
+import java.io.Console;
 import java.io.IOException;
 
 import com.jbion.riseoflords.config.Config;
@@ -18,6 +19,16 @@ public class Main {
     private static final long ONE_HOUR_IN_MILLIS = 60 * ONE_MINUTE_IN_MILLIS;
 
     public static void main(String[] args) {
+        try {
+            launch(args);
+        } catch (Exception e) {
+            Log.get().e(TAG, "\nUNCAUGHT EXCEPTION: ", e.getMessage());
+            e.printStackTrace(System.err);
+        }
+        waitForEnter(null);
+    }
+
+    public static void launch(String[] args) {
         System.out.println();
 
         String filename = args.length > 1 ? args[1] : PROP_FILE;
@@ -55,6 +66,18 @@ public class Main {
             System.out.println();
         }
         Log.get().i(TAG, "End of attacks.");
+    }
+
+    public static void waitForEnter(String message, Object... args) {
+        Console c = System.console();
+        if (c != null) {
+            if (message != null) {
+                c.format(message, args);
+            } else {
+                c.format("\nPress ENTER to exit.\n");
+            }
+            c.readLine();
+        }
     }
 
     private static void sleepWithIndications(long durationInMillis) {
