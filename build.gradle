@@ -23,11 +23,19 @@ dependencies {
 
 mainClassName = "com.jbion.riseoflords.Main"
 
+jar {
+    manifest { attributes "Main-Class": mainClassName }
+    from { 
+    	configurations.compile.collect { 
+    		it.isDirectory() ? it : zipTree(it) 
+    	}
+    }
+}
+
 launch4j {
     mainClassName = "com.jbion.riseoflords.Main"
 	cmdLine = true
     headerType = "console"
-//    jar = 'lib/' + project.name + '-' + project.version + '.jar'
     jar = 'lib/' + project.jar.archiveName
     chdir = '.'
     icon = '../resources/main/rol-bot.ico'
