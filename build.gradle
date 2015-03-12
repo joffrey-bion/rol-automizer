@@ -34,7 +34,6 @@ jar {
 
 launch4j {
     mainClassName = "com.jbion.riseoflords.Main"
-	cmdLine = true
     headerType = "console"
     jar = 'lib/' + project.jar.archiveName
     chdir = '.'
