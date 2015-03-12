@@ -159,7 +159,7 @@ public class Parser {
      */
     public static int parseWeaponsWornness(String weaponsPageResponse) {
         final Element body = Jsoup.parse(weaponsPageResponse).body();
-        final Elements elts = body.getElementsByAttributeValueContaining("title", "Armes endommagées");
+        final Elements elts = body.getElementsByAttributeValueContaining("title", "Armes endommag\u00e9es");
         final Element input = elts.get(0);
         final String value = input.text().trim();
         if (value.endsWith("%")) {
