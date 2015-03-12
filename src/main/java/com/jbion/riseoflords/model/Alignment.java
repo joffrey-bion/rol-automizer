@@ -22,7 +22,7 @@ public enum Alignment {
     }
 
     public static Alignment get(String shortName) {
-        for (Alignment al : ALIGNMENTS) {
+        for (final Alignment al : ALIGNMENTS) {
             if (al.shortName.equals(shortName)) {
                 return al;
             }

@@ -5,7 +5,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -21,16 +20,13 @@ public class RequestSender {
     /**
      * A basic response handler that returns the response content as a String.
      */
-    private final ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
-        @Override
-        public String handleResponse(final HttpResponse response) throws ClientProtocolException, IOException {
-            int status = response.getStatusLine().getStatusCode();
-            if (status >= 200 && status < 300) {
-                HttpEntity entity = response.getEntity();
-                return entity != null ? EntityUtils.toString(entity) : null;
-            } else {
-                throw new ClientProtocolException("Unexpected response status: " + status);
-            }
+    private final ResponseHandler<String> responseHandler = response -> {
+        final int status = response.getStatusLine().getStatusCode();
+        if (status >= 200 && status < 300) {
+            final HttpEntity entity = response.getEntity();
+            return entity != null ? EntityUtils.toString(entity) : null;
+        } else {
+            throw new ClientProtocolException("Unexpected response status: " + status);
         }
     };
 
@@ -40,13 +36,13 @@ public class RequestSender {
      * Creates a new {@link RequestSender}.
      */
     public RequestSender() {
-        BasicCookieStore cookieStore = new BasicCookieStore();
+        final BasicCookieStore cookieStore = new BasicCookieStore();
         http = HttpClients.custom().setDefaultCookieStore(cookieStore).setUserAgent(FAKE_USER_AGENT).build();
     }
 
     /**
      * Executes the specified request and returns the response as a String.
-     * 
+     *
      * @param request
      *            the request to execute
      * @return the server's response
@@ -54,14 +50,14 @@ public class RequestSender {
     public String execute(HttpUriRequest request) {
         try {
             return http.execute(request, responseHandler);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new IllegalStateException("Exception not handled yet.", e);
         }
     }
 
     /**
      * Executes the specified request and acts depending on the success of that request.
-     * 
+     *
      * @param request
      *            the request to execute
      * @param responseSuccessful
@@ -74,7 +70,7 @@ public class RequestSender {
 
     /**
      * Executes the specified request and acts depending on the success of that request.
-     * 
+     *
      * @param request
      *            the request to execute
      * @param responseSuccessful
@@ -91,7 +87,7 @@ public class RequestSender {
 
     /**
      * Executes the specified request and acts depending on the success of that request.
-     * 
+     *
      * @param request
      *            the request to execute
      * @param responseSuccessful
@@ -107,14 +103,14 @@ public class RequestSender {
     public <T> T execute(HttpUriRequest request, Predicate<String> responseSuccessful,
             Function<String, T> successHandler, Function<String, T> failureHandler) {
         try {
-            String response = http.execute(request, responseHandler);
+            final String response = http.execute(request, responseHandler);
             if (!responseSuccessful.test(response)) {
                 System.err.println(response);
                 return failureHandler.apply(response);
             } else {
                 return successHandler.apply(response);
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new IllegalStateException("Exception not handled yet.", e);
         }
     }

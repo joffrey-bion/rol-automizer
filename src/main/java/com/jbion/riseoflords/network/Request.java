@@ -23,13 +23,11 @@ class Request {
     private boolean built = false;
     private List<NameValuePair> postData = null;
 
-    private Request() {
-    }
+    private Request() {}
 
     /**
-     * Creates a new {@link Request} initialized on the specified URL, with a preset page
-     * parameter.
-     * 
+     * Creates a new {@link Request} initialized on the specified URL, with a preset page parameter.
+     *
      * @param baseUrl
      *            the base URL to use
      * @param page
@@ -37,10 +35,10 @@ class Request {
      * @return the created request
      */
     public static Request from(String baseUrl, String page) {
-        Request req = new Request();
+        final Request req = new Request();
         try {
             req.uriBuilder = new URIBuilder(baseUrl).addParameter("p", page);
-        } catch (URISyntaxException e) {
+        } catch (final URISyntaxException e) {
             throw new IllegalArgumentException("incorrect URL");
         }
         return req;
@@ -48,7 +46,7 @@ class Request {
 
     /**
      * Adds the specified parameter to the URL's query string.
-     * 
+     *
      * @param key
      *            the parameter's key
      * @param value
@@ -66,9 +64,11 @@ class Request {
     /**
      * Adds the specified parameter to the request body. This forbids later use of {@link #get()} on
      * this {@link Request}, as this method should only be used for {@link #post()} requests.
-     * 
-     * @param key the key of the parameter to add
-     * @param value the value of the parameter to add
+     *
+     * @param key
+     *            the key of the parameter to add
+     * @param value
+     *            the value of the parameter to add
      * @return this {@link Request}
      */
     public Request addPostData(String key, String value) {
@@ -84,7 +84,7 @@ class Request {
 
     /**
      * Creates a GET request with all the previously set parameters.
-     * 
+     *
      * @return an {@link HttpGet} object representing the request
      */
     public HttpGet get() {
@@ -94,14 +94,14 @@ class Request {
         try {
             built = true;
             return new HttpGet(uriBuilder.build());
-        } catch (URISyntaxException e) {
+        } catch (final URISyntaxException e) {
             throw new IllegalStateException("incorrect URL");
         }
     }
 
     /**
      * Creates a POST request with all the previously set parameters and POST content.
-     * 
+     *
      * @return an {@link HttpPost} object representing the request
      */
     public HttpPost post() {
@@ -110,15 +110,15 @@ class Request {
         }
         try {
             built = true;
-            HttpPost postRequest = new HttpPost(uriBuilder.build());
+            final HttpPost postRequest = new HttpPost(uriBuilder.build());
             try {
-                UrlEncodedFormEntity postContent = new UrlEncodedFormEntity(postData);
+                final UrlEncodedFormEntity postContent = new UrlEncodedFormEntity(postData);
                 postRequest.setEntity(postContent);
-            } catch (UnsupportedEncodingException e) {
+            } catch (final UnsupportedEncodingException e) {
                 throw new IllegalStateException("Exception not handled yet.", e);
             }
             return postRequest;
-        } catch (URISyntaxException e) {
+        } catch (final URISyntaxException e) {
             throw new IllegalStateException("incorrect URL");
         }
     }

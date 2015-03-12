@@ -7,7 +7,7 @@ public class Format {
 
     private static final DecimalFormat fmt;
     static {
-        DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
+        final DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
         symbols.setGroupingSeparator('.');
         fmt = new DecimalFormat("###,###.##", symbols);
     }

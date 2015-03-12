@@ -35,7 +35,7 @@ public class Config {
     private long timeBetweenAttacks;
 
     public static Config loadFromResource(String filename) throws IOException, BadConfigException {
-        InputStream input = Main.class.getResourceAsStream(filename);
+        final InputStream input = Main.class.getResourceAsStream(filename);
         if (input == null) {
             throw new FileNotFoundException("file " + filename + " not found as resource");
         }
@@ -47,22 +47,22 @@ public class Config {
     }
 
     public static Config load(InputStream configFile) throws IOException, BadConfigException {
-        Properties prop = new Properties();
+        final Properties prop = new Properties();
         prop.load(configFile);
 
-        Config config = new Config();
-        String login = getMandatoryProperty(prop, "account.login");
-        String password = getMandatoryProperty(prop, "account.password");
+        final Config config = new Config();
+        final String login = getMandatoryProperty(prop, "account.login");
+        final String password = getMandatoryProperty(prop, "account.password");
         config.account = new Account(login, password);
 
-        int minRank = getIntProperty(prop, "filter.minRank", 5000);
-        int maxRank = getIntProperty(prop, "filter.maxRank", 6000);
-        int minGold = getIntProperty(prop, "filter.minGold", 450000);
+        final int minRank = getIntProperty(prop, "filter.minRank", 5000);
+        final int maxRank = getIntProperty(prop, "filter.maxRank", 6000);
+        final int minGold = getIntProperty(prop, "filter.minGold", 450000);
         config.filter = new PlayerFilter(minRank, maxRank, minGold);
 
-        int maxTurns = getIntProperty(prop, "attack.maxTurns", 20);
-        int storingFrequency = getIntProperty(prop, "attack.storingFrequency", 2);
-        int repairFrequency = getIntProperty(prop, "attack.repairFrequency", 5);
+        final int maxTurns = getIntProperty(prop, "attack.maxTurns", 20);
+        final int storingFrequency = getIntProperty(prop, "attack.storingFrequency", 2);
+        final int repairFrequency = getIntProperty(prop, "attack.repairFrequency", 5);
         config.params = new AttackParams(maxTurns, repairFrequency, storingFrequency);
 
         config.timeBetweenAttacks = getIntProperty(prop, "sequence.hoursBetweenAttacks", 1) * 3600 * 1000;
@@ -72,7 +72,7 @@ public class Config {
     }
 
     private static String getMandatoryProperty(Properties prop, String key) throws BadConfigException {
-        String strValue = prop.getProperty(key);
+        final String strValue = prop.getProperty(key);
         if (strValue == null) {
             throw new BadConfigException("missing key '" + key + "', can't continue");
         }
@@ -83,14 +83,14 @@ public class Config {
     }
 
     private static int getIntProperty(Properties prop, String key, int defaultValue) throws BadConfigException {
-        String strValue = prop.getProperty(key);
+        final String strValue = prop.getProperty(key);
         if (strValue == null) {
             Log.get().w(TAG, "missing key '", key, "', using default value (", defaultValue, ")");
             return defaultValue;
         }
         try {
             return Integer.parseInt(strValue);
-        } catch (NumberFormatException e) {
+        } catch (final NumberFormatException e) {
             throw new BadConfigException("the value for key '" + key + "' must be an integer");
         }
     }

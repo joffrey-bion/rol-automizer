@@ -30,7 +30,7 @@ public class Parser {
      *            the response to parse
      */
     public static void updateState(AccountState state, String response) {
-        Element body = Jsoup.parse(response).body();
+        final Element body = Jsoup.parse(response).body();
         state.gold = findValueInTag(body, "onmouseover", "A chaque tour de jeu");
         state.chestGold = findValueInTag(body, "onmouseover", "Votre coffre magique");
         state.mana = findValueInTag(body, "onmouseover", "Votre mana repr\u00e9sente");
@@ -39,14 +39,14 @@ public class Parser {
     }
 
     private static int findValueInTag(Element root, String attrKey, String attrContains) {
-        Elements elts = root.getElementsByAttributeValueContaining(attrKey, attrContains);
-        String imgSrc = elts.get(0).child(0).attr("src");
+        final Elements elts = root.getElementsByAttributeValueContaining(attrKey, attrContains);
+        final String imgSrc = elts.get(0).child(0).attr("src");
         // get num param
-        int position = imgSrc.indexOf("num=");
+        final int position = imgSrc.indexOf("num=");
         if (position != -1) {
             String num = imgSrc.substring(position + 4);
             // remove other params
-            int andPosition = num.indexOf("&");
+            final int andPosition = num.indexOf("&");
             if (andPosition != -1) {
                 num = num.substring(0, andPosition);
             }
@@ -64,13 +64,13 @@ public class Parser {
      * @return the parsed list of players
      */
     public static List<Player> parsePlayerList(String playerListPageResponse) {
-        Element body = Jsoup.parse(playerListPageResponse).body();
-        Elements elts = body.getElementsByAttributeValueContaining("href", "main/fiche&voirpseudo=");
-        List<Player> list = new LinkedList<>();
-        for (Element elt : elts) {
-            Element usernameCell = elt.parent();
+        final Element body = Jsoup.parse(playerListPageResponse).body();
+        final Elements elts = body.getElementsByAttributeValueContaining("href", "main/fiche&voirpseudo=");
+        final List<Player> list = new LinkedList<>();
+        for (final Element elt : elts) {
+            final Element usernameCell = elt.parent();
             assert usernameCell.tagName().equals("td");
-            Element userRow = usernameCell.parent();
+            final Element userRow = usernameCell.parent();
             assert userRow.tagName().equals("tr");
             list.add(parsePlayer(userRow));
         }
@@ -86,19 +86,19 @@ public class Parser {
      */
     private static Player parsePlayer(Element playerRow) {
         assert playerRow.tagName().equals("tr");
-        Elements fields = playerRow.getElementsByTag("td");
-        Player player = new Player();
+        final Elements fields = playerRow.getElementsByTag("td");
+        final Player player = new Player();
 
         // rank
-        Element rankElt = fields.get(0);
+        final Element rankElt = fields.get(0);
         player.setRank(getTextAsNumber(rankElt));
 
         // name
-        Element nameElt = fields.get(2).child(0);
+        final Element nameElt = fields.get(2).child(0);
         player.setName(nameElt.text().trim());
 
         // gold
-        Element goldElt = fields.get(3);
+        final Element goldElt = fields.get(3);
         if (goldElt.hasText()) {
             // gold amount is textual
             player.setGold(getTextAsNumber(goldElt));
@@ -108,13 +108,13 @@ public class Parser {
         }
 
         // army
-        Element armyElt = fields.get(4);
-        String army = armyElt.text().trim();
+        final Element armyElt = fields.get(4);
+        final String army = armyElt.text().trim();
         player.setArmy(Army.get(army));
 
         // alignment
-        Element alignmentElt = fields.get(5).child(0);
-        String alignment = alignmentElt.text().trim();
+        final Element alignmentElt = fields.get(5).child(0);
+        final String alignment = alignmentElt.text().trim();
         player.setAlignment(Alignment.get(alignment));
 
         return player;
@@ -128,12 +128,12 @@ public class Parser {
      * @return the amount of stolen gold, or -1 if the report couldn't be read properly
      */
     public static int parseGoldStolen(String attackReportResponse) {
-        Element body = Jsoup.parse(attackReportResponse).body();
-        Elements elts = body.getElementsByAttributeValue("class", "combat_gagne");
+        final Element body = Jsoup.parse(attackReportResponse).body();
+        final Elements elts = body.getElementsByAttributeValue("class", "combat_gagne");
         if (elts.size() == 0) {
             return -1;
         }
-        Element divVictory = elts.get(0).parent().parent();
+        final Element divVictory = elts.get(0).parent().parent();
         return getTextAsNumber(divVictory.getElementsByTag("b").get(0));
     }
 
@@ -146,7 +146,7 @@ public class Parser {
      * @return the parsed number
      */
     private static int getTextAsNumber(Element numberElement) {
-        String number = numberElement.text().trim();
+        final String number = numberElement.text().trim();
         return Integer.valueOf(number.replace(".", ""));
     }
 
@@ -158,10 +158,10 @@ public class Parser {
      * @return the current percentage of wornness of the weapons
      */
     public static int parseWeaponsWornness(String weaponsPageResponse) {
-        Element body = Jsoup.parse(weaponsPageResponse).body();
-        Elements elts = body.getElementsByAttributeValueContaining("title", "Armes endommagées");
-        Element input = elts.get(0);
-        String value = input.text().trim();
+        final Element body = Jsoup.parse(weaponsPageResponse).body();
+        final Elements elts = body.getElementsByAttributeValueContaining("title", "Armes endommagées");
+        final Element input = elts.get(0);
+        final String value = input.text().trim();
         if (value.endsWith("%")) {
             return Integer.valueOf(value.substring(0, value.length() - 1));
         } else {
@@ -177,9 +177,9 @@ public class Parser {
      * @return the amount of gold parsed, or -1 if it couldn't be parsed
      */
     public static int parsePlayerGold(String playerPageResponse) {
-        Element body = Jsoup.parse(playerPageResponse).body();
-        Elements elts = body.getElementsByAttributeValueContaining("src", "aff_montant");
-        Element img = elts.get(0);
+        final Element body = Jsoup.parse(playerPageResponse).body();
+        final Elements elts = body.getElementsByAttributeValueContaining("src", "aff_montant");
+        final Element img = elts.get(0);
         return getGoldFromImgElement(img);
     }
 
@@ -192,12 +192,12 @@ public class Parser {
      */
     private static int getGoldFromImgElement(Element goldImageElement) {
         assert goldImageElement.tagName().equals("img");
-        String goldImgUrl = goldImageElement.attr("src");
+        final String goldImgUrl = goldImageElement.attr("src");
         assert goldImgUrl.length() > 0 : "emtpy gold image url";
         try {
-            BufferedImage img = ImageIO.read(new URL(BASE_URL + goldImgUrl));
+            final BufferedImage img = ImageIO.read(new URL(BASE_URL + goldImgUrl));
             return GoldImageOCR.readAmount(img);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             System.err.println("error downloading image from url=" + goldImgUrl);
         }
         return -1;

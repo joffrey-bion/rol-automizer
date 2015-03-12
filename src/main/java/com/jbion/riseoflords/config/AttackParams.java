@@ -13,7 +13,7 @@ public class AttackParams {
 
     /**
      * Creates a new {@link AttackParams}.
-     * 
+     *
      * @param maxTurns
      *            the maximum number of players to attack
      * @param repairFrequency
@@ -29,7 +29,7 @@ public class AttackParams {
 
     /**
      * Gets the max number of turns to use for the attack.
-     * 
+     *
      * @return the max number of turns to use for the attack
      */
     public int getMaxTurns() {
@@ -38,7 +38,7 @@ public class AttackParams {
 
     /**
      * Gets the number of attacks between each weapon reparation.
-     * 
+     *
      * @return the number of attacks between each weapon reparation
      */
     public int getRepairFrequency() {
@@ -47,7 +47,7 @@ public class AttackParams {
 
     /**
      * Gets the number of attacks between each gold storage.
-     * 
+     *
      * @return the number of attacks between each gold storage
      */
     public int getStoringFrequency() {

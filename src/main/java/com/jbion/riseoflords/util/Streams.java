@@ -12,14 +12,12 @@ import java.io.UnsupportedEncodingException;
 public class Streams {
 
     /**
-     * The size of the buffer to use when reading an {@link InputStream}, in
-     * characters.
+     * The size of the buffer to use when reading an {@link InputStream}, in characters.
      */
     private static final int BUFFER_SIZE = 8192;
 
     /**
-     * Reads the specified {@link InputStream} to the end, and returns it as a
-     * {@code String}.
+     * Reads the specified {@link InputStream} to the end, and returns it as a {@code String}.
      *
      * @param inputStream
      *            the {@code InputStream} to read
@@ -32,7 +30,7 @@ public class Streams {
      *             if an I/O error occurs while reading the stream
      */
     public static String toString(InputStream inputStream, String charsetName) throws UnsupportedEncodingException,
-    IOException {
+            IOException {
         final char[] buffer = new char[BUFFER_SIZE];
         final StringBuilder sb = new StringBuilder();
         Reader in = null;

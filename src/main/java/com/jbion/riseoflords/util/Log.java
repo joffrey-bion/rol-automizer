@@ -61,17 +61,17 @@ public class Log {
         if (LEVEL.compareTo(level) < 0) {
             return;
         }
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         if (DISPLAY_LEVEL) {
             sb.append(level.getShortName()).append(" ");
         }
         if (DISPLAY_TAG) {
             sb.append("[").append(tag).append("] ");
         }
-        for (Object msg : message) {
+        for (final Object msg : message) {
             sb.append(msg);
         }
-        String msg = indent(sb.toString());
+        final String msg = indent(sb.toString());
         if (level.isError()) {
             System.err.println(msg);
         } else {

@@ -19,7 +19,7 @@ public enum Army {
     }
 
     public static Army get(String shortName) {
-        for (Army army : ARMIES) {
+        for (final Army army : ARMIES) {
             if (army.shortNameMan.equals(shortName) || army.shortNameWoman.equals(shortName)) {
                 return army;
             }
