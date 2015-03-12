@@ -23,7 +23,7 @@ public class Parser {
 
     /**
      * Updates the specified {@link AccountState} based on the top elements of the specified page.
-     * 
+     *
      * @param state
      *            the state to update
      * @param response
@@ -33,7 +33,7 @@ public class Parser {
         Element body = Jsoup.parse(response).body();
         state.gold = findValueInTag(body, "onmouseover", "A chaque tour de jeu");
         state.chestGold = findValueInTag(body, "onmouseover", "Votre coffre magique");
-        state.mana = findValueInTag(body, "onmouseover", "Votre mana représente");
+        state.mana = findValueInTag(body, "onmouseover", "Votre mana repr\u00e9sente");
         state.turns = findValueInTag(body, "onmouseover", "Un nouveau tour de jeu");
         state.adventurins = findValueInTag(body, "href", "main/aventurines_detail");
     }
@@ -58,7 +58,7 @@ public class Parser {
 
     /**
      * Parses the list of players contained in the specified page.
-     * 
+     *
      * @param playerListPageResponse
      *            a response containing a list of players
      * @return the parsed list of players
@@ -79,7 +79,7 @@ public class Parser {
 
     /**
      * Creates a new player from the cells in the specified {@code <tr>} element.
-     * 
+     *
      * @param playerRow
      *            the row to parse
      * @return the created {@link Player}
@@ -122,7 +122,7 @@ public class Parser {
 
     /**
      * Gets the amount of stolen golden from the attack report.
-     * 
+     *
      * @param attackReportResponse
      *            the response containing the attack report.
      * @return the amount of stolen gold, or -1 if the report couldn't be read properly
@@ -139,7 +139,7 @@ public class Parser {
 
     /**
      * Gets and parses the text contained in the spacified {@link Element}.
-     * 
+     *
      * @param numberElement
      *            an element containing a text representing an integer, with possible dots as
      *            thousand separator.
@@ -152,7 +152,7 @@ public class Parser {
 
     /**
      * Parses the weapons page response to return the current state of the weapons.
-     * 
+     *
      * @param weaponsPageResponse
      *            weapons page response
      * @return the current percentage of wornness of the weapons
@@ -171,7 +171,7 @@ public class Parser {
 
     /**
      * Parses the amount of gold on the specified player page.
-     * 
+     *
      * @param playerPageResponse
      *            the details page of a player
      * @return the amount of gold parsed, or -1 if it couldn't be parsed
@@ -185,7 +185,7 @@ public class Parser {
 
     /**
      * Uses an OCR to recognize a number in the specified {@code <img>} element.
-     * 
+     *
      * @param goldImageElement
      *            the {@code <img>} element to analyze
      * @return the number parsed, or -1 if an error occurred

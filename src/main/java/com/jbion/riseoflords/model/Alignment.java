@@ -10,7 +10,7 @@ public enum Alignment {
     SANS_SCRUPULES("SsS."),
     VIL("Vil."),
     ABOMINABLE("Abo."),
-    DEMONIAQUE("Dém.");
+    DEMONIAQUE("D\u00e9m.");
 
     // for efficiency
     private static final Alignment[] ALIGNMENTS = values();

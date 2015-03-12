@@ -5,7 +5,7 @@ public enum Army {
     WARRIORS("Chev.", "Guer."),
     MAGES("Sorc.", "Sorc."),
     SUICIDERS("Suic.", "Suic."),
-    HEALERS("Sage", "Prét.");
+    HEALERS("Sage", "Pr\u00e9t.");
 
     // for efficiency
     private static final Army[] ARMIES = values();

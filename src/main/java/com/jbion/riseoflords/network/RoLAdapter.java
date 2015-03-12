@@ -62,7 +62,7 @@ public class RoLAdapter {
                 .addPostData("LogPseudo", username) //
                 .addPostData("LogPassword", password) //
                 .post();
-        return http.execute(postRequest, r -> r.contains("Identification réussie!"));
+        return http.execute(postRequest, r -> r.contains("Identification r\u00e9ussie!"));
     }
 
     /**
@@ -72,7 +72,7 @@ public class RoLAdapter {
      */
     public boolean logout() {
         HttpGet getRequest = Request.from(URL_INDEX, PAGE_LOGOUT).get();
-        return http.execute(getRequest, r -> r.contains("Déjà inscrit? Connectez-vous"));
+        return http.execute(getRequest, r -> r.contains("D\u00e9j\u00e0 inscrit? Connectez-vous"));
     }
 
     /**
@@ -148,7 +148,7 @@ public class RoLAdapter {
         if (response.contains("remporte le combat!") || response.contains("perd cette bataille!")) {
             Parser.updateState(state, response);
             return Parser.parseGoldStolen(response);
-        } else if (response.contains("tempête magique s'abat")) {
+        } else if (response.contains("temp\u00eate magique s'abat")) {
             Parser.updateState(state, response);
             return ERROR_STORM_ACTIVE;
         } else {
