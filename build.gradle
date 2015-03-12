@@ -1,9 +1,5 @@
 apply plugin: 'java'
-
-// use 'gradle eclipse' to generate eclipse project files
 apply plugin: 'eclipse'
-
-apply plugin: 'application'
 apply plugin: 'launch4j'
 
 group = 'com.jbion.bots'
@@ -21,8 +17,9 @@ dependencies {
     testCompile 'junit:junit:4.+'
 }
 
-mainClassName = "com.jbion.riseoflords.Main"
+String mainClassName = "com.jbion.riseoflords.Main"
 
+// to build a fat jar with all dependencies included
 jar {
     manifest { attributes "Main-Class": mainClassName }
     from { 
@@ -32,11 +29,11 @@ jar {
     }
 }
 
+// wraps the executable jar into an exe file
 launch4j {
     mainClassName = "com.jbion.riseoflords.Main"
     headerType = "console"
     jar = 'lib/' + project.jar.archiveName
-    chdir = '.'
     icon = '../resources/main/rol-bot.ico'
 }
 
@@ -48,4 +45,11 @@ buildscript {
     dependencies {
         classpath 'edu.sc.seis.gradle:launch4j:1.0.6'
     }
+}
+
+task distExe(type: Copy) {
+	dependsOn tasks.launch4j
+	from(project.buildDir.path + '/' + project.launch4j.outputDir)
+	into('dist')
+	include(project.launch4j.outfile)
 }
