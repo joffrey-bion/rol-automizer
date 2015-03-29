@@ -1,14 +1,20 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'launch4j'
+apply plugin: 'application'
 
 group = 'com.jbion.bots'
-version = '1.0.0'
+version = '1.0.2'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 repositories {
     mavenCentral()
+    // this flat dir is for the distribution directory
+    flatDir {
+        name "distRepo"
+        dirs "dist"
+    }
 }
 
 dependencies {
@@ -17,7 +23,13 @@ dependencies {
     testCompile 'junit:junit:4.+'
 }
 
-String mainClassName = "com.jbion.riseoflords.Main"
+// defines what to distribute (jar and exe)
+artifacts {
+    archives jar
+    archives file(buildDir.name + '/' + launch4j.outputDir + '/' + launch4j.outfile)
+}
+
+mainClassName = "com.jbion.riseoflords.Main"
 
 // to build a fat jar with all dependencies included
 jar {
@@ -35,8 +47,22 @@ launch4j {
     headerType = "console"
     jar = 'lib/' + project.jar.archiveName
     icon = '../resources/main/rol-bot.ico'
+    windowTitle = project.name
 }
 
+// specifies were to 'upload' the produced artifacts using our flat dir for distribution
+uploadArchives {
+    repositories {
+        add project.repositories.distRepo
+    }
+}
+
+// convenient task to do all the work
+task dist {
+    dependsOn tasks.launch4j, tasks.uploadArchives
+}
+
+// loads the launch4j dependency for build time
 buildscript {
     repositories {
         mavenCentral()
@@ -45,11 +71,4 @@ buildscript {
     dependencies {
         classpath 'edu.sc.seis.gradle:launch4j:1.0.6'
     }
-}
-
-task distExe(type: Copy) {
-	dependsOn tasks.launch4j
-	from(project.buildDir.path + '/' + project.launch4j.outputDir)
-	into('dist')
-	include(project.launch4j.outfile)
 }
