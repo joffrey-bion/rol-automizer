@@ -15,8 +15,8 @@ Then you only have to focus on the interesting part of the game: how to spend yo
 
 Get started in 3 minutes
 -----------
-1. Download the [JAR of the sequencer here](https://github.com/joffrey-bion/RiseOfLords/blob/master/dist/RiseOfLords.jar?raw=true)
-2. Create a `bot.properties` file, similar to the following one ([download here](https://raw.githubusercontent.com/joffrey-bion/RiseOfLords/master/src/dist/bot.properties)), customize the settings and put it **next to the JAR archive**:
+1. Download the [binary program here](https://github.com/joffrey-bion/RiseOfLords/blob/master/dist/)
+2. Create a `.rol` file with a text editor, similar to the following one ([download here](https://raw.githubusercontent.com/joffrey-bion/RiseOfLords/master/src/dist/template.rol)):
 
         # credentials for connection
         account.login=myLogin
@@ -31,18 +31,16 @@ Get started in 3 minutes
         # maximum number of attacks
         attack.maxTurns=80
         # store gold into chest every N attacks
-        attack.storingFrequency=2
+        attack.storagePeriod=2
         # repair weapons every N attacks
-        attack.repairFrequency=5
+        attack.repairPeriod=5
         
         # duration in hours to wait between each attack session
         sequence.hoursBetweenAttacks=1
         # number of attack sessions to perform
         sequence.nbOfAttacks=5
 
-3. Finally, for convenience, use [this tiny script](https://raw.githubusercontent.com/joffrey-bion/RiseOfLords/master/dist/launcher.cmd) to launch the program on Windows, or launch the JAR directly from the command line yourself:
-
-        java -jar RiseOfLords.jar
+3. You may now open your .rol file with the main program.
        
 4. Enjoy the gold
 
