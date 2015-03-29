@@ -16,7 +16,7 @@ Then you only have to focus on the interesting part of the game: how to spend yo
 Get started in 3 minutes
 -----------
 1. Download the [binary program here](https://github.com/joffrey-bion/RiseOfLords/blob/master/dist/RiseOfLords-1.0.2.exe?raw=true)
-2. Create a `.rol` file with a text editor, similar to the following one ([download here](https://raw.githubusercontent.com/joffrey-bion/RiseOfLords/master/src/dist/template.rol)):
+2. Create a `.rol` file with a text editor, similar to the following one ([download here](https://raw.githubusercontent.com/joffrey-bion/RiseOfLords/master/dist/template.rol)):
 
         # credentials for connection
         account.login=myLogin
