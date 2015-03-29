@@ -11,9 +11,9 @@ filter.minGold=420000
 # maximum number of attacks
 attack.maxTurns=100
 # store gold into chest every N attacks
-attack.storingFrequency=2
+attack.storagePeriod=2
 # repair weapons every N attacks
-attack.repairFrequency=5
+attack.repairPeriod=5
         
 # duration in hours to wait between each attack session
 sequence.hoursBetweenAttacks=1

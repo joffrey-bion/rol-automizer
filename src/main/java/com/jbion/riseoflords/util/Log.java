@@ -14,6 +14,11 @@ public class Log {
         return log;
     }
 
+    public static enum Mode {
+        CONSOLE,
+        FILE;
+    }
+
     public static enum Level {
         WTF("WTF", true),
         ERROR("E", true),
@@ -57,9 +62,12 @@ public class Log {
         return res + msg;
     }
 
-    public void log(Level level, String tag, Object... message) {
+    public void log(Mode mode, Level level, String tag, Object... message) {
         if (LEVEL.compareTo(level) < 0) {
             return;
+        }
+        if (mode == Mode.FILE) {
+            return; // not handled yet
         }
         final StringBuilder sb = new StringBuilder();
         if (DISPLAY_LEVEL) {
@@ -86,26 +94,30 @@ public class Log {
     }
 
     public void v(String tag, Object... message) {
-        log(Level.VERBOSE, tag, message);
+        log(Mode.CONSOLE, Level.VERBOSE, tag, message);
     }
 
     public void d(String tag, Object... message) {
-        log(Level.DEBUG, tag, message);
+        log(Mode.CONSOLE, Level.DEBUG, tag, message);
     }
 
     public void i(String tag, Object... message) {
-        log(Level.INFO, tag, message);
+        log(Mode.CONSOLE, Level.INFO, tag, message);
+    }
+
+    public void i(Mode mode, String tag, Object... message) {
+        log(mode, Level.INFO, tag, message);
     }
 
     public void w(String tag, Object... message) {
-        log(Level.WARN, tag, message);
+        log(Mode.CONSOLE, Level.WARN, tag, message);
     }
 
     public void e(String tag, Object... message) {
-        log(Level.ERROR, tag, message);
+        log(Mode.CONSOLE, Level.ERROR, tag, message);
     }
 
     public void wtf(String tag, Object... message) {
-        log(Level.WTF, tag, message);
+        log(Mode.CONSOLE, Level.WTF, tag, message);
     }
 }

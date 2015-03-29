@@ -61,9 +61,9 @@ public class Config {
         config.filter = new PlayerFilter(minRank, maxRank, minGold);
 
         final int maxTurns = getIntProperty(prop, "attack.maxTurns", 20);
-        final int storingFrequency = getIntProperty(prop, "attack.storingFrequency", 2);
-        final int repairFrequency = getIntProperty(prop, "attack.repairFrequency", 5);
-        config.params = new AttackParams(maxTurns, repairFrequency, storingFrequency);
+        final int storagePeriod = getIntProperty(prop, "attack.storagePeriod", 2);
+        final int repairPeriod = getIntProperty(prop, "attack.repairPeriod", 5);
+        config.params = new AttackParams(maxTurns, repairPeriod, storagePeriod);
 
         config.timeBetweenAttacks = getIntProperty(prop, "sequence.hoursBetweenAttacks", 1) * 3600 * 1000;
         config.nbOfAttacks = getIntProperty(prop, "sequence.nbOfAttacks", 1);

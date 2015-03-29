@@ -68,4 +68,8 @@ public class PlayerFilter {
     public String toString() {
         return "Player filter:\n   ranks: " + minRank + "-" + maxRank + "\n   min gold: " + goldThreshold;
     }
+
+    public int getNbPlayersToScan() {
+        return getMaxRank() - getMinRank() + 1;
+    }
 }

@@ -14,6 +14,7 @@ import com.jbion.riseoflords.model.Player;
 import com.jbion.riseoflords.network.RoLAdapter;
 import com.jbion.riseoflords.util.Format;
 import com.jbion.riseoflords.util.Log;
+import com.jbion.riseoflords.util.Log.Mode;
 import com.jbion.riseoflords.util.Sleeper;
 import com.jbion.riseoflords.util.Sleeper.Speed;
 
@@ -45,6 +46,7 @@ public class Sequence {
         login(account.getLogin(), account.getPassword());
         attackRichest(config.getPlayerFilter(), config.getAttackParams());
         fakeTime.changePageLong();
+        log.i(TAG, "");
         logout();
         log.i(TAG, "End of session.");
     }
@@ -97,8 +99,13 @@ public class Sequence {
      */
     private int attackRichest(PlayerFilter filter, AttackParams params) {
         final int maxTurns = Math.min(rol.getCurrentState().turns, params.getMaxTurns());
-        log.i(TAG, "Starting massive attack on players ranked ", filter.getMinRank(), " to ", filter.getMaxRank(),
-                " richer than ", Format.gold(filter.getGoldThreshold()), " gold (", maxTurns, " attacks max)");
+        if (maxTurns <= 0) {
+            log.i(TAG, "No more turns to spend, aborting attack.");
+            return 0;
+        }
+        log.i(TAG, String
+              .format("Starting massive attack on players ranked %d to %d richer than %s gold (%d attacks max)",
+                      filter.getMinRank(), filter.getMaxRank(), Format.gold(filter.getGoldThreshold()), maxTurns));
         log.i(TAG, "Searching players matching the config filter...");
         log.indent();
         final List<Player> matchingPlayers = new ArrayList<>();
@@ -112,19 +119,28 @@ public class Sequence {
                     .limit(params.getMaxTurns()) // limit to max turns
                     .limit(rol.getCurrentState().turns) // limit to available turns
                     .collect(Collectors.toList());
-            log.i(TAG,
-                    String.format("%2d matching player(s) ranked %d to %d", filteredPage.size(), startRank,
-                            Math.min(startRank + 98, filter.getMaxRank())));
+            int pageMaxRank = Math.min(startRank + 98, filter.getMaxRank());
+            log.i(Mode.FILE, TAG, String.format("  %2d matching player%s ranked %d to %d (%d/%d players scanned)",
+                                                matchingPlayers.size(), matchingPlayers.size() > 1 ? "s" : "",
+                                                filter.getMinRank(), pageMaxRank,
+                                                pageMaxRank - filter.getMinRank() + 1, filter.getNbPlayersToScan()));
             matchingPlayers.addAll(filteredPage);
+            System.out.print("\r");
+            System.out.print(String.format("  %2d matching player%s ranked %d to %d (%d/%d players scanned)",
+                                           matchingPlayers.size(), matchingPlayers.size() > 1 ? "s" : "",
+                                           filter.getMinRank(), pageMaxRank, pageMaxRank - filter.getMinRank() + 1,
+                                           filter.getNbPlayersToScan()));
             fakeTime.readPage();
             startRank += 99;
         }
+        System.out.println();
+        System.out.println();
         log.deindent(1);
-        log.i(TAG, "");
         final int nbMatchingPlayers = matchingPlayers.size();
-        if (nbMatchingPlayers > params.getMaxTurns() || nbMatchingPlayers > rol.getCurrentState().turns) {
-            log.i(TAG, matchingPlayers.size(),
-                    " players matching rank and gold criterias, filtering only the richest of them...");
+        if (nbMatchingPlayers > maxTurns) {
+            log.i(TAG,
+                  String.format("only %d out of the %d matching players can be attacked, filtering only the richest of them...",
+                                maxTurns, matchingPlayers.size()));
             // too many players, select only the richest
             final List<Player> playersToAttack = matchingPlayers.stream() // stream players
                     .sorted(richestFirst) // richest first
@@ -172,12 +188,12 @@ public class Sequence {
             nbAttackedPlayers++;
             final boolean isLastPlayer = nbConsideredPlayers == playersToAttack.size();
             // repair weapons as specified
-            if (nbAttackedPlayers % params.getRepairFrequency() == 0 || isLastPlayer) {
+            if (nbAttackedPlayers % params.getRepairPeriod() == 0 || isLastPlayer) {
                 fakeTime.changePage();
                 repairWeapons();
             }
             // store gold as specified
-            if (nbAttackedPlayers % params.getStoringFrequency() == 0 || isLastPlayer) {
+            if (nbAttackedPlayers % params.getStoragePeriod() == 0 || isLastPlayer) {
                 fakeTime.changePage();
                 storeGoldIntoChest();
                 fakeTime.pauseWhenSafe();
@@ -221,14 +237,14 @@ public class Sequence {
         log.deindent(1);
         if (goldStolen > 0) {
             log.i(TAG, "Victory! ", Format.gold(goldStolen), " gold stolen from player ", player.getName(),
-                    ", current gold: ", Format.gold(rol.getCurrentState().gold));
+                  ", current gold: ", Format.gold(rol.getCurrentState().gold));
         } else if (goldStolen == RoLAdapter.ERROR_STORM_ACTIVE) {
             log.e(TAG, "Cannot attack: a storm is raging upon your kingdom!");
         } else if (goldStolen == RoLAdapter.ERROR_REQUEST) {
             log.e(TAG, "Attack request failed, something went wrong");
         } else {
             log.w(TAG, "Defeat! Ach, player ", player.getName(), " was too sronk! Current gold: ",
-                    rol.getCurrentState().gold);
+                  rol.getCurrentState().gold);
         }
         return goldStolen;
     }
