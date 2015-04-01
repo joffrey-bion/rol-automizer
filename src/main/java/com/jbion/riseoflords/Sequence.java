@@ -124,10 +124,10 @@ public class Sequence {
             matchingPlayers.addAll(filteredPage);
             System.out.print("\r");
             System.out.print(String.format(
-                    "  %s matching player%s found so far, ranked %d to %d (%d/%d players scanned)",
+                    "   %s matching player%s found so far, ranked %d to %d (%d/%d players scanned)  ",
                     nbMatchingPlayers > 0 ? nbMatchingPlayers : "No", nbMatchingPlayers > 1 ? "s" : "",
-                            filter.getMinRank(), pageMaxRank, pageMaxRank - filter.getMinRank() + 1,
-                            filter.getNbPlayersToScan()));
+                    filter.getMinRank(), pageMaxRank, pageMaxRank - filter.getMinRank() + 1,
+                    filter.getNbPlayersToScan()));
             fakeTime.readPage();
             startRank += 99;
         }
