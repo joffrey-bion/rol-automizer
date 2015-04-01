@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.Properties;
 
 import com.jbion.riseoflords.Main;
@@ -32,7 +33,7 @@ public class Config {
     private PlayerFilter filter;
     private AttackParams params;
     private int nbOfAttacks;
-    private long timeBetweenAttacks;
+    private Duration timeBetweenAttacks;
 
     public static Config loadFromResource(String filename) throws IOException, BadConfigException {
         final InputStream input = Main.class.getResourceAsStream(filename);
@@ -65,7 +66,7 @@ public class Config {
         final int repairPeriod = getIntProperty(prop, "attack.repairPeriod", 5);
         config.params = new AttackParams(maxTurns, repairPeriod, storagePeriod);
 
-        config.timeBetweenAttacks = getIntProperty(prop, "sequence.hoursBetweenAttacks", 1) * 3600 * 1000;
+        config.timeBetweenAttacks = Duration.ofHours(getIntProperty(prop, "sequence.hoursBetweenAttacks", 1));
         config.nbOfAttacks = getIntProperty(prop, "sequence.nbOfAttacks", 1);
 
         return config;
@@ -111,7 +112,7 @@ public class Config {
         return nbOfAttacks;
     }
 
-    public long getTimeBetweenAttacks() {
+    public Duration getTimeBetweenAttacks() {
         return timeBetweenAttacks;
     }
 

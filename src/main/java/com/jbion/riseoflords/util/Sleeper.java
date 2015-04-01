@@ -7,7 +7,7 @@ public class Sleeper {
     private static final String TAG = Sleeper.class.getSimpleName();
 
     public static enum Speed {
-        INHUMAN(500),
+        INHUMAN(400),
         FAST(700),
         NORMAL(1000),
         SLOW(1500),

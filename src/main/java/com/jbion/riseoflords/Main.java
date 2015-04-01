@@ -2,6 +2,7 @@ package com.jbion.riseoflords;
 
 import java.io.Console;
 import java.io.IOException;
+import java.time.Duration;
 
 import com.jbion.riseoflords.config.Config;
 import com.jbion.riseoflords.config.Config.BadConfigException;
@@ -10,12 +11,6 @@ import com.jbion.riseoflords.util.Log;
 public class Main {
 
     private static final String TAG = Main.class.getSimpleName();
-
-    private static final String DEFAULT_PROP_FILE = "default.rol";
-
-    private static final long ONE_SECOND_IN_MILLIS = 1000;
-    private static final long ONE_MINUTE_IN_MILLIS = 60 * ONE_SECOND_IN_MILLIS;
-    private static final long ONE_HOUR_IN_MILLIS = 60 * ONE_MINUTE_IN_MILLIS;
 
     public static void main(String[] args) {
         try {
@@ -28,7 +23,13 @@ public class Main {
     }
 
     public static void launch(String[] args) {
-        final String filename = args.length > 0 ? args[0] : DEFAULT_PROP_FILE;
+        if (args.length == 0) {
+            System.out.println("No config file provided: you must provide a .rol file to open.");
+            System.out.println();
+            System.out.println("More info at https://github.com/joffrey-bion/RiseOfLords");
+            return;
+        }
+        final String filename = args[0];
 
         Config config;
         try {
@@ -55,11 +56,10 @@ public class Main {
             if (i + 1 < config.getNbOfAttacks()) {
                 // more attacks are waiting
                 System.out.println();
-                Log.get().title(TAG, "SLEEP");
-                sleepWithIndications(config.getTimeBetweenAttacks());
+                waitForNextAttack(config.getTimeBetweenAttacks());
             }
-            System.out.println();
         }
+        System.out.println();
         Log.get().i(TAG, "End of attacks.");
     }
 
@@ -75,29 +75,29 @@ public class Main {
         }
     }
 
-    private static void sleepWithIndications(long durationInMillis) {
-        final long hours = durationInMillis / ONE_HOUR_IN_MILLIS;
-        final long minutes = durationInMillis % ONE_HOUR_IN_MILLIS / ONE_MINUTE_IN_MILLIS;
-        final long seconds = durationInMillis % ONE_MINUTE_IN_MILLIS / ONE_SECOND_IN_MILLIS;
-        final long millis = durationInMillis % ONE_SECOND_IN_MILLIS;
+    private static void waitForNextAttack(Duration duration) {
         try {
-            // sleeping the first bit to round to the minute
-            Thread.sleep(millis + ONE_SECOND_IN_MILLIS * seconds);
-            Log.get()
-            .i(TAG,
-                    String.format("Waiting for %d:%02d:%02d before the next attack session...", hours, minutes,
-                            seconds));
-            Log.get().indent();
-            long totalMinutes = minutes + 60 * hours;
-            while (totalMinutes > 0) {
-                Log.get().i(TAG, totalMinutes, " min left...");
-                Thread.sleep(ONE_MINUTE_IN_MILLIS);
-                totalMinutes--;
+            long millis = duration.toMillis() % 1000;
+            Thread.sleep(millis);
+            duration = duration.minusMillis(millis);
+
+            while (!duration.isZero() && !duration.isNegative()) {
+                Thread.sleep(1000);
+                duration = duration.minusSeconds(1);
+                printDuration(duration);
             }
-            Log.get().deindent(1);
-        } catch (final InterruptedException e) {
-            System.err.println("Sleep interrupted. Session aborted.");
-            return;
+            System.out.print("\r");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
+    }
+
+    private static void printDuration(Duration d) {
+        final long hours = d.toHours();
+        final long minutes = d.minusHours(hours).toMinutes();
+        final long seconds = d.minusHours(hours).minusMinutes(minutes).toMillis() / 1000;
+        System.out.print("\r");
+        System.out.print(String.format("   Next attack session in %s%02d:%02d...", (hours > 0 ? hours + ":" : ""),
+                minutes, seconds));
     }
 }
