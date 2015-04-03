@@ -1,8 +1,8 @@
-Rise Of Lords Sequencer
+Rise Of Lords Automizer
 ===========
 
 You play RoL, but you're tired of repetitive tasks such as attacking a whole series of players?
-This is the solution : a simple sequencer for http://www.riseoflords.com/
+This is the solution: a simple sequencer for http://www.riseoflords.com/.
 
 What does it do?
 -----------
