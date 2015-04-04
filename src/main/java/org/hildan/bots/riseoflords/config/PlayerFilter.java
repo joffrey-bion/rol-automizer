@@ -1,4 +1,4 @@
-package com.jbion.riseoflords.config;
+package org.hildan.bots.riseoflords.config;
 
 /**
  * Parameters to choose players.

@@ -1,4 +1,4 @@
-package com.jbion.riseoflords.network;
+package org.hildan.bots.riseoflords.network;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,10 +7,9 @@ import java.util.Random;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
-
-import com.jbion.riseoflords.model.AccountState;
-import com.jbion.riseoflords.model.Player;
-import com.jbion.riseoflords.network.parsers.Parser;
+import org.hildan.bots.riseoflords.model.AccountState;
+import org.hildan.bots.riseoflords.model.Player;
+import org.hildan.bots.riseoflords.network.parsers.Parser;
 
 public class RoLAdapter {
 

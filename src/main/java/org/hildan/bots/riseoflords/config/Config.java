@@ -1,4 +1,4 @@
-package com.jbion.riseoflords.config;
+package org.hildan.bots.riseoflords.config;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -7,8 +7,8 @@ import java.io.InputStream;
 import java.time.Duration;
 import java.util.Properties;
 
-import com.jbion.riseoflords.Main;
-import com.jbion.riseoflords.util.Log;
+import org.hildan.bots.riseoflords.Main;
+import org.hildan.bots.riseoflords.util.Log;
 
 public class Config {
 

@@ -1,4 +1,4 @@
-package com.jbion.riseoflords.network.parsers;
+package org.hildan.bots.riseoflords.network.parsers;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -8,14 +8,13 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import org.hildan.bots.riseoflords.model.AccountState;
+import org.hildan.bots.riseoflords.model.Alignment;
+import org.hildan.bots.riseoflords.model.Army;
+import org.hildan.bots.riseoflords.model.Player;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
-import com.jbion.riseoflords.model.AccountState;
-import com.jbion.riseoflords.model.Alignment;
-import com.jbion.riseoflords.model.Army;
-import com.jbion.riseoflords.model.Player;
 
 public class Parser {
 

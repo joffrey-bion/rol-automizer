@@ -1,4 +1,4 @@
-package com.jbion.riseoflords.network.parsers;
+package org.hildan.bots.riseoflords.network.parsers;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -7,7 +7,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import com.jbion.riseoflords.util.Log;
+import org.hildan.bots.riseoflords.util.Log;
 
 public class GoldImageOCR {
 

@@ -1,21 +1,21 @@
-package com.jbion.riseoflords;
+package org.hildan.bots.riseoflords;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.jbion.riseoflords.config.Account;
-import com.jbion.riseoflords.config.AttackParams;
-import com.jbion.riseoflords.config.Config;
-import com.jbion.riseoflords.config.PlayerFilter;
-import com.jbion.riseoflords.model.AccountState;
-import com.jbion.riseoflords.model.Player;
-import com.jbion.riseoflords.network.RoLAdapter;
-import com.jbion.riseoflords.util.Format;
-import com.jbion.riseoflords.util.Log;
-import com.jbion.riseoflords.util.Sleeper;
-import com.jbion.riseoflords.util.Sleeper.Speed;
+import org.hildan.bots.riseoflords.config.Account;
+import org.hildan.bots.riseoflords.config.AttackParams;
+import org.hildan.bots.riseoflords.config.Config;
+import org.hildan.bots.riseoflords.config.PlayerFilter;
+import org.hildan.bots.riseoflords.model.AccountState;
+import org.hildan.bots.riseoflords.model.Player;
+import org.hildan.bots.riseoflords.network.RoLAdapter;
+import org.hildan.bots.riseoflords.util.Format;
+import org.hildan.bots.riseoflords.util.Log;
+import org.hildan.bots.riseoflords.util.Sleeper;
+import org.hildan.bots.riseoflords.util.Sleeper.Speed;
 
 public class Sequence {
 

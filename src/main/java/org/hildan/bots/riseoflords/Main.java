@@ -1,12 +1,12 @@
-package com.jbion.riseoflords;
+package org.hildan.bots.riseoflords;
 
 import java.io.Console;
 import java.io.IOException;
 import java.time.Duration;
 
-import com.jbion.riseoflords.config.Config;
-import com.jbion.riseoflords.config.Config.BadConfigException;
-import com.jbion.riseoflords.util.Log;
+import org.hildan.bots.riseoflords.config.Config;
+import org.hildan.bots.riseoflords.config.Config.BadConfigException;
+import org.hildan.bots.riseoflords.util.Log;
 
 public class Main {
 

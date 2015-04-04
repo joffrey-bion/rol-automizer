@@ -1,4 +1,4 @@
-package com.jbion.riseoflords.network;
+package org.hildan.bots.riseoflords.network;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;

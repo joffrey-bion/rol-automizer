@@ -1,4 +1,4 @@
-package com.jbion.riseoflords.model;
+package org.hildan.bots.riseoflords.model;
 
 public class AccountState {
 

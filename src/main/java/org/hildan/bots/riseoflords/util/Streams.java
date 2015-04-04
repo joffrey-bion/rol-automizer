@@ -1,4 +1,4 @@
-package com.jbion.riseoflords.util;
+package org.hildan.bots.riseoflords.util;
 
 import java.io.IOException;
 import java.io.InputStream;
