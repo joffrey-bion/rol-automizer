@@ -6,7 +6,7 @@ account.password=myPassword
 filter.minRank=2500
 filter.maxRank=6000
 # attack only player with more gold than specified
-filter.minGold=420000
+filter.minGold=400000
         
 # maximum number of attacks
 attack.maxTurns=100

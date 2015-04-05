@@ -1,20 +1,31 @@
+// loads the launch4j dependency for build time
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'edu.sc.seis.gradle:launch4j:1.0.6'
+    }
+}
+
+plugins {
+    id "com.jfrog.bintray" version "1.0"
+}
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'launch4j'
 apply plugin: 'application'
 
-group = 'com.jbion.bots'
+group = 'org.hildan.bots'
 version = '1.0.3'
 sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
+
+mainClassName = "org.hildan.bots.riseoflords.Main"
 
 repositories {
     mavenCentral()
-    // this flat dir is for the distribution directory
-    flatDir {
-        name "distRepo"
-        dirs "dist"
-    }
 }
 
 dependencies {
@@ -22,14 +33,6 @@ dependencies {
     compile 'org.jsoup:jsoup:1.7.3'
     testCompile 'junit:junit:4.+'
 }
-
-// defines what to distribute (jar and exe)
-artifacts {
-    archives jar
-    archives file(buildDir.name + '/' + launch4j.outputDir + '/' + launch4j.outfile)
-}
-
-mainClassName = "com.jbion.riseoflords.Main"
 
 // to build a fat jar with all dependencies included
 jar {
@@ -43,32 +46,46 @@ jar {
 
 // wraps the executable jar into an exe file
 launch4j {
-    mainClassName = "com.jbion.riseoflords.Main"
+    mainClassName = "org.hildan.bots.riseoflords.Main"
     headerType = "console"
     jar = 'lib/' + project.jar.archiveName
     icon = '../resources/main/rol-bot.ico'
     windowTitle = project.name
 }
 
-// specifies were to 'upload' the produced artifacts using our flat dir for distribution
-uploadArchives {
-    repositories {
-        add project.repositories.distRepo
-    }
+// defines what to distribute (jar and exe)
+artifacts {
+    archives jar
+    archives file(buildDir.name + '/' + launch4j.outputDir + '/' + launch4j.outfile)
+    archives file(buildDir.name + '/resources/main/template.rol')
 }
 
-// convenient task to do all the work
-task dist {
-    dependsOn tasks.launch4j, tasks.uploadArchives
-}
+bintrayUpload.dependsOn tasks.launch4j
 
-// loads the launch4j dependency for build time
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'edu.sc.seis.gradle:launch4j:1.0.6'
-    }
+bintray {
+	user = project.bintrayUsername // taken from gradle.properties
+	key = project.bintrayApiKey // taken from gradle.properties
+	configurations = ['archives']
+	
+    publish = true // the version should be auto published after an upload
+	
+	pkg {
+	    repo = project.bintrayRepoApps // taken from gradle.properties
+	    name = project.name
+	    desc = 'A action sequencer to do the boring tasks on the game http://www.riseoflords.com.'
+	    
+	    String githubRepoName = 'rol-automizer'
+	    websiteUrl = 'https://github.com/joffrey-bion/' + githubRepoName
+	    issueTrackerUrl = 'https://github.com/joffrey-bion/' + githubRepoName + '/issues'
+	    vcsUrl = 'https://github.com/joffrey-bion/' + githubRepoName + '.git'
+	    
+	    licenses = ['MIT']
+	    labels = ['riseoflords', 'rol', 'bot']
+	    
+	    publicDownloadNumbers = false
+	    
+	    version {
+	        name = project.version // Bintray logical version name
+	    }
+	}
 }
