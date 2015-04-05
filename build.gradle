@@ -72,7 +72,7 @@ bintray {
 	pkg {
 	    repo = project.bintrayRepoApps // taken from gradle.properties
 	    name = project.name
-	    desc = 'A action sequencer to do the boring tasks on the game http://www.riseoflords.com.'
+	    desc = 'An action sequencer to do the boring tasks on the game http://www.riseoflords.com.'
 	    
 	    String githubRepoName = 'rol-automizer'
 	    websiteUrl = 'https://github.com/joffrey-bion/' + githubRepoName
