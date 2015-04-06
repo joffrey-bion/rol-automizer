@@ -38,7 +38,7 @@ jar {
 
 // wraps the executable jar into an exe file
 launch4j {
-    mainClassName = "org.hildan.bots.riseoflords.Main"
+    mainClassName = project.mainClassName
     headerType = "console"
     jar = 'lib/' + project.jar.archiveName
     icon = '../resources/main/rol-bot.ico'
