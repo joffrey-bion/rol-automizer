@@ -1,17 +1,11 @@
-// loads the launch4j dependency for build time
+// launch4j is used to package the program in an exe file
 buildscript {
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'edu.sc.seis.gradle:launch4j:1.0.6'
-    }
+    repositories { mavenCentral() }
+    dependencies { classpath 'edu.sc.seis.gradle:launch4j:1.0.6' }
 }
 
-plugins {
-    id "com.jfrog.bintray" version "1.0"
-}
+// bintray plugin is used to upload artifacts to a bintray repo
+plugins { id "com.jfrog.bintray" version "1.0" }
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
@@ -24,9 +18,7 @@ sourceCompatibility = '1.8'
 
 mainClassName = "org.hildan.bots.riseoflords.Main"
 
-repositories {
-    mavenCentral()
-}
+repositories { mavenCentral() }
 
 dependencies {
     compile 'org.apache.httpcomponents:httpclient:4.3.6'
@@ -37,10 +29,10 @@ dependencies {
 // to build a fat jar with all dependencies included
 jar {
     manifest { attributes "Main-Class": mainClassName }
-    from { 
-    	configurations.compile.collect { 
-    		it.isDirectory() ? it : zipTree(it) 
-    	}
+    from {
+        configurations.compile.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
     }
 }
 
@@ -63,29 +55,24 @@ artifacts {
 bintrayUpload.dependsOn tasks.launch4j
 
 bintray {
-	user = project.bintrayUsername // taken from gradle.properties
-	key = project.bintrayApiKey // taken from gradle.properties
-	configurations = ['archives']
-	
+    user = project.bintrayUsername // taken from gradle.properties
+    key = project.bintrayApiKey // taken from gradle.properties
+    configurations = ['archives']
+
     publish = true // the version should be auto published after an upload
-	
-	pkg {
-	    repo = project.bintrayRepoApps // taken from gradle.properties
-	    name = project.name
-	    desc = 'An action sequencer to do the boring tasks on the game http://www.riseoflords.com.'
-	    
-	    String githubRepoName = 'rol-automizer'
-	    websiteUrl = 'https://github.com/joffrey-bion/' + githubRepoName
-	    issueTrackerUrl = 'https://github.com/joffrey-bion/' + githubRepoName + '/issues'
-	    vcsUrl = 'https://github.com/joffrey-bion/' + githubRepoName + '.git'
-	    
-	    licenses = ['MIT']
-	    labels = ['riseoflords', 'rol', 'bot']
-	    
-	    publicDownloadNumbers = false
-	    
-	    version {
-	        name = project.version // Bintray logical version name
-	    }
-	}
+
+    pkg {
+        repo = project.bintrayRepoApps // taken from gradle.properties
+        name = project.name
+        desc = 'An action sequencer to do the boring tasks on the game http://www.riseoflords.com.'
+        labels = ['riseoflords', 'rol', 'bot']
+
+        String githubRepoName = project.name
+        websiteUrl = 'https://github.com/joffrey-bion/' + githubRepoName
+        issueTrackerUrl = 'https://github.com/joffrey-bion/' + githubRepoName + '/issues'
+        vcsUrl = 'https://github.com/joffrey-bion/' + githubRepoName + '.git'
+
+        licenses = ['MIT']
+        version { gpg { sign = true } }
+    }
 }
