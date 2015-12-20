@@ -2,7 +2,7 @@ Rise Of Lords Automizer
 ===========
 
 You play RoL, but you're tired of repetitive tasks such as attacking a whole series of players?
-This is the solution: a simple sequencer for http://www.riseoflords.com/.
+This is the solution: a simple sequencer for the game [Rise of Lords](http://www.riseoflords.com/).
 
 What does it do?
 -----------
@@ -15,7 +15,7 @@ Then you only have to focus on the interesting part of the game: how to spend yo
 
 Get started in 3 minutes
 -----------
-1. Download the [binary program here](https://github.com/joffrey-bion/RiseOfLords/blob/master/dist/RiseOfLords-1.0.3.exe?raw=true)
+1. Download the [binary program here](https://dl.bintray.com/joffrey-bion/applications/org/hildan/bots/rol-automizer/1.0.3/rol-automizer-1.0.3.exe)
 2. Create a `.rol` file with a text editor, similar to the following one ([download here](https://raw.githubusercontent.com/joffrey-bion/RiseOfLords/master/dist/template.rol)):
 
         # credentials for connection
@@ -23,10 +23,10 @@ Get started in 3 minutes
         account.password=myPassword
         
         # attack only players within the given bounds
-        filter.minRank=5000
+        filter.minRank=4000
         filter.maxRank=6500
         # attack only player with more gold than specified
-        filter.minGold=400000
+        filter.minGold=350000
         
         # maximum number of attacks
         attack.maxTurns=80
@@ -40,7 +40,6 @@ Get started in 3 minutes
         # number of attack sessions to perform
         sequence.nbOfAttacks=5
 
-3. You may now open your .rol file with the main program.
-       
+3. You may now open your .rol file with the main program (right click > open with...)
 4. Enjoy the gold
 
