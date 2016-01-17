@@ -50,10 +50,10 @@ public class Main {
         System.out.println();
 
         final Sequence sequence = new Sequence(config);
-        for (int i = 0; i < config.getNbOfAttacks(); i++) {
+        for (int i = 0; config.unlimitedAttacks() || i < config.getNbOfAttacks(); i++) {
             Log.get().title(TAG, String.format("ATTACK SESSION %d/%d", i + 1, config.getNbOfAttacks()));
             sequence.start();
-            if (i + 1 < config.getNbOfAttacks()) {
+            if (config.unlimitedAttacks() || i + 1 < config.getNbOfAttacks()) {
                 // more attacks are waiting
                 System.out.println();
                 waitForNextAttack(config.getTimeBetweenAttacks());

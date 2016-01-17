@@ -3,13 +3,13 @@ account.login=myLogin
 account.password=myPassword
         
 # attack only players within the given bounds
-filter.minRank=2500
-filter.maxRank=6000
+filter.minRank=750
+filter.maxRank=4500
 # attack only player with more gold than specified
-filter.minGold=400000
+filter.minGold=380000
         
 # maximum number of attacks
-attack.maxTurns=100
+attack.maxTurns=200
 # store gold into chest every N attacks
 attack.storagePeriod=2
 # repair weapons every N attacks
@@ -17,5 +17,5 @@ attack.repairPeriod=5
         
 # duration in hours to wait between each attack session
 sequence.hoursBetweenAttacks=1
-# number of attack sessions to perform
-sequence.nbOfAttacks=4
+# number of attack sessions to perform (0 for no limit)
+sequence.nbOfAttacks=0

@@ -112,6 +112,10 @@ public class Config {
         return nbOfAttacks;
     }
 
+    public boolean unlimitedAttacks() {
+        return nbOfAttacks == 0;
+    }
+
     public Duration getTimeBetweenAttacks() {
         return timeBetweenAttacks;
     }
