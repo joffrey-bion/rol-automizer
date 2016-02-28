@@ -30,7 +30,7 @@ public class RolAutomizer {
         if (args.length == 0) {
             System.out.println("No config file provided: you must provide a .rol file to open.");
             System.out.println();
-            System.out.println("More info at https://github.com/joffrey-bion/RiseOfLords");
+            System.out.println("More info at https://github.com/joffrey-bion/rol-automizer");
             return;
         }
         final String filename = args[0];
