@@ -9,7 +9,7 @@ import javax.imageio.ImageIO;
 
 import org.hildan.bots.riseoflords.util.Log;
 
-public class GoldImageOCR {
+class GoldImageOCR {
 
     private static final String DIGITS_DIR = "/img";
 
@@ -20,7 +20,7 @@ public class GoldImageOCR {
 
     private static final BufferedImage DOT = loadImage(DIGITS_DIR + "/dot.png");
 
-    public static int readAmount(BufferedImage img) {
+    static int readAmount(BufferedImage img) {
         assert img.getWidth() == 70 : "image width is not 70";
         assert img.getHeight() == 8 : "image height is not 8";
         final List<BufferedImage> digits = getDigitsImages(img);
@@ -43,8 +43,7 @@ public class GoldImageOCR {
 
     private static BufferedImage loadImage(String filename) {
         try {
-            final BufferedImage img = ImageIO.read(GoldImageOCR.class.getResourceAsStream(filename));
-            return img;
+            return ImageIO.read(GoldImageOCR.class.getResourceAsStream(filename));
         } catch (final IOException e) {
             throw new RuntimeException("image couldn't be loaded");
         }
@@ -71,7 +70,7 @@ public class GoldImageOCR {
         Integer end = null;
         for (int i = 0; i < img.getWidth(); i++) {
             if (emptyCols.contains(i)) {
-                if (start != null && end != null) {
+                if (start != null) {
                     digitsBounds.add(new Integer[] { start, end });
                 }
                 start = null;
@@ -117,10 +116,7 @@ public class GoldImageOCR {
         }
         final int[] recoARGB = getARGB(recoPixel);
         final int[] refARGB = getARGB(refPixel);
-        if (recoARGB[0] == refARGB[0]) {
-            return true;
-        }
-        return false;
+        return recoARGB[0] == refARGB[0];
     }
 
     private static boolean areSimilar(BufferedImage recoDigit, BufferedImage refDigit) {

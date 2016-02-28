@@ -6,7 +6,7 @@ public class Sleeper {
 
     private static final String TAG = Sleeper.class.getSimpleName();
 
-    public static enum Speed {
+    public enum Speed {
         INHUMAN(400),
         FAST(700),
         NORMAL(1000),
@@ -15,7 +15,7 @@ public class Sleeper {
 
         private final int factor;
 
-        private Speed(int factor) {
+        Speed(int factor) {
             this.factor = factor;
         }
 

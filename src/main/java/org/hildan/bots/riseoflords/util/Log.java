@@ -14,12 +14,12 @@ public class Log {
         return log;
     }
 
-    public static enum Mode {
+    private enum Mode {
         CONSOLE,
-        FILE;
+        FILE
     }
 
-    public static enum Level {
+    private enum Level {
         WTF("WTF", true),
         ERROR("E", true),
         WARN("W", true),
@@ -30,7 +30,7 @@ public class Log {
         private final String shortName;
         private final boolean isError;
 
-        private Level(String shortName, boolean isError) {
+        Level(String shortName, boolean isError) {
             this.shortName = shortName;
             this.isError = isError;
         }
@@ -62,7 +62,7 @@ public class Log {
         return res + msg;
     }
 
-    public void log(Mode mode, Level level, String tag, Object... message) {
+    private void log(Mode mode, Level level, String tag, Object... message) {
         if (LEVEL.compareTo(level) < 0) {
             return;
         }
@@ -103,10 +103,6 @@ public class Log {
 
     public void i(String tag, Object... message) {
         log(Mode.CONSOLE, Level.INFO, tag, message);
-    }
-
-    public void i(Mode mode, String tag, Object... message) {
-        log(mode, Level.INFO, tag, message);
     }
 
     public void w(String tag, Object... message) {

@@ -26,7 +26,7 @@ class Request {
     private Request() {}
 
     /**
-     * Creates a new {@link Request} initialized on the specified URL, with a preset page parameter.
+     * Creates a new Request initialized on the specified URL, with a preset page parameter.
      *
      * @param baseUrl
      *            the base URL to use
@@ -34,7 +34,7 @@ class Request {
      *            the "p" parameter value, containing the page to request
      * @return the created request
      */
-    public static Request from(String baseUrl, String page) {
+    static Request from(String baseUrl, String page) {
         final Request req = new Request();
         try {
             req.uriBuilder = new URIBuilder(baseUrl).addParameter("p", page);
@@ -51,9 +51,9 @@ class Request {
      *            the parameter's key
      * @param value
      *            the parameter's value
-     * @return this {@link Request}
+     * @return this Request
      */
-    public Request addParameter(String key, String value) {
+    Request addParameter(String key, String value) {
         if (built) {
             throw new IllegalStateException("request already built, can't add parameters");
         }
@@ -63,15 +63,15 @@ class Request {
 
     /**
      * Adds the specified parameter to the request body. This forbids later use of {@link #get()} on
-     * this {@link Request}, as this method should only be used for {@link #post()} requests.
+     * this Request, as this method should only be used for {@link #post()} requests.
      *
      * @param key
      *            the key of the parameter to add
      * @param value
      *            the value of the parameter to add
-     * @return this {@link Request}
+     * @return this Request
      */
-    public Request addPostData(String key, String value) {
+    Request addPostData(String key, String value) {
         if (built) {
             throw new IllegalStateException("request already built, can't add post data");
         }
@@ -87,7 +87,7 @@ class Request {
      *
      * @return an {@link HttpGet} object representing the request
      */
-    public HttpGet get() {
+    HttpGet get() {
         if (postData != null) {
             throw new IllegalStateException("post data has been added, cannot build a GET request");
         }
@@ -104,7 +104,7 @@ class Request {
      *
      * @return an {@link HttpPost} object representing the request
      */
-    public HttpPost post() {
+    HttpPost post() {
         if (postData == null) {
             postData = new ArrayList<>();
         }

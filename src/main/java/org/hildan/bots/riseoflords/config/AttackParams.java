@@ -12,7 +12,7 @@ public class AttackParams {
     private final int storagePeriod;
 
     /**
-     * Creates a new {@link AttackParams}.
+     * Creates a new AttackParams.
      *
      * @param maxTurns
      *            the maximum number of players to attack
@@ -21,7 +21,7 @@ public class AttackParams {
      * @param storagePeriod
      *            number of attacks between each gold storage
      */
-    public AttackParams(int maxTurns, int repairPeriod, int storagePeriod) {
+    AttackParams(int maxTurns, int repairPeriod, int storagePeriod) {
         this.maxTurns = maxTurns;
         this.repairPeriod = repairPeriod;
         this.storagePeriod = storagePeriod;

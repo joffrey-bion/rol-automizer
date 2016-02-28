@@ -16,16 +16,8 @@ public class Config {
 
     public static class BadConfigException extends Exception {
 
-        public BadConfigException() {
-            super();
-        }
-
-        public BadConfigException(String message) {
+        BadConfigException(String message) {
             super(message);
-        }
-
-        public BadConfigException(Throwable cause) {
-            super(cause);
         }
     }
 
@@ -47,7 +39,7 @@ public class Config {
         return load(new FileInputStream(filename));
     }
 
-    public static Config load(InputStream configFile) throws IOException, BadConfigException {
+    private static Config load(InputStream configFile) throws IOException, BadConfigException {
         final Properties prop = new Properties();
         prop.load(configFile);
 

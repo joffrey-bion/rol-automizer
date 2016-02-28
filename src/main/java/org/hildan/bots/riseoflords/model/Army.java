@@ -13,7 +13,7 @@ public enum Army {
     private final String shortNameMan;
     private final String shortNameWoman;
 
-    private Army(String shortNameMan, String shortNameWoman) {
+    Army(String shortNameMan, String shortNameWoman) {
         this.shortNameMan = shortNameMan;
         this.shortNameWoman = shortNameWoman;
     }

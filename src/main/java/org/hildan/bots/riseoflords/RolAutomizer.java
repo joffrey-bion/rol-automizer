@@ -26,7 +26,7 @@ public class RolAutomizer {
         waitForEnter(null);
     }
 
-    public static void launch(String[] args) throws LoginException {
+    private static void launch(String[] args) throws LoginException {
         if (args.length == 0) {
             System.out.println("No config file provided: you must provide a .rol file to open.");
             System.out.println();
@@ -67,7 +67,7 @@ public class RolAutomizer {
         Log.get().i(TAG, "End of attacks.");
     }
 
-    public static void waitForEnter(String message, Object... args) {
+    private static void waitForEnter(String message, Object... args) {
         final Console c = System.console();
         if (c != null) {
             if (message != null) {

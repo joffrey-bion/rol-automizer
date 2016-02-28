@@ -9,7 +9,6 @@ import org.hildan.bots.riseoflords.config.Account;
 import org.hildan.bots.riseoflords.config.AttackParams;
 import org.hildan.bots.riseoflords.config.Config;
 import org.hildan.bots.riseoflords.config.PlayerFilter;
-import org.hildan.bots.riseoflords.model.AccountState;
 import org.hildan.bots.riseoflords.model.Player;
 import org.hildan.bots.riseoflords.network.RoLAdapter;
 import org.hildan.bots.riseoflords.util.Format;
@@ -33,10 +32,6 @@ public class Sequence {
     public Sequence(Config config) {
         this.config = config;
         this.rol = new RoLAdapter();
-    }
-
-    public AccountState getCurrentState() {
-        return rol.getCurrentState();
     }
 
     public void start() throws LoginException {

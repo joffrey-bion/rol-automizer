@@ -17,7 +17,7 @@ public enum Alignment {
 
     private final String shortName;
 
-    private Alignment(String shortName) {
+    Alignment(String shortName) {
         this.shortName = shortName;
     }
 

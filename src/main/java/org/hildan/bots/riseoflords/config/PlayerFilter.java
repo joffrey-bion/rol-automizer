@@ -15,14 +15,7 @@ public class PlayerFilter {
     private final int goldThreshold;
 
     /**
-     * Creates a new {@link PlayerFilter} with default values.
-     */
-    public PlayerFilter() {
-        this(2500, 4500, 450000);
-    }
-
-    /**
-     * Creates a new {@link PlayerFilter} with the specified values.
+     * Creates a new PlayerFilter with the specified values.
      *
      * @param minRank
      *            lower limit for players rank
@@ -31,7 +24,7 @@ public class PlayerFilter {
      * @param goldThreshold
      *            lower limit for players gold
      */
-    public PlayerFilter(int minRank, int maxRank, int goldThreshold) {
+    PlayerFilter(int minRank, int maxRank, int goldThreshold) {
         this.minRank = minRank;
         this.maxRank = maxRank;
         this.goldThreshold = goldThreshold;
