@@ -1,22 +1,17 @@
-// launch4j is used to package the program in an exe file
-buildscript {
-    repositories { mavenCentral() }
-    dependencies { classpath 'edu.sc.seis.gradle:launch4j:1.0.6' }
+plugins {
+    id "com.jfrog.bintray" version "1.0"
+    id "edu.sc.seis.launch4j" version "1.6.1"
 }
-
-// bintray plugin is used to upload artifacts to a bintray repo
-plugins { id "com.jfrog.bintray" version "1.0" }
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
-apply plugin: 'launch4j'
 apply plugin: 'application'
 
 group = 'org.hildan.bots'
 version = '1.1.0'
-sourceCompatibility = '1.8'
+description = 'An action sequencer to do the boring tasks on the game http://www.riseoflords.com.'
 
-mainClassName = "org.hildan.bots.riseoflords.Main"
+mainClassName = "org.hildan.bots.riseoflords.RolAutomizer"
 
 repositories { mavenCentral() }
 
@@ -36,11 +31,10 @@ jar {
     }
 }
 
-// wraps the executable jar into an exe file
+// wraps the jar into an exe file
 launch4j {
     mainClassName = project.mainClassName
     headerType = "console"
-    jar = 'lib/' + project.jar.archiveName
     icon = '../resources/main/rol-bot.ico'
     windowTitle = project.name
 }
@@ -54,6 +48,7 @@ artifacts {
 
 bintrayUpload.dependsOn tasks.launch4j
 
+// used to upload artifacts to the Bintray repo
 bintray {
     user = project.hasProperty('bintrayUsername') ? project.bintrayUsername : ''
     key = project.hasProperty('bintrayApiKey') ? project.bintrayApiKey : ''
@@ -64,8 +59,8 @@ bintray {
     pkg {
         repo = project.hasProperty('bintrayRepoApps') ? project.bintrayRepoApps : ''
         name = project.name
-        desc = 'An action sequencer to do the boring tasks on the game http://www.riseoflords.com.'
-        labels = ['riseoflords', 'rol', 'bot']
+        desc = project.description
+        labels = ['riseoflords', 'rol', 'bot', 'game']
 
         String githubRepoName = project.name
         websiteUrl = 'https://github.com/joffrey-bion/' + githubRepoName
@@ -73,6 +68,9 @@ bintray {
         vcsUrl = 'https://github.com/joffrey-bion/' + githubRepoName + '.git'
 
         licenses = ['MIT']
-        version { gpg { sign = true } }
+        version {
+            vcsTag = 'v' + project.version
+            gpg { sign = true }
+        }
     }
 }

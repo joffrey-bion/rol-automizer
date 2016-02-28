@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.time.Duration;
 import java.util.Properties;
 
-import org.hildan.bots.riseoflords.Main;
+import org.hildan.bots.riseoflords.RolAutomizer;
 import org.hildan.bots.riseoflords.util.Log;
 
 public class Config {
@@ -36,7 +36,7 @@ public class Config {
     private Duration timeBetweenAttacks;
 
     public static Config loadFromResource(String filename) throws IOException, BadConfigException {
-        final InputStream input = Main.class.getResourceAsStream(filename);
+        final InputStream input = RolAutomizer.class.getResourceAsStream(filename);
         if (input == null) {
             throw new FileNotFoundException("file " + filename + " not found as resource");
         }
