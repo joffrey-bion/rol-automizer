@@ -1,5 +1,5 @@
-Rise Of Lords Automizer
-===========
+# Rise Of Lords Automizer
+
 [![Bintray](https://img.shields.io/bintray/v/joffrey-bion/applications/rol-automizer.svg)](https://bintray.com/joffrey-bion/applications/rol-automizer/_latestVersion)
 [![Travis Build](https://img.shields.io/travis/joffrey-bion/rol-automizer/master.svg)](https://travis-ci.org/joffrey-bion/rol-automizer)
 [![Dependency Status](https://www.versioneye.com/user/projects/56d2f52c157a6913c1e6c83f/badge.svg?style=flat)](https://www.versioneye.com/user/projects/56d2f52c157a6913c1e6c83f)
@@ -8,8 +8,8 @@ Rise Of Lords Automizer
 You play RoL, but you're tired of repetitive tasks such as attacking a whole series of players?
 This is the solution: a simple sequencer for the game [Rise of Lords](http://www.riseoflords.com/).
 
-What does it do?
------------
+## What does it do?
+
 This program is meant to do the boring task of attacking players for you. All you have to do is setting what kind of players you want to attack (rank and minimum gold). The sequencer takes care of the rest:
 - **attacks players** (up to a maximum that you set)
 - **repairs weapons** from time to time (can be customized)
@@ -17,8 +17,8 @@ This program is meant to do the boring task of attacking players for you. All yo
  
 Then you only have to focus on the interesting part of the game: how to spend your gold!
 
-Get started in 3 minutes
------------
+## Get started in 3 minutes
+
 1. Download the [binary program here](https://dl.bintray.com/joffrey-bion/applications/org/hildan/bots/rol-automizer/1.0.3/rol-automizer-1.0.3.exe)
 2. Create a `.rol` file with a text editor, similar to the following one ([download here](https://raw.githubusercontent.com/joffrey-bion/RiseOfLords/master/dist/template.rol)):
 
@@ -47,3 +47,6 @@ Get started in 3 minutes
 3. You may now open your .rol file with the main program (right click > open with...)
 4. Enjoy the gold
 
+## License
+
+Code released under [the MIT license](https://github.com/joffrey-bion/rol-automizer/blob/master/LICENSE)
