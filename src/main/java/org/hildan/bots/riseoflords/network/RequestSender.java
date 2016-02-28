@@ -105,7 +105,6 @@ public class RequestSender {
         try {
             final String response = http.execute(request, responseHandler);
             if (!responseSuccessful.test(response)) {
-                System.err.println(response);
                 return failureHandler.apply(response);
             } else {
                 return successHandler.apply(response);
