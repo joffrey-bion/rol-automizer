@@ -10,6 +10,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.hildan.bots.riseoflords.model.AccountState;
 import org.hildan.bots.riseoflords.model.Player;
 import org.hildan.bots.riseoflords.network.parsers.Parser;
+import org.hildan.bots.riseoflords.sequencing.LoginException;
 
 public class RoLAdapter {
 
@@ -54,14 +55,17 @@ public class RoLAdapter {
      *            the username to use
      * @param password
      *            the password to use
-     * @return true for successful login, false otherwise
+     * @throws LoginException if the login operation failed
      */
-    public boolean login(String username, String password) {
+    public void login(String username, String password) throws LoginException {
         final HttpPost postRequest = Request.from(URL_INDEX, PAGE_LOGIN) //
                 .addPostData("LogPseudo", username) //
                 .addPostData("LogPassword", password) //
                 .post();
-        return http.execute(postRequest, r -> r.contains("Identification r\u00e9ussie!"));
+        boolean success = http.execute(postRequest, r -> r.contains("Identification r\u00e9ussie!"));
+        if (!success) {
+            throw new LoginException(username, password);
+        }
     }
 
     /**
@@ -220,11 +224,10 @@ public class RoLAdapter {
                 .addParameter("onglet", "") //
                 .get();
         final String response = http.execute(request);
-        if (response.contains("Faites votre choix")) {
-            return Parser.parseWeaponsWornness(response) == 0;
-        } else {
+        if (!response.contains("Faites votre choix")) {
             return false;
         }
+        return Parser.parseWeaponsWornness(response) == 0;
     }
 
     /**

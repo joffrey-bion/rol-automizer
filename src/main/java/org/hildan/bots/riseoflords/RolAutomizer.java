@@ -6,23 +6,27 @@ import java.time.Duration;
 
 import org.hildan.bots.riseoflords.config.Config;
 import org.hildan.bots.riseoflords.config.Config.BadConfigException;
+import org.hildan.bots.riseoflords.sequencing.LoginException;
+import org.hildan.bots.riseoflords.sequencing.Sequence;
 import org.hildan.bots.riseoflords.util.Log;
 
-public class Main {
+public class RolAutomizer {
 
-    private static final String TAG = Main.class.getSimpleName();
+    private static final String TAG = RolAutomizer.class.getSimpleName();
 
     public static void main(String[] args) {
         try {
             launch(args);
-        } catch (final Exception e) {
+        } catch (LoginException e) {
+            Log.get().e(TAG, "\nLogin failed for user ", e.getUsername());
+        } catch (Exception e) {
             Log.get().e(TAG, "\nUNCAUGHT EXCEPTION: ", e.getMessage());
             e.printStackTrace(System.err);
         }
         waitForEnter(null);
     }
 
-    public static void launch(String[] args) {
+    public static void launch(String[] args) throws LoginException {
         if (args.length == 0) {
             System.out.println("No config file provided: you must provide a .rol file to open.");
             System.out.println();

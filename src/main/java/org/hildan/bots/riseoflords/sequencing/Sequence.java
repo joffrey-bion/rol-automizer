@@ -1,4 +1,4 @@
-package org.hildan.bots.riseoflords;
+package org.hildan.bots.riseoflords.sequencing;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -39,7 +39,7 @@ public class Sequence {
         return rol.getCurrentState();
     }
 
-    public void start() {
+    public void start() throws LoginException {
         log.i(TAG, "Starting attack session...");
         final Account account = config.getAccount();
         login(account.getLogin(), account.getPassword());
@@ -58,17 +58,13 @@ public class Sequence {
      * @param password
      *            the password to connect with
      */
-    private void login(String username, String password) {
+    private void login(String username, String password) throws LoginException {
         log.d(TAG, "Logging in with username ", username, "...");
-        final boolean success = rol.login(username, password);
-        if (success) {
-            log.i(TAG, "Logged in with username: ", username);
-            log.i(TAG, "");
-            log.i(TAG, "Faking redirection page delay... (this takes a few seconds)");
-            log.i(TAG, "");
-        } else {
-            throw new RuntimeException("Login failure.");
-        }
+        rol.login(username, password);
+        log.i(TAG, "Logged in with username: ", username);
+        log.i(TAG, "");
+        log.i(TAG, "Faking redirection page delay... (this takes a few seconds)");
+        log.i(TAG, "");
         fakeTime.waitAfterLogin();
         rol.homePage();
         fakeTime.actionInPage();
