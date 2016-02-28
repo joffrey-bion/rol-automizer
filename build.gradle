@@ -5,6 +5,7 @@ plugins {
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'idea'
 apply plugin: 'application'
 
 group = 'org.hildan.bots'
@@ -31,7 +32,7 @@ jar {
     }
 }
 
-// wraps the jar into an exe file
+// wraps the executable jar into an exe file
 launch4j {
     mainClassName = project.mainClassName
     headerType = "console"
