@@ -2,7 +2,7 @@
 
 [![Bintray](https://img.shields.io/bintray/v/joffrey-bion/applications/rol-automizer.svg)](https://bintray.com/joffrey-bion/applications/rol-automizer/_latestVersion)
 [![Travis Build](https://img.shields.io/travis/joffrey-bion/rol-automizer/master.svg)](https://travis-ci.org/joffrey-bion/rol-automizer)
-[![Dependency Status](https://www.versioneye.com/user/projects/56d2f52c157a6913c1e6c83f/badge.svg?style=flat)](https://www.versioneye.com/user/projects/56d2f52c157a6913c1e6c83f)
+[![Dependency Status](https://www.versioneye.com/user/projects/56d2f52c157a6913c1e6c83f/badge.svg)](https://www.versioneye.com/user/projects/56d2f52c157a6913c1e6c83f)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/joffrey-bion/rol-automizer/blob/master/LICENSE)
 
 You play RoL, but you're tired of repetitive tasks such as attacking a whole series of players?
