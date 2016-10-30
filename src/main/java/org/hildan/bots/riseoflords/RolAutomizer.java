@@ -15,18 +15,11 @@ public class RolAutomizer {
     private static final String TAG = RolAutomizer.class.getSimpleName();
 
     public static void main(String[] args) {
-        try {
-            launch(args);
-        } catch (LoginException e) {
-            Log.get().e(TAG, "\nLogin failed for user ", e.getUsername());
-        } catch (Exception e) {
-            Log.get().e(TAG, "\nUNCAUGHT EXCEPTION: ", e.getMessage());
-            e.printStackTrace(System.err);
-        }
+        launch(args);
         waitForEnter(null);
     }
 
-    private static void launch(String[] args) throws LoginException {
+    private static void launch(String[] args) {
         if (args.length == 0) {
             System.out.println("No config file provided: you must provide a .rol file to open.");
             System.out.println();
@@ -56,7 +49,14 @@ public class RolAutomizer {
         final Sequence sequence = new Sequence(config);
         for (int i = 0; config.unlimitedAttacks() || i < config.getNbOfAttacks(); i++) {
             Log.get().title(TAG, String.format("ATTACK SESSION %d/%d", i + 1, config.getNbOfAttacks()));
-            sequence.start();
+            try {
+                sequence.start();
+            } catch (LoginException e) {
+                Log.get().e(TAG, "\nLogin failed for user ", e.getUsername());
+            } catch (Exception e) {
+                Log.get().e(TAG, "\nUNCAUGHT EXCEPTION: ", e.getMessage());
+                e.printStackTrace(System.err);
+            }
             if (config.unlimitedAttacks() || i + 1 < config.getNbOfAttacks()) {
                 // more attacks are waiting
                 System.out.println();
