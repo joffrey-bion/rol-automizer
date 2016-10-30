@@ -12,17 +12,17 @@ import org.hildan.bots.riseoflords.config.PlayerFilter;
 import org.hildan.bots.riseoflords.model.Player;
 import org.hildan.bots.riseoflords.network.RoLAdapter;
 import org.hildan.bots.riseoflords.util.Format;
-import org.hildan.bots.riseoflords.util.Log;
 import org.hildan.bots.riseoflords.util.Sleeper;
 import org.hildan.bots.riseoflords.util.Sleeper.Speed;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Sequence {
 
-    private static final String TAG = Sequence.class.getSimpleName();
+    private static final Logger logger = LoggerFactory.getLogger(Sequence.class);
 
     private static final Comparator<Player> richestFirst = Comparator.comparingInt(Player::getGold).reversed();
 
-    private final Log log = Log.get();
     private final Sleeper fakeTime = new Sleeper(Speed.INHUMAN);
 
     private final RoLAdapter rol;
@@ -35,31 +35,28 @@ public class Sequence {
     }
 
     public void start() throws LoginException {
-        log.i(TAG, "Starting attack session...");
+        logger.info("Starting attack session...");
         final Account account = config.getAccount();
         login(account.getLogin(), account.getPassword());
         attackRichest(config.getPlayerFilter(), config.getAttackParams());
         fakeTime.changePageLong();
-        log.i(TAG, "");
         logout();
-        log.i(TAG, "End of session.");
+        logger.info("End of session.");
     }
 
     /**
      * Logs in with the specified credentials, and wait for standard time.
      *
      * @param username
-     *            the login to connect with
+     *         the login to connect with
      * @param password
-     *            the password to connect with
+     *         the password to connect with
      */
     private void login(String username, String password) throws LoginException {
-        log.d(TAG, "Logging in with username ", username, "...");
+        logger.debug("Logging in with username {}...", username);
         rol.login(username, password);
-        log.i(TAG, "Logged in with username: ", username);
-        log.i(TAG, "");
-        log.i(TAG, "Faking redirection page delay... (this takes a few seconds)");
-        log.i(TAG, "");
+        logger.info("Logged in with username: {}", username);
+        logger.info("Faking redirection page delay... (this takes a few seconds)");
         fakeTime.waitAfterLogin();
         rol.homePage();
         fakeTime.actionInPage();
@@ -69,12 +66,12 @@ public class Sequence {
      * Logs out.
      */
     private void logout() {
-        log.d(TAG, "Logging out...");
+        logger.debug("Logging out...");
         final boolean success = rol.logout();
         if (success) {
-            log.i(TAG, "Logout successful");
+            logger.info("Logout successful");
         } else {
-            log.e(TAG, "Logout failure");
+            logger.error("Logout failure");
         }
     }
 
@@ -82,60 +79,54 @@ public class Sequence {
      * Attacks the richest players matching the filter.
      *
      * @param filter
-     *            the {@link PlayerFilter} to use to choose players
+     *         the {@link PlayerFilter} to use to choose players
      * @param params
-     *            the {@link AttackParams} to use for attacks/actions sequencing
+     *         the {@link AttackParams} to use for attacks/actions sequencing
+     *
      * @return the total gold stolen
      */
     private int attackRichest(PlayerFilter filter, AttackParams params) {
         final int maxTurns = Math.min(rol.getCurrentState().turns, params.getMaxTurns());
         if (maxTurns <= 0) {
-            log.i(TAG, "No more turns to spend, aborting attack.");
+            logger.info("No more turns to spend, aborting attack.");
             return 0;
         }
-        log.i(TAG,
-                String.format("Starting attack on players ranked %d to %d richer than %s gold (%d attacks max)",
-                        filter.getMinRank(), filter.getMaxRank(), Format.gold(filter.getGoldThreshold()), maxTurns));
-        log.i(TAG, "");
-        log.i(TAG, "Searching players matching the config filter...");
-        log.indent();
+        logger.info("Starting attack on players ranked {} to {} richer than {} gold ({} attacks max)",
+                        filter.getMinRank(), filter.getMaxRank(), Format.gold(filter.getGoldThreshold()), maxTurns);
+        logger.info("Searching players matching the config filter...");
         final List<Player> matchingPlayers = new ArrayList<>();
         int startRank = filter.getMinRank();
         while (startRank < filter.getMaxRank()) {
-            log.d(TAG, "Reading page of players ranked ", startRank, " to ", startRank + 98, "...");
+            logger.debug("Reading page of players ranked {} to {}...", startRank, startRank + 98);
             final List<Player> filteredPage = rol.listPlayers(startRank).stream() // stream players
-                    .filter(p -> p.getGold() >= filter.getGoldThreshold()) // above gold threshold
-                    .filter(p -> p.getRank() <= filter.getMaxRank()) // below max rank
-                    .sorted(richestFirst) // richest first
-                    .limit(params.getMaxTurns()) // limit to max turns
-                    .limit(rol.getCurrentState().turns) // limit to available turns
-                    .collect(Collectors.toList());
+                                                 .filter(p -> p.getGold()
+                                                         >= filter.getGoldThreshold()) // above gold threshold
+                                                 .filter(p -> p.getRank() <= filter.getMaxRank()) // below max rank
+                                                 .sorted(richestFirst) // richest first
+                                                 .limit(params.getMaxTurns()) // limit to max turns
+                                                 .limit(rol.getCurrentState().turns) // limit to available turns
+                                                 .collect(Collectors.toList());
             int pageMaxRank = Math.min(startRank + 98, filter.getMaxRank());
             int nbMatchingPlayers = matchingPlayers.size();
             matchingPlayers.addAll(filteredPage);
-            System.out.print("\r");
-            System.out.print(String.format(
-                    "   %s matching player%s found so far, ranked %d to %d (%d/%d players scanned)  ",
-                    nbMatchingPlayers > 0 ? nbMatchingPlayers : "No", nbMatchingPlayers > 1 ? "s" : "",
-                    filter.getMinRank(), pageMaxRank, pageMaxRank - filter.getMinRank() + 1,
-                    filter.getNbPlayersToScan()));
+            logger.info("{} matching player{} found so far, ranked {} to {} ({}/{} players scanned)",
+                            nbMatchingPlayers > 0 ? nbMatchingPlayers : "No", nbMatchingPlayers > 1 ? "s" : "",
+                            filter.getMinRank(), pageMaxRank, pageMaxRank - filter.getMinRank() + 1,
+                            filter.getNbPlayersToScan());
             fakeTime.readPage();
             startRank += 99;
         }
-        System.out.println();
-        System.out.println();
-        log.deindent(1);
         final int nbMatchingPlayers = matchingPlayers.size();
         if (nbMatchingPlayers > maxTurns) {
-            log.i(TAG, String.format(
-                    "only %d out of the %d matching players can be attacked, filtering only the richest of them...",
+            logger.info(String.format(
+                    "Only %d out of the %d matching players can be attacked, filtering only the richest of them...",
                     maxTurns, matchingPlayers.size()));
             // too many players, select only the richest
             final List<Player> playersToAttack = matchingPlayers.stream() // stream players
-                    .sorted(richestFirst) // richest first
-                    .limit(params.getMaxTurns()) // limit to max turns
-                    .limit(rol.getCurrentState().turns) // limit to available turns
-                    .collect(Collectors.toList());
+                                                                .sorted(richestFirst) // richest first
+                                                                .limit(params.getMaxTurns()) // limit to max turns
+                                                                .limit(rol.getCurrentState().turns) // limit to available turns
+                                                                .collect(Collectors.toList());
             return attackAll(playersToAttack, params);
         } else {
             return attackAll(matchingPlayers, params);
@@ -146,20 +137,20 @@ public class Sequence {
      * Attacks all the specified players, following the given parameters.
      *
      * @param playersToAttack
-     *            the filtered list of players to attack. They must verify the thresholds specified
-     *            by the given {@link PlayerFilter}.
+     *         the filtered list of players to attack. They must verify the thresholds specified by the given {@link
+     *         PlayerFilter}.
      * @param params
-     *            the parameters to follow. In particular the storing and repair frequencies are
-     *            used.
+     *         the parameters to follow. In particular the storing and repair frequencies are used.
+     *
      * @return the total gold stolen
      */
     private int attackAll(List<Player> playersToAttack, AttackParams params) {
-        log.i(TAG, playersToAttack.size(), " players to attack");
+        logger.info("{} players to attack", playersToAttack.size());
         if (rol.getCurrentState().turns == 0) {
-            log.e(TAG, "No turns available, impossible to attack.");
+            logger.error("No turns available, impossible to attack");
             return 0;
         } else if (rol.getCurrentState().turns < playersToAttack.size()) {
-            log.e(TAG, "Not enough turns to attack this many players, attack aborted.");
+            logger.error("Not enough turns to attack this many players, attack aborted");
             return 0;
         }
         int totalGoldStolen = 0;
@@ -190,8 +181,8 @@ public class Sequence {
                 fakeTime.changePageLong();
             }
         }
-        log.i(TAG, Format.gold(totalGoldStolen), " total gold stolen from ", nbAttackedPlayers, " players.");
-        log.i(TAG, "The chest now contains ", Format.gold(rol.getCurrentState().chestGold), " gold.");
+        logger.info("{} total gold stolen from {} players.", Format.gold(totalGoldStolen), nbAttackedPlayers);
+        logger.info("The chest now contains {} gold.", Format.gold(rol.getCurrentState().chestGold));
         return totalGoldStolen;
     }
 
@@ -199,83 +190,74 @@ public class Sequence {
      * Attacks the specified player.
      *
      * @param player
-     *            the player to attack
+     *         the player to attack
+     *
      * @return the gold stolen from that player
      */
     private int attack(Player player) {
-        log.d(TAG, "Attacking player ", player.getName(), "...");
-        log.indent();
-        log.v(TAG, "Displaying player page...");
+        logger.debug("Attacking player {}...", player.getName());
+        logger.trace("Displaying player page...");
         final int playerGold = rol.displayPlayer(player.getName());
-        log.indent();
         if (playerGold == RoLAdapter.ERROR_REQUEST) {
-            log.e(TAG, "Something's wrong: request failed");
-            log.deindent(2);
+            logger.error("Something's wrong: request failed");
             return -1;
         } else if (playerGold != player.getGold()) {
-            log.w(TAG, "Something's wrong: the player does not have the expected gold");
-            log.deindent(2);
+            logger.warn("Something's wrong: the player does not have the expected gold");
             return -1;
         }
-        log.deindent(1);
 
         fakeTime.actionInPage();
 
-        log.v(TAG, "Attacking...");
+        logger.trace("Attacking...");
         final int goldStolen = rol.attack(player.getName());
-        log.deindent(1);
         if (goldStolen > 0) {
-            log.i(TAG, "Victory! ", Format.gold(goldStolen), " gold stolen from player ", player.getName(),
-                    ", current gold: ", Format.gold(rol.getCurrentState().gold));
+            logger.info("Victory! {} gold stolen from player {}, current gold: {}", Format.gold(goldStolen),
+                    player.getName(), Format.gold(rol.getCurrentState().gold));
         } else if (goldStolen == RoLAdapter.ERROR_STORM_ACTIVE) {
-            log.e(TAG, "Cannot attack: a storm is raging upon your kingdom!");
+            logger.warn("Cannot attack: a storm is raging upon your kingdom!");
         } else if (goldStolen == RoLAdapter.ERROR_REQUEST) {
-            log.e(TAG, "Attack request failed, something went wrong");
+            logger.error("Attack HTTP request failed, something went wrong");
         } else {
-            log.w(TAG, "Defeat! Ach, player ", player.getName(), " was too sronk! Current gold: ",
+            logger.warn("Defeat! Ach, player {} was too sronk! Current gold: {}", player.getName(),
                     rol.getCurrentState().gold);
         }
         return goldStolen;
     }
 
     private int storeGoldIntoChest() {
-        log.v(TAG, "Storing gold into the chest...");
-        log.indent();
-        log.v(TAG, "Displaying chest page...");
+        logger.trace("Storing gold into the chest...");
+        logger.trace("Displaying chest page...");
         final int amount = rol.displayChestPage();
-        log.v(TAG, Format.gold(amount) + " gold to store");
+        logger.trace("{} gold to store", Format.gold(amount));
 
         fakeTime.actionInPage();
 
-        log.v(TAG, "Storing everything...");
-        log.indent();
+        logger.trace("Storing everything...");
         final boolean success = rol.storeInChest(amount);
         if (success) {
-            log.v(TAG, "The gold is safe!");
+            logger.trace("The gold is safe!");
         } else {
-            log.v(TAG, "Something went wrong!");
+            logger.trace("Something went wrong!");
         }
-        log.deindent(2);
-        log.i(TAG, Format.gold(amount), " gold stored in chest, total: " + Format.gold(rol.getCurrentState().chestGold));
+        logger.info("{} gold stored in chest, total: {}", Format.gold(amount),
+                Format.gold(rol.getCurrentState().chestGold));
         return amount;
     }
 
     private void repairWeapons() {
-        log.v(TAG, "Repairing weapons...");
-        log.indent();
-        log.v(TAG, "Displaying weapons page...");
+        logger.trace("Repairing weapons...");
+        logger.trace("Displaying weapons page...");
         final int wornness = rol.displayWeaponsPage();
-        log.v(TAG, "Weapons worn at ", wornness, "%");
+        logger.trace("Weapons worn at {}%", wornness);
 
         fakeTime.actionInPage();
 
-        log.v(TAG, "Repair request...");
+        logger.trace("Repair request...");
         final boolean success = rol.repairWeapons();
-        log.deindent(1);
         if (!success) {
-            log.e(TAG, "Couldn't repair weapons, is there enough gold?");
+            logger.error("Couldn't repair weapons, is there enough gold?");
         } else {
-            log.i(TAG, "Weapons repaired");
+            logger.info("Weapons repaired");
         }
     }
 }

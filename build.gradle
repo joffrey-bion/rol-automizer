@@ -19,6 +19,8 @@ repositories { mavenCentral() }
 dependencies {
     compile 'org.apache.httpcomponents:httpclient:4.5.2'
     compile 'org.jsoup:jsoup:1.9.2'
+    compile 'ch.qos.logback:logback-classic:1.0.13'
+    compile 'javax.mail:mail:1.4.3' // to send emails with logback
     testCompile 'junit:junit:4.+'
 }
 
@@ -43,7 +45,7 @@ launch4j {
 // defines what to distribute (jar and exe)
 artifacts {
     archives jar
-    archives file(buildDir.name + '/' + launch4j.outputDir + '/' + launch4j.outfile)
+//    archives file(buildDir.name + '/' + launch4j.outputDir + '/' + launch4j.outfile)
     archives file(buildDir.name + '/resources/main/template.rol')
 }
 

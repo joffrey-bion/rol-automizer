@@ -1,6 +1,6 @@
 package org.hildan.bots.riseoflords;
 
-import java.io.Console;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.Duration;
 
@@ -8,75 +8,54 @@ import org.hildan.bots.riseoflords.config.Config;
 import org.hildan.bots.riseoflords.config.Config.BadConfigException;
 import org.hildan.bots.riseoflords.sequencing.LoginException;
 import org.hildan.bots.riseoflords.sequencing.Sequence;
-import org.hildan.bots.riseoflords.util.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RolAutomizer {
 
-    private static final String TAG = RolAutomizer.class.getSimpleName();
+    private static final Logger logger = LoggerFactory.getLogger(RolAutomizer.class);
 
     public static void main(String[] args) {
-        launch(args);
-        waitForEnter(null);
-    }
-
-    private static void launch(String[] args) {
         if (args.length == 0) {
-            System.out.println("No config file provided: you must provide a .rol file to open.");
-            System.out.println();
-            System.out.println("More info at https://github.com/joffrey-bion/rol-automizer");
+            logger.error("No config file provided: you must provide a .rol file to open.\n"
+                    + "More info at https://github.com/joffrey-bion/rol-automizer");
             return;
         }
         final String filename = args[0];
 
-        Config config;
-        try {
-            config = Config.loadFromFile(filename);
-        } catch (final BadConfigException e) {
-            Log.get().e(TAG, "Error reading config file: ", e.getMessage());
+        Config config = loadConfig(filename);
+        if (config == null) {
             return;
-        } catch (final IOException e) {
-            try {
-                config = Config.loadFromResource(filename);
-            } catch (IOException | BadConfigException e2) {
-                Log.get().e(TAG, "Error reading config file: ", e.getMessage());
-                return;
-            }
         }
-        Log.get().title(TAG, "CONFIG");
-        Log.get().i(TAG, config);
-        System.out.println();
+        logger.info("Loaded config:\n{}", config.toString());
 
         final Sequence sequence = new Sequence(config);
         for (int i = 0; config.unlimitedAttacks() || i < config.getNbOfAttacks(); i++) {
-            Log.get().title(TAG, String.format("ATTACK SESSION %d/%d", i + 1, config.getNbOfAttacks()));
+            logger.info("Starting attack session {}/{}", i + 1, config.getNbOfAttacks());
             try {
                 sequence.start();
             } catch (LoginException e) {
-                Log.get().e(TAG, "\nLogin failed for user ", e.getUsername());
+                logger.error("Login failed for user {}", e.getUsername());
             } catch (Exception e) {
-                Log.get().e(TAG, "\nUNCAUGHT EXCEPTION: ", e.getMessage());
-                e.printStackTrace(System.err);
+                logger.error("UNCAUGHT EXCEPTION", e);
             }
             if (config.unlimitedAttacks() || i + 1 < config.getNbOfAttacks()) {
                 // more attacks are waiting
-                System.out.println();
                 waitForNextAttack(config.getTimeBetweenAttacks());
             }
         }
-        System.out.println();
-        Log.get().i(TAG, "End of attacks.");
+        logger.info("End of attacks");
     }
 
-    private static void waitForEnter(String message, Object... args) {
-        final Console c = System.console();
-        if (c != null) {
-            if (message != null) {
-                c.format(message, args);
-            } else {
-                c.format("\nPress ENTER to exit.\n");
-            }
-            c.readLine();
+    private static Config loadConfig(String filename) {
+        try {
+            return Config.loadFromFile(filename);
+        } catch (FileNotFoundException e) {
+            logger.error("Cannot find config file {}", filename);
+        } catch (BadConfigException | IOException e) {
+            logger.error("Error reading config file", e);
         }
+        return null;
     }
 
     private static void waitForNextAttack(Duration duration) {
@@ -101,7 +80,8 @@ public class RolAutomizer {
         final long minutes = d.minusHours(hours).toMinutes();
         final long seconds = d.minusHours(hours).minusMinutes(minutes).toMillis() / 1000;
         System.out.print("\r");
-        System.out.print(String.format("   Next attack session in %s%02d:%02d...", (hours > 0 ? hours + ":" : ""),
-                minutes, seconds));
+        System.out.print(
+                String.format("   Next attack session in %s%02d:%02d...", (hours > 0 ? hours + ":" : ""), minutes,
+                        seconds));
     }
 }

@@ -2,9 +2,12 @@ package org.hildan.bots.riseoflords.util;
 
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Sleeper {
 
-    private static final String TAG = Sleeper.class.getSimpleName();
+    private static final Logger logger = LoggerFactory.getLogger(Sleeper.class);
 
     public enum Speed {
         INHUMAN(400),
@@ -24,7 +27,6 @@ public class Sleeper {
         }
     }
 
-    private final Log log = Log.get();
     private final Random rand = new Random(System.currentTimeMillis());
     private final Speed speed;
 
@@ -35,7 +37,7 @@ public class Sleeper {
     private void sleep(int millis, boolean scaleDuration) {
         try {
             final int affectedMillis = scaleDuration ? speed.affect(millis) : millis;
-            log.d(TAG, "    ...  ", affectedMillis, " ms  ...");
+            logger.debug("    ...  faking human delay {} ms  ...", affectedMillis);
             Thread.sleep(affectedMillis);
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();

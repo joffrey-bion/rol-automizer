@@ -8,11 +8,12 @@ import java.time.Duration;
 import java.util.Properties;
 
 import org.hildan.bots.riseoflords.RolAutomizer;
-import org.hildan.bots.riseoflords.util.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Config {
 
-    private static final String TAG = Config.class.getSimpleName();
+    private static final Logger logger = LoggerFactory.getLogger(Config.class);
 
     public static class BadConfigException extends Exception {
 
@@ -67,10 +68,10 @@ public class Config {
     private static String getMandatoryProperty(Properties prop, String key) throws BadConfigException {
         final String strValue = prop.getProperty(key);
         if (strValue == null) {
-            throw new BadConfigException("missing key '" + key + "', can't continue");
+            throw new BadConfigException("Missing key '" + key + "', can't continue");
         }
         if (strValue.length() == 0) {
-            throw new BadConfigException("no value for '" + key + "', can't continue");
+            throw new BadConfigException("No value for '" + key + "', can't continue");
         }
         return strValue;
     }
@@ -78,13 +79,13 @@ public class Config {
     private static int getIntProperty(Properties prop, String key, int defaultValue) throws BadConfigException {
         final String strValue = prop.getProperty(key);
         if (strValue == null) {
-            Log.get().w(TAG, "missing key '", key, "', using default value (", defaultValue, ")");
+            logger.warn("Missing key '{}', using default value ({})", key, defaultValue);
             return defaultValue;
         }
         try {
             return Integer.parseInt(strValue);
         } catch (final NumberFormatException e) {
-            throw new BadConfigException("the value for key '" + key + "' must be an integer");
+            throw new BadConfigException("The value for key '" + key + "' must be an integer");
         }
     }
 

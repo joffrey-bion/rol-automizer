@@ -15,8 +15,12 @@ import org.hildan.bots.riseoflords.model.Player;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Parser {
+
+    private static final Logger logger = LoggerFactory.getLogger(Parser.class);
 
     private static final String BASE_URL = "http://www.riseoflords.com/";
 
@@ -197,7 +201,7 @@ public class Parser {
             final BufferedImage img = ImageIO.read(new URL(BASE_URL + goldImgUrl));
             return GoldImageOCR.readAmount(img);
         } catch (final IOException e) {
-            System.err.println("error downloading image from url=" + goldImgUrl);
+            logger.error("Error downloading the gold image at {}", goldImgUrl);
         }
         return -1;
     }
