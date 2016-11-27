@@ -69,8 +69,20 @@ public class Sleeper {
         sleep(1200, 2500);
     }
 
-    public void pauseWhenSafe() {
+    public void beforeRepair() {
+        changePage();
+    }
+
+    public void beforeGoldStorage() {
+        changePage();
+    }
+
+    public void afterGoldStorage() {
         sleep(2000, 3000);
+    }
+
+    public void betweenAttacksWhenNoStorage() {
+        changePage();
     }
 
     public void waitAfterLogin() {
