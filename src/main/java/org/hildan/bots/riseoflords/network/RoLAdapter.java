@@ -115,7 +115,7 @@ public class RoLAdapter {
 
     /**
      * Displays the specified player's detail page. Used to fake a visit on the user detail page
-     * before an attack. The result does not matter.
+     * before an attack.
      *
      * @param playerName
      *            the name of the player to lookup
@@ -207,6 +207,7 @@ public class RoLAdapter {
         final HttpGet request = Request.from(URL_GAME, PAGE_WEAPONS).get();
         final String response = http.execute(request);
         if (response.contains("Faites votre choix")) {
+            Parser.updateState(state, response);
             return Parser.parseWeaponsWornness(response);
         } else {
             return ERROR_REQUEST;
@@ -227,6 +228,7 @@ public class RoLAdapter {
         if (!response.contains("Faites votre choix")) {
             return false;
         }
+        Parser.updateState(state, response);
         return Parser.parseWeaponsWornness(response) == 0;
     }
 
@@ -239,6 +241,7 @@ public class RoLAdapter {
         final HttpUriRequest request = Request.from(URL_GAME, PAGE_SORCERY).get();
         final String response = http.execute(request);
         if (response.contains("Niveau de vos sorciers")) {
+            Parser.updateState(state, response);
             return state.mana;
         } else {
             return ERROR_REQUEST;

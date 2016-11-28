@@ -169,16 +169,16 @@ public class Sequence {
             final boolean isLastPlayer = nbConsideredPlayers == playersToAttack.size();
             // repair weapons as specified
             if (nbAttackedPlayers % params.getRepairPeriod() == 0 || isLastPlayer) {
-                fakeTime.changePage();
+                fakeTime.beforeRepair();
                 repairWeapons();
             }
             // store gold as specified
-            if (nbAttackedPlayers % params.getStoragePeriod() == 0 || isLastPlayer) {
-                fakeTime.changePage();
+            if (rol.getCurrentState().gold >= params.getStorageThreshold() || isLastPlayer) {
+                fakeTime.beforeGoldStorage();
                 storeGoldIntoChest();
-                fakeTime.pauseWhenSafe();
+                fakeTime.afterGoldStorage();
             } else {
-                fakeTime.changePageLong();
+                fakeTime.betweenAttacksWhenNoStorage();
             }
         }
         logger.info("{} total gold stolen from {} players.", Format.gold(totalGoldStolen), nbAttackedPlayers);

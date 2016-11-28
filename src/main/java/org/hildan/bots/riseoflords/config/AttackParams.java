@@ -2,14 +2,11 @@ package org.hildan.bots.riseoflords.config;
 
 public class AttackParams {
 
-    /** The maximum number of turns to spend. */
     private final int maxTurns;
 
-    /** Number of attacks between each weapon reparation. */
     private final int repairPeriod;
 
-    /** Number of attacks between each gold storage. */
-    private final int storagePeriod;
+    private final int storageThreshold;
 
     /**
      * Creates a new AttackParams.
@@ -18,13 +15,13 @@ public class AttackParams {
      *            the maximum number of players to attack
      * @param repairPeriod
      *            number of attacks between each weapon reparation
-     * @param storagePeriod
-     *            number of attacks between each gold storage
+     * @param storageThreshold
+     *            gold will be stored if this amount is reached
      */
-    AttackParams(int maxTurns, int repairPeriod, int storagePeriod) {
+    AttackParams(int maxTurns, int repairPeriod, int storageThreshold) {
         this.maxTurns = maxTurns;
         this.repairPeriod = repairPeriod;
-        this.storagePeriod = storagePeriod;
+        this.storageThreshold = storageThreshold;
     }
 
     /**
@@ -46,17 +43,17 @@ public class AttackParams {
     }
 
     /**
-     * Gets the number of attacks between each gold storage.
+     * Gets the amount of gold that should trigger storage in the chest.
      *
-     * @return the number of attacks between each gold storage
+     * @return the amount of gold that should trigger storage in the chest.
      */
-    public int getStoragePeriod() {
-        return storagePeriod;
+    public int getStorageThreshold() {
+        return storageThreshold;
     }
 
     @Override
     public String toString() {
         return "Attack params:\n   maxTurns: " + maxTurns + "\n   repair period: " + repairPeriod
-                + "\n   storage period: " + storagePeriod;
+                + "\n   gold storage threshold: " + storageThreshold;
     }
 }
