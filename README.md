@@ -19,7 +19,7 @@ Then you only have to focus on the interesting part of the game: how to spend yo
 
 ## Get started in 3 minutes
 
-1. Download the [binary program here](https://dl.bintray.com/joffrey-bion/applications/org/hildan/bots/rol-automizer/1.0.3/rol-automizer-1.0.3.exe)
+1. Download the [binary program here](https://dl.bintray.com/joffrey-bion/applications/org/hildan/bots/rol-automizer/1.3.0/rol-automizer-1.3.0.exe)
 2. Create a `.rol` file with a text editor, similar to the following one ([download here](https://raw.githubusercontent.com/joffrey-bion/RiseOfLords/master/dist/template.rol)):
 
         # credentials for connection
@@ -34,8 +34,8 @@ Then you only have to focus on the interesting part of the game: how to spend yo
         
         # maximum number of attacks
         attack.maxTurns=80
-        # store gold into chest every N attacks
-        attack.storagePeriod=2
+        # store gold into chest as soon as this threshold is reached
+        attack.storageThreshold=300000
         # repair weapons every N attacks
         attack.repairPeriod=5
         
