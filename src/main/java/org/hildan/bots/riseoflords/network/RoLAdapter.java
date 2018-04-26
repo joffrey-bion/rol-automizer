@@ -14,8 +14,9 @@ import org.hildan.bots.riseoflords.sequencing.LoginException;
 
 public class RoLAdapter {
 
-    private static final String URL_INDEX = "http://www.riseoflords.com/index.php";
-    private static final String URL_GAME = "http://www.riseoflords.com/jeu.php";
+    public static final String BASE_URL = "https://www.riseoflords.com";
+    private static final String URL_INDEX = BASE_URL + "/index.php";
+    private static final String URL_GAME = BASE_URL + "/jeu.php";
 
     private static final String PAGE_LOGIN = "verifpass";
     private static final String PAGE_LOGOUT = "logout";
@@ -26,7 +27,6 @@ public class RoLAdapter {
     private static final String PAGE_CHEST = "main/tresor";
     private static final String PAGE_WEAPONS = "main/arsenal";
     private static final String PAGE_SORCERY = "main/autel_sorciers";
-
     public static final int ERROR_REQUEST = -1;
     public static final int ERROR_STORM_ACTIVE = -2;
 
@@ -81,7 +81,7 @@ public class RoLAdapter {
     /**
      * Displays the village page, and updates the state.
      */
-    public void homePage() {
+    public void displayHomePage() {
         final HttpGet getRequest = Request.from(URL_GAME, PAGE_HOME).get();
         final String response = http.execute(getRequest);
         if (response.contains("images/layout2012/carte")) {

@@ -58,7 +58,7 @@ public class Sequence {
         logger.info("Logged in with username: {}", username);
         logger.info("Faking redirection page delay... (this takes a few seconds)");
         fakeTime.waitAfterLogin();
-        rol.homePage();
+        rol.displayHomePage();
         fakeTime.actionInPage();
     }
 

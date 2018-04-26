@@ -12,6 +12,7 @@ import org.hildan.bots.riseoflords.model.AccountState;
 import org.hildan.bots.riseoflords.model.Alignment;
 import org.hildan.bots.riseoflords.model.Army;
 import org.hildan.bots.riseoflords.model.Player;
+import org.hildan.bots.riseoflords.network.RoLAdapter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -21,8 +22,6 @@ import org.slf4j.LoggerFactory;
 public class Parser {
 
     private static final Logger logger = LoggerFactory.getLogger(Parser.class);
-
-    private static final String BASE_URL = "http://www.riseoflords.com/";
 
     /**
      * Updates the specified {@link AccountState} based on the top elements of the specified page.
@@ -198,7 +197,7 @@ public class Parser {
         final String goldImgUrl = goldImageElement.attr("src");
         assert goldImgUrl.length() > 0 : "emtpy gold image url";
         try {
-            final BufferedImage img = ImageIO.read(new URL(BASE_URL + goldImgUrl));
+            final BufferedImage img = ImageIO.read(new URL(RoLAdapter.BASE_URL + "/" + goldImgUrl));
             return GoldImageOCR.readAmount(img);
         } catch (final IOException e) {
             logger.error("Error downloading the gold image at {}", goldImgUrl);
