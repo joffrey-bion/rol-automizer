@@ -1,27 +1,29 @@
 plugins {
-    id "com.jfrog.bintray" version "1.8.0"
-    id "edu.sc.seis.launch4j" version "2.4.3"
+    id("com.jfrog.bintray") version "1.8.0"
+    id("edu.sc.seis.launch4j") version "2.4.3"
 }
 
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-apply plugin: 'application'
+apply(plugin: "java")
+apply(plugin: "eclipse")
+apply(plugin: "idea")
+apply(plugin: "application")
 
-group = 'org.hildan.bots'
-version = '1.3.1'
-description = 'An action sequencer to do the boring tasks on the game http://www.riseoflords.com.'
+group = "org.hildan.bots"
+version = "1.3.1"
+description = "An action sequencer to do the boring tasks on the game http://www.riseoflords.com."
 
 mainClassName = "org.hildan.bots.riseoflords.RolAutomizer"
 
-repositories { mavenCentral() }
+repositories {
+    mavenCentral()
+}
 
 dependencies {
-    compile 'org.apache.httpcomponents:httpclient:4.5.5'
-    compile 'org.jsoup:jsoup:1.9.2'
-    compile 'ch.qos.logback:logback-classic:1.2.3'
-    compile 'javax.mail:mail:1.4.3' // to send emails with logback
-    testCompile 'junit:junit:4.+'
+    compile("org.apache.httpcomponents:httpclient:4.5.5")
+    compile("org.jsoup:jsoup:1.9.2")
+    compile("ch.qos.logback:logback-classic:1.2.3")
+    compile("javax.mail:mail:1.4.3") // to send emails with logback
+    testCompile("junit:junit:4.+")
 }
 
 // to build a fat jar with all dependencies included
@@ -38,41 +40,40 @@ jar {
 launch4j {
     mainClassName = project.mainClassName
     headerType = "console"
-    icon = '../resources/main/rol-bot.ico'
+    icon = "../resources/main/rol-bot.ico"
     windowTitle = project.name
 }
 
 // defines what to distribute (jar and exe)
 artifacts {
     archives jar
-//    archives file(buildDir.name + '/' + launch4j.outputDir + '/' + launch4j.outfile)
-    archives file(buildDir.name + '/resources/main/template.rol')
+    archives file(buildDir.name + "/resources/main/template.rol")
 }
 
 bintrayUpload.dependsOn tasks.launch4j
 
 // used to upload artifacts to the Bintray repo
 bintray {
-    user = project.hasProperty('bintrayUser') ? project.bintrayUser : ''
-    key = project.hasProperty('bintrayApiKey') ? project.bintrayApiKey : ''
-    configurations = ['archives']
+    user = project.hasProperty("bintrayUser") ? project.bintrayUser : ""
+    key = project.hasProperty("bintrayApiKey") ? project.bintrayApiKey : ""
+    configurations = ["archives"]
 
     publish = true // the version should be auto published after an upload
 
     pkg {
-        repo = project.hasProperty('bintrayRepoApps') ? project.bintrayRepoApps : ''
+        repo = project.hasProperty("bintrayRepoApps") ? project.bintrayRepoApps : ""
         name = project.name
         desc = project.description
-        labels = ['riseoflords', 'rol', 'bot', 'game']
+        labels = ["riseoflords", "rol", "bot", "game"]
 
         String githubRepoName = project.name
-        websiteUrl = 'https://github.com/joffrey-bion/' + githubRepoName
-        issueTrackerUrl = 'https://github.com/joffrey-bion/' + githubRepoName + '/issues'
-        vcsUrl = 'https://github.com/joffrey-bion/' + githubRepoName + '.git'
+        websiteUrl = "https://github.com/joffrey-bion/" + githubRepoName
+        issueTrackerUrl = "https://github.com/joffrey-bion/" + githubRepoName + "/issues"
+        vcsUrl = "https://github.com/joffrey-bion/" + githubRepoName + ".git"
 
-        licenses = ['MIT']
+        licenses = ["MIT"]
         version {
-            vcsTag = 'v' + project.version
+            vcsTag = "v" + project.version
             gpg { sign = true }
         }
     }
