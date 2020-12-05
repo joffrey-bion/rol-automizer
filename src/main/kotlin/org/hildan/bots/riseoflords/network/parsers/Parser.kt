@@ -17,10 +17,7 @@ object Parser {
     private val logger = LoggerFactory.getLogger(Parser::class.java)
 
     /**
-     * Updates the specified [AccountState] based on the top elements of the specified page.
-     *
-     * @param state the state to update
-     * @param response the response to parse
+     * Updates the specified [state] based on the top elements of the specified page [response].
      */
     fun updateState(state: AccountState, response: String) {
         val body = Jsoup.parse(response).body()
@@ -41,10 +38,7 @@ object Parser {
     }
 
     /**
-     * Parses the list of players contained in the specified page.
-     *
-     * @param playerListPageResponse a response containing a list of players
-     * @return the parsed list of players
+     * Parses the list of players contained in the specified [playerListPageResponse].
      */
     fun parsePlayerList(playerListPageResponse: String): List<Player> {
         val body = Jsoup.parse(playerListPageResponse).body()
@@ -59,10 +53,7 @@ object Parser {
     }
 
     /**
-     * Creates a new player from the cells in the specified `<tr>` element.
-     *
-     * @param playerRow the row to parse
-     * @return the created [Player]
+     * Creates a new player from the cells in the specified `<tr>` element [playerRow].
      */
     private fun parsePlayer(playerRow: Element): Player {
         assert(playerRow.tagName() == "tr")
@@ -87,13 +78,9 @@ object Parser {
     }
 
     /**
-     * Gets the amount of stolen golden from the attack report.
-     *
-     * @param attackReportResponse
-     * the response containing the attack report.
-     * @return the amount of stolen gold, or -1 if the report couldn't be read properly
+     * Gets the amount of stolen golden from the given [attackReportResponse], or -1 in case of read error.
      */
-    fun parseGoldStolen(attackReportResponse: String?): Int {
+    fun parseGoldStolen(attackReportResponse: String): Int {
         val body = Jsoup.parse(attackReportResponse).body()
         val elts = body.getElementsByAttributeValue("class", "combat_gagne")
         if (elts.size == 0) {
@@ -104,12 +91,7 @@ object Parser {
     }
 
     /**
-     * Gets and parses the text contained in the spacified [Element].
-     *
-     * @param numberElement
-     * an element containing a text representing an integer, with possible dots as
-     * thousand separator.
-     * @return the parsed number
+     * Gets and parses the text contained in the specified [numberElement] as an [Int].
      */
     private fun getTextAsNumber(numberElement: Element): Int {
         val number = numberElement.text().trim { it <= ' ' }
@@ -117,13 +99,9 @@ object Parser {
     }
 
     /**
-     * Parses the weapons page response to return the current state of the weapons.
-     *
-     * @param weaponsPageResponse
-     * weapons page response
-     * @return the current percentage of wornness of the weapons
+     * Parses the [weaponsPageResponse] to return the current state of wornness of the weapons (in percents).
      */
-    fun parseWeaponsWornness(weaponsPageResponse: String?): Int {
+    fun parseWeaponsWornness(weaponsPageResponse: String): Int {
         val body = Jsoup.parse(weaponsPageResponse).body()
         val elts = body.getElementsByAttributeValueContaining("title", "Armes endommag\u00e9es")
         val input = elts[0]
@@ -136,13 +114,9 @@ object Parser {
     }
 
     /**
-     * Parses the amount of gold on the specified player page.
-     *
-     * @param playerPageResponse
-     * the details page of a player
-     * @return the amount of gold parsed, or -1 if it couldn't be parsed
+     * Parses the amount of gold on the specified [playerPageResponse], or -1 in case of error.
      */
-    fun parsePlayerGold(playerPageResponse: String?): Int {
+    fun parsePlayerGold(playerPageResponse: String): Int {
         val body = Jsoup.parse(playerPageResponse).body()
         val elts = body.getElementsByAttributeValueContaining("src", "aff_montant")
         val img = elts[0]
@@ -150,11 +124,7 @@ object Parser {
     }
 
     /**
-     * Uses an OCR to recognize a number in the specified `<img>` element.
-     *
-     * @param goldImageElement
-     * the `<img>` element to analyze
-     * @return the number parsed, or -1 if an error occurred
+     * Uses an OCR to recognize a number in the specified `<img>` element [goldImageElement], or -1 in case of error.
      */
     private fun getGoldFromImgElement(goldImageElement: Element): Int {
         assert(goldImageElement.tagName() == "img")
