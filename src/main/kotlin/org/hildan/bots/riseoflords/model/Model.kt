@@ -1,55 +1,53 @@
-package org.hildan.bots.riseoflords.model;
+package org.hildan.bots.riseoflords.model
 
-public class Player {
+data class AccountState(
+    var gold: Int = 0,
+    var chestGold: Int = 0,
+    var mana: Int = 0,
+    var adventurins: Int = 0,
+    var turns: Int = 0,
+)
 
-    private int rank;
-    private String name;
-    private int gold;
-    private Army army;
-    private Alignment alignment;
+data class Player(
+    val rank: Int,
+    val name: String,
+    val gold: Int,
+    val army: Army,
+    val alignment: Alignment,
+)
 
-    public int getRank() {
-        return rank;
+enum class Alignment(private val shortName: String) {
+    SAINT("Sai."),
+    CHEVALERESQUE("Che."),
+    ALTRUISTE("Alt."),
+    JUSTE("Jus."),
+    NEUTRE("Neu."),
+    SANS_SCRUPULES("SsS."),
+    VIL("Vil."),
+    ABOMINABLE("Abo."),
+    DEMONIAQUE("D\u00e9m.");
+
+    companion object {
+        private val ALIGNMENTS = values().associateBy { it.shortName }
+
+        operator fun get(shortName: String): Alignment =
+            ALIGNMENTS[shortName] ?: throw IllegalArgumentException("No alignment corresponds to the short name '$shortName'")
     }
+}
 
-    public void setRank(int rank) {
-        this.rank = rank;
-    }
+enum class Army(
+    private val shortNameMan: String,
+    private val shortNameWoman: String
+) {
+    WARRIORS("Chev.", "Guer."),
+    MAGES("Sorc.", "Sorc."),
+    SUICIDERS("Suic.", "Suic."),
+    HEALERS("Sage", "Pr\u00e9t.");
 
-    public String getName() {
-        return name;
-    }
+    companion object {
+        private val ARMIES = values().associateBy { it.shortNameMan } + values().associateBy { it.shortNameWoman }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getGold() {
-        return gold;
-    }
-
-    public void setGold(int gold) {
-        this.gold = gold;
-    }
-
-    public Army getArmy() {
-        return army;
-    }
-
-    public void setArmy(Army army) {
-        this.army = army;
-    }
-
-    public Alignment getAlignment() {
-        return alignment;
-    }
-
-    public void setAlignment(Alignment alignment) {
-        this.alignment = alignment;
-    }
-
-    @Override
-    public String toString() {
-        return "{rank=" + rank + ", name=" + name + ", gold=" + gold + ", army=" + army + ", align=" + alignment + "}";
+        operator fun get(shortName: String): Army =
+            ARMIES[shortName] ?: throw IllegalArgumentException("No army corresponds to the short name '$shortName'")
     }
 }

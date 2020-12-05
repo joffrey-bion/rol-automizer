@@ -1,19 +1,11 @@
-package org.hildan.bots.riseoflords.util;
+package org.hildan.bots.riseoflords.util
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 
-public class Format {
+object Format {
+    private val symbols = DecimalFormatSymbols.getInstance().apply { groupingSeparator = '.' }
+    private val fmt: DecimalFormat = DecimalFormat("###,###.##", symbols)
 
-    private static final DecimalFormat fmt;
-    static {
-        final DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
-        symbols.setGroupingSeparator('.');
-        fmt = new DecimalFormat("###,###.##", symbols);
-    }
-
-    public static String gold(int amount) {
-        return fmt.format(amount);
-    }
-
+    fun gold(amount: Int): String = fmt.format(amount.toLong())
 }

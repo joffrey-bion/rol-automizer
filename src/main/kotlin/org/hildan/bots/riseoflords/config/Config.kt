@@ -1,120 +1,98 @@
-package org.hildan.bots.riseoflords.config;
+package org.hildan.bots.riseoflords.config
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.Duration;
-import java.util.Properties;
+import java.io.FileInputStream
+import java.time.Duration
+import java.util.*
 
-import org.hildan.bots.riseoflords.RolAutomizer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+data class Config(
+    val account: Account,
+    val playerFilter: PlayerFilter,
+    val attackParams: AttackParams,
+    val nbOfAttacks: Int,
+    val timeBetweenAttacks: Duration
+) {
+    fun unlimitedAttacks(): Boolean = nbOfAttacks == 0
 
-public class Config {
+    override fun toString(): String = """
+           $account
+           $playerFilter
+           $attackParams
+           """.trimIndent()
 
-    private static final Logger logger = LoggerFactory.getLogger(Config.class);
+    companion object {
 
-    public static class BadConfigException extends Exception {
-
-        BadConfigException(String message) {
-            super(message);
+        fun loadFromFile(filename: String): Config = with(Properties().apply { load(FileInputStream(filename)) }) {
+            Config(
+                account = Account(
+                    login = getMandatoryProperty("account.login"),
+                    password = getMandatoryProperty("account.password"),
+                ),
+                playerFilter = PlayerFilter(
+                    minRank = getIntProperty("filter.minRank", 500),
+                    maxRank = getIntProperty("filter.maxRank", 4_000),
+                    goldThreshold = getIntProperty("filter.minGold", 400_000),
+                ),
+                attackParams = AttackParams(
+                    maxTurns = getIntProperty("attack.maxTurns", 20),
+                    repairPeriod = getIntProperty("attack.repairPeriod", 5),
+                    storageThreshold = getIntProperty("attack.storageThreshold", 500_000),
+                ),
+                nbOfAttacks = getIntProperty("sequence.nbOfAttacks", 1),
+                timeBetweenAttacks = Duration.ofHours(getIntProperty("sequence.hoursBetweenAttacks", 1).toLong()),
+            )
         }
     }
+}
 
-    private Account account;
-    private PlayerFilter filter;
-    private AttackParams params;
-    private int nbOfAttacks;
-    private Duration timeBetweenAttacks;
+data class Account(
+    val login: String,
+    val password: String,
+) {
+    override fun toString(): String = """
+        Account:
+            username: $login
+            password: ${"*".repeat(8)}
+    """.trimIndent()
+}
 
-    public static Config loadFromResource(String filename) throws IOException, BadConfigException {
-        final InputStream input = RolAutomizer.class.getResourceAsStream(filename);
-        if (input == null) {
-            throw new FileNotFoundException("file " + filename + " not found as resource");
-        }
-        return load(input);
-    }
+/** Parameters to choose players. */
+class PlayerFilter(
+    /** The minimum rank to attack.  */
+    val minRank: Int,
+    /** The maximum rank to attack.  */
+    val maxRank: Int,
+    /** Only players with at least this much gold will be attacked.  */
+    val goldThreshold: Int
+) {
+    val nbPlayersToScan: Int
+        get() = maxRank - minRank + 1
 
-    public static Config loadFromFile(String filename) throws IOException, BadConfigException {
-        return load(new FileInputStream(filename));
-    }
+    override fun toString(): String = "Player filter:\n   ranks: $minRank-$maxRank\n   min gold: $goldThreshold"
+}
 
-    private static Config load(InputStream configFile) throws IOException, BadConfigException {
-        final Properties prop = new Properties();
-        prop.load(configFile);
+data class AttackParams(
+    /** The maximum number of turns to use for the attack. */
+    val maxTurns: Int,
+    /** The number of attacks between each weapon reparation. */
+    val repairPeriod: Int,
+    /** The amount of gold that should trigger storage in the chest. */
+    val storageThreshold: Int
+) {
+    override fun toString(): String = """
+        Attack params:
+            maxTurns: $maxTurns
+            repair period: $repairPeriod
+            gold storage threshold: $storageThreshold
+    """.trimIndent()
+}
 
-        final Config config = new Config();
-        final String login = getMandatoryProperty(prop, "account.login");
-        final String password = getMandatoryProperty(prop, "account.password");
-        config.account = new Account(login, password);
+class BadConfigException(message: String?) : Exception(message)
 
-        final int minRank = getIntProperty(prop, "filter.minRank", 5000);
-        final int maxRank = getIntProperty(prop, "filter.maxRank", 6000);
-        final int minGold = getIntProperty(prop, "filter.minGold", 450000);
-        config.filter = new PlayerFilter(minRank, maxRank, minGold);
+private fun Properties.getMandatoryProperty(key: String): String =
+    getProperty(key)?.ifEmpty { null } ?: throw BadConfigException("No value for '$key', can't continue")
 
-        final int maxTurns = getIntProperty(prop, "attack.maxTurns", 20);
-        final int storageThreshold = getIntProperty(prop, "attack.storageThreshold", 300000);
-        final int repairPeriod = getIntProperty(prop, "attack.repairPeriod", 5);
-        config.params = new AttackParams(maxTurns, repairPeriod, storageThreshold);
-
-        config.timeBetweenAttacks = Duration.ofHours(getIntProperty(prop, "sequence.hoursBetweenAttacks", 1));
-        config.nbOfAttacks = getIntProperty(prop, "sequence.nbOfAttacks", 1);
-
-        return config;
-    }
-
-    private static String getMandatoryProperty(Properties prop, String key) throws BadConfigException {
-        final String strValue = prop.getProperty(key);
-        if (strValue == null) {
-            throw new BadConfigException("Missing key '" + key + "', can't continue");
-        }
-        if (strValue.length() == 0) {
-            throw new BadConfigException("No value for '" + key + "', can't continue");
-        }
-        return strValue;
-    }
-
-    private static int getIntProperty(Properties prop, String key, int defaultValue) throws BadConfigException {
-        final String strValue = prop.getProperty(key);
-        if (strValue == null) {
-            logger.warn("Missing key '{}', using default value ({})", key, defaultValue);
-            return defaultValue;
-        }
-        try {
-            return Integer.parseInt(strValue);
-        } catch (final NumberFormatException e) {
-            throw new BadConfigException("The value for key '" + key + "' must be an integer");
-        }
-    }
-
-    public Account getAccount() {
-        return account;
-    }
-
-    public PlayerFilter getPlayerFilter() {
-        return filter;
-    }
-
-    public AttackParams getAttackParams() {
-        return params;
-    }
-
-    public int getNbOfAttacks() {
-        return nbOfAttacks;
-    }
-
-    public boolean unlimitedAttacks() {
-        return nbOfAttacks == 0;
-    }
-
-    public Duration getTimeBetweenAttacks() {
-        return timeBetweenAttacks;
-    }
-
-    @Override
-    public String toString() {
-        return account + "\n" + filter + "\n" + params;
-    }
+private fun Properties.getIntProperty(key: String, defaultValue: Int): Int = try {
+    getProperty(key)?.toInt() ?: defaultValue
+} catch (e: NumberFormatException) {
+    throw BadConfigException("The value for key '$key' must be an integer")
 }

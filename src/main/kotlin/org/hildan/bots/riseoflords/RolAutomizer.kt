@@ -1,87 +1,90 @@
-package org.hildan.bots.riseoflords;
+package org.hildan.bots.riseoflords
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.time.Duration;
+import org.hildan.bots.riseoflords.config.BadConfigException
+import org.hildan.bots.riseoflords.config.Config
+import org.hildan.bots.riseoflords.network.LoginException
+import org.slf4j.LoggerFactory
+import java.io.FileNotFoundException
+import java.io.IOException
+import java.time.Duration
 
-import org.hildan.bots.riseoflords.config.Config;
-import org.hildan.bots.riseoflords.config.Config.BadConfigException;
-import org.hildan.bots.riseoflords.sequencing.LoginException;
-import org.hildan.bots.riseoflords.sequencing.Sequence;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+object RolAutomizer {
 
-public class RolAutomizer {
+    private val logger = LoggerFactory.getLogger(RolAutomizer::class.java)
 
-    private static final Logger logger = LoggerFactory.getLogger(RolAutomizer.class);
-
-    public static void main(String[] args) {
-        if (args.length == 0) {
-            logger.error("No config file provided: you must provide a .rol file to open.\n"
-                    + "More info at https://github.com/joffrey-bion/rol-automizer");
-            return;
+    @JvmStatic
+    fun main(args: Array<String>) {
+        if (args.isEmpty()) {
+            logger.error(
+                """
+                No config file provided: you must provide a .rol file to open.
+                More info at https://github.com/joffrey-bion/rol-automizer
+                """.trimIndent()
+            )
+            return
         }
-        final String filename = args[0];
-
-        Config config = loadConfig(filename);
-        if (config == null) {
-            return;
-        }
-        logger.info("Loaded config:\n{}", config.toString());
-
-        final Sequence sequence = new Sequence(config);
-        for (int i = 0; config.unlimitedAttacks() || i < config.getNbOfAttacks(); i++) {
-            logger.info("Starting attack session {}/{}", i + 1, config.getNbOfAttacks());
+        val filename = args[0]
+        val config = loadConfig(filename) ?: return
+        logger.info("Loaded config:\n{}", config.toString())
+        val sequence = org.hildan.bots.riseoflords.sequencing.Sequence(config)
+        var i = 0
+        while (config.unlimitedAttacks() || i < config.nbOfAttacks) {
+            logger.info("Starting attack session {}/{}", i + 1, config.nbOfAttacks)
             try {
-                sequence.start();
-            } catch (LoginException e) {
-                logger.error("Login failed for user {}", e.getUsername());
-            } catch (Exception e) {
-                logger.error("UNCAUGHT EXCEPTION", e);
+                sequence.start()
+            } catch (e: LoginException) {
+                logger.error("Login failed for user {}", e.username)
+            } catch (e: Exception) {
+                logger.error("UNCAUGHT EXCEPTION", e)
             }
-            if (config.unlimitedAttacks() || i + 1 < config.getNbOfAttacks()) {
+            if (config.unlimitedAttacks() || i + 1 < config.nbOfAttacks) {
                 // more attacks are waiting
-                waitForNextAttack(config.getTimeBetweenAttacks());
+                waitForNextAttack(config.timeBetweenAttacks)
             }
+            i++
         }
-        logger.info("End of attacks");
+        logger.info("End of attacks")
     }
 
-    private static Config loadConfig(String filename) {
+    private fun loadConfig(filename: String): Config? {
         try {
-            return Config.loadFromFile(filename);
-        } catch (FileNotFoundException e) {
-            logger.error("Cannot find config file {}", filename);
-        } catch (BadConfigException | IOException e) {
-            logger.error("Error reading config file", e);
+            return Config.loadFromFile(filename)
+        } catch (e: FileNotFoundException) {
+            logger.error("Cannot find config file {}", filename)
+        } catch (e: BadConfigException) {
+            logger.error("Error reading config file", e)
+        } catch (e: IOException) {
+            logger.error("Error reading config file", e)
         }
-        return null;
+        return null
     }
 
-    private static void waitForNextAttack(Duration duration) {
+    private fun waitForNextAttack(duration: Duration) {
+        var d = duration
         try {
-            long millis = duration.toMillis() % 1000;
-            Thread.sleep(millis);
-            duration = duration.minusMillis(millis);
-
-            while (!duration.isZero() && !duration.isNegative()) {
-                Thread.sleep(1000);
-                duration = duration.minusSeconds(1);
-                printDuration(duration);
+            val millis = d.toMillis() % 1000
+            Thread.sleep(millis)
+            d = d.minusMillis(millis)
+            while (!d.isZero && !d.isNegative) {
+                Thread.sleep(1000)
+                d = d.minusSeconds(1)
+                printDuration(d)
             }
-            System.out.print("\r");
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            print("\r")
+        } catch (e: InterruptedException) {
+            Thread.currentThread().interrupt()
         }
     }
 
-    private static void printDuration(Duration d) {
-        final long hours = d.toHours();
-        final long minutes = d.minusHours(hours).toMinutes();
-        final long seconds = d.minusHours(hours).minusMinutes(minutes).toMillis() / 1000;
-        System.out.print("\r");
-        System.out.print(
-                String.format("   Next attack session in %s%02d:%02d...", (hours > 0 ? hours + ":" : ""), minutes,
-                        seconds));
+    private fun printDuration(d: Duration) {
+        val hours = d.toHours()
+        val minutes = d.minusHours(hours).toMinutes()
+        val seconds = d.minusHours(hours).minusMinutes(minutes).toMillis() / 1000
+        print("\r")
+        print(
+            String.format(
+                "   Next attack session in %s%02d:%02d...", if (hours > 0) "$hours:" else "", minutes, seconds
+            )
+        )
     }
 }

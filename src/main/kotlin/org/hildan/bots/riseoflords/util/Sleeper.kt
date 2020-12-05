@@ -1,91 +1,68 @@
-package org.hildan.bots.riseoflords.util;
+package org.hildan.bots.riseoflords.util
 
-import java.util.Random;
+import org.slf4j.LoggerFactory
+import kotlin.random.Random
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+class Sleeper(private val speed: Speed) {
 
-public class Sleeper {
-
-    private static final Logger logger = LoggerFactory.getLogger(Sleeper.class);
-
-    public enum Speed {
+    enum class Speed(private val factor: Int) {
         INHUMAN(400),
         FAST(700),
         NORMAL(1000),
         SLOW(1500),
         REALLY_SLOW(2000);
 
-        private final int factor;
-
-        Speed(int factor) {
-            this.factor = factor;
-        }
-
-        public int affect(int millis) {
-            return millis * factor / 1000;
-        }
+        fun scale(millis: Int): Int = millis * factor / 1000
     }
 
-    private final Random rand = new Random(System.currentTimeMillis());
-    private final Speed speed;
-
-    public Sleeper(Speed speed) {
-        this.speed = speed;
-    }
-
-    private void sleep(int millis, boolean scaleDuration) {
+    private fun sleep(minMillis: Int, maxMillis: Int, scaleDuration: Boolean = true) {
         try {
-            final int affectedMillis = scaleDuration ? speed.affect(millis) : millis;
-            logger.debug("    ...  faking human delay {} ms  ...", affectedMillis);
-            Thread.sleep(affectedMillis);
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
+            val millis = Random.nextInt(minMillis, maxMillis)
+            val scaledMillis = if (scaleDuration) speed.scale(millis) else millis
+            logger.debug("    ...  faking human delay {} ms  ...", scaledMillis)
+            Thread.sleep(scaledMillis.toLong())
+        } catch (e: InterruptedException) {
+            Thread.currentThread().interrupt()
         }
     }
 
-    private void sleep(int minMillis, int maxMillis, boolean scaleDuration) {
-        final int duration = rand.nextInt(maxMillis - minMillis + 1) + minMillis;
-        sleep(duration, scaleDuration);
+    fun actionInPage() {
+        sleep(600, 1000)
     }
 
-    private void sleep(int minMillis, int maxMillis) {
-        sleep(minMillis, maxMillis, true);
+    fun changePage() {
+        sleep(900, 1500)
     }
 
-    public void actionInPage() {
-        sleep(600, 1000);
+    fun changePageLong() {
+        sleep(1000, 2000)
     }
 
-    public void changePage() {
-        sleep(900, 1500);
+    fun readPage() {
+        sleep(1200, 2500)
     }
 
-    public void changePageLong() {
-        sleep(1000, 2000);
+    fun beforeRepair() {
+        changePage()
     }
 
-    public void readPage() {
-        sleep(1200, 2500);
+    fun beforeGoldStorage() {
+        changePage()
     }
 
-    public void beforeRepair() {
-        changePage();
+    fun afterGoldStorage() {
+        sleep(2000, 3000)
     }
 
-    public void beforeGoldStorage() {
-        changePage();
+    fun betweenAttacksWhenNoStorage() {
+        changePage()
     }
 
-    public void afterGoldStorage() {
-        sleep(2000, 3000);
+    fun waitAfterLogin() {
+        sleep(6000, 7000, false)
     }
 
-    public void betweenAttacksWhenNoStorage() {
-        changePage();
-    }
-
-    public void waitAfterLogin() {
-        sleep(6000, 7000, false);
+    companion object {
+        private val logger = LoggerFactory.getLogger(Sleeper::class.java)
     }
 }

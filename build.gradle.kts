@@ -3,6 +3,7 @@ import com.jfrog.bintray.gradle.BintrayExtension.*
 plugins {
     java
     application
+    kotlin("jvm") version "1.4.20"
     id("com.jfrog.bintray") version "1.8.0"
     id("edu.sc.seis.launch4j") version "2.4.3"
 }
