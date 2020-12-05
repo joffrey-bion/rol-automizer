@@ -52,16 +52,15 @@ artifacts {
 
 tasks.bintrayUpload.get().dependsOn(tasks.launch4j.get())
 
-// used to upload artifacts to the Bintray repo
 bintray {
-    user = project.findProperty("bintrayUser")?.toString() ?: ""
-    key = project.findProperty("bintrayApiKey")?.toString() ?: ""
+    user = System.getenv("BINTRAY_USER") ?: ""
+    key = System.getenv("BINTRAY_KEY") ?: ""
     setConfigurations("archives")
 
     publish = true // the version should be auto published after an upload
 
     pkg(closureOf<PackageConfig> {
-        repo = project.findProperty("bintrayRepoApps")?.toString() ?: ""
+        repo = project.findProperty("bintrayRepo")?.toString() ?: ""
         name = project.name
         desc = project.description
         setLabels("riseoflords", "rol", "bot", "game")
