@@ -21,11 +21,10 @@ repositories {
 }
 
 dependencies {
-    compile("org.apache.httpcomponents:httpclient:4.5.5")
-    compile("org.jsoup:jsoup:1.9.2")
-    compile("ch.qos.logback:logback-classic:1.2.3")
-    compile("javax.mail:mail:1.4.3") // to send emails with logback
-    testCompile("junit:junit:4.+")
+    implementation("org.apache.httpcomponents:httpclient:4.5.5")
+    implementation("org.jsoup:jsoup:1.9.2")
+    implementation("ch.qos.logback:logback-classic:1.2.3")
+    implementation("javax.mail:mail:1.4.3") // to send emails with logback
 }
 
 // to build a fat jar with all dependencies included
