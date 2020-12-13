@@ -11,12 +11,12 @@ import org.hildan.bots.riseoflords.util.Sleeper.Speed
 import org.slf4j.LoggerFactory
 import java.util.*
 
-class Sequence(private val config: Config) {
+class AttackManager(private val config: Config) {
 
     private val fakeTime = Sleeper(Speed.INHUMAN)
     private val rol: RiseOfLordsClient = RiseOfLordsClient()
 
-    fun start() {
+    fun startAttackSession() {
         logger.info("Starting attack session...")
         login(config.account.login, config.account.password)
         attackRichest(config.playerFilter, config.attackParams)
@@ -234,6 +234,6 @@ class Sequence(private val config: Config) {
     }
 
     companion object {
-        private val logger = LoggerFactory.getLogger(Sequence::class.java)
+        private val logger = LoggerFactory.getLogger(AttackManager::class.java)
     }
 }

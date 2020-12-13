@@ -1,8 +1,6 @@
 package org.hildan.bots.riseoflords.config
 
-import java.io.FileInputStream
 import java.time.Duration
-import java.util.*
 
 data class Config(
     val account: Account,
@@ -11,37 +9,11 @@ data class Config(
     val nbOfAttacks: Int,
     val timeBetweenAttacks: Duration
 ) {
-    fun unlimitedAttacks(): Boolean = nbOfAttacks == 0
-
     override fun toString(): String = """
            $account
            $playerFilter
            $attackParams
            """.trimIndent()
-
-    companion object {
-
-        fun loadFromFile(filename: String): Config = with(Properties().apply { load(FileInputStream(filename)) }) {
-            Config(
-                account = Account(
-                    login = getMandatoryProperty("account.login"),
-                    password = getMandatoryProperty("account.password"),
-                ),
-                playerFilter = PlayerFilter(
-                    minRank = getIntProperty("filter.minRank", 500),
-                    maxRank = getIntProperty("filter.maxRank", 4_000),
-                    goldThreshold = getIntProperty("filter.minGold", 400_000),
-                ),
-                attackParams = AttackParams(
-                    maxTurns = getIntProperty("attack.maxTurns", 20),
-                    repairPeriod = getIntProperty("attack.repairPeriod", 5),
-                    storageThreshold = getIntProperty("attack.storageThreshold", 500_000),
-                ),
-                nbOfAttacks = getIntProperty("sequence.nbOfAttacks", 1),
-                timeBetweenAttacks = Duration.ofHours(getIntProperty("sequence.hoursBetweenAttacks", 1).toLong()),
-            )
-        }
-    }
 }
 
 data class Account(
@@ -84,15 +56,4 @@ data class AttackParams(
             repair period: $repairPeriod
             gold storage threshold: $storageThreshold
     """.trimIndent()
-}
-
-class BadConfigException(message: String?) : Exception(message)
-
-private fun Properties.getMandatoryProperty(key: String): String =
-    getProperty(key)?.ifEmpty { null } ?: throw BadConfigException("No value for '$key', can't continue")
-
-private fun Properties.getIntProperty(key: String, defaultValue: Int): Int = try {
-    getProperty(key)?.toInt() ?: defaultValue
-} catch (e: NumberFormatException) {
-    throw BadConfigException("The value for key '$key' must be an integer")
 }
