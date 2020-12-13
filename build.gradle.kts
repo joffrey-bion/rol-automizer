@@ -20,6 +20,12 @@ repositories {
     mavenCentral()
 }
 
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+}
+
 dependencies {
     implementation("org.apache.httpcomponents:httpclient:4.5.5")
     implementation("org.jsoup:jsoup:1.9.2")
