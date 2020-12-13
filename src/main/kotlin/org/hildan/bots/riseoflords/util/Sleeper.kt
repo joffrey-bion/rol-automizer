@@ -26,41 +26,23 @@ class Sleeper(private val speed: Speed) {
         }
     }
 
-    fun actionInPage() {
-        sleep(600, 1000)
-    }
+    fun actionInPage() = sleep(600, 1000)
 
-    fun changePage() {
-        sleep(900, 1500)
-    }
+    private fun changePage() = sleep(900, 1500)
 
-    fun changePageLong() {
-        sleep(1000, 2000)
-    }
+    fun changePageLong() = sleep(1000, 2000)
 
-    fun readPage() {
-        sleep(1200, 2500)
-    }
+    fun readPage() = sleep(1200, 2500)
 
-    fun beforeRepair() {
-        changePage()
-    }
+    fun beforeRepair() = changePage()
 
-    fun beforeGoldStorage() {
-        changePage()
-    }
+    fun beforeGoldStorage() = changePage()
 
-    fun afterGoldStorage() {
-        sleep(2000, 3000)
-    }
+    fun afterGoldStorage() = sleep(2000, 3000)
 
-    fun betweenAttacksWhenNoStorage() {
-        changePage()
-    }
+    fun betweenAttacksWhenNoStorage() = changePage()
 
-    fun waitAfterLogin() {
-        sleep(6000, 7000, false)
-    }
+    fun waitAfterLogin() = sleep(6000, 7000, false)
 
     companion object {
         private val logger = LoggerFactory.getLogger(Sleeper::class.java)
