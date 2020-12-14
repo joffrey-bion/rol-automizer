@@ -11,4 +11,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run bot
-        run: docker run -it ${{ github.repository_owner }}/rol-automizer -u ${{ secrets.ROL_USERNAME }} -p ${{ secrets.ROL_PASSWORD }}
+        run: docker run ghcr.io/${{ github.repository_owner }}/rol-automizer -u ${{ secrets.ROL_USERNAME }} -p ${{ secrets.ROL_PASSWORD }}
