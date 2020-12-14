@@ -129,7 +129,7 @@ object Parser {
     private fun getGoldFromImgElement(goldImageElement: Element): Int {
         assert(goldImageElement.tagName() == "img")
         val goldImgUrl = goldImageElement.attr("src")
-        assert(goldImgUrl.isNotEmpty()) { "emtpy gold image url" }
+        assert(goldImgUrl.isNotEmpty()) { "empty gold image url" }
         try {
             val img = ImageIO.read(URL(RiseOfLordsClient.BASE_URL + "/" + goldImgUrl))
             return GoldImageOCR.readAmount(img)

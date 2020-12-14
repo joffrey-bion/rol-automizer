@@ -2,158 +2,102 @@ package org.hildan.bots.riseoflords.network.parsers
 
 import org.slf4j.LoggerFactory
 import java.awt.image.BufferedImage
-import java.io.IOException
-import java.util.*
 import javax.imageio.ImageIO
 
 internal object GoldImageOCR {
 
     private val logger = LoggerFactory.getLogger(GoldImageOCR::class.java)
 
-    private const val DIGITS_DIR = "/img"
-
     private val DIGITS = arrayOf(
-        loadInternalImageResource("$DIGITS_DIR/0.png"),
-        loadInternalImageResource("$DIGITS_DIR/1.png"),
-        loadInternalImageResource("$DIGITS_DIR/2.png"),
-        loadInternalImageResource("$DIGITS_DIR/3.png"),
-        loadInternalImageResource("$DIGITS_DIR/4.png"),
-        loadInternalImageResource("$DIGITS_DIR/5.png"),
-        loadInternalImageResource("$DIGITS_DIR/6.png"),
-        loadInternalImageResource("$DIGITS_DIR/7.png"),
-        loadInternalImageResource("$DIGITS_DIR/8.png"),
-        loadInternalImageResource("$DIGITS_DIR/9.png")
+        loadImage("0.png"),
+        loadImage("1.png"),
+        loadImage("2.png"),
+        loadImage("3.png"),
+        loadImage("4.png"),
+        loadImage("5.png"),
+        loadImage("6.png"),
+        loadImage("7.png"),
+        loadImage("8.png"),
+        loadImage("9.png"),
     )
 
-    private val DOT = loadInternalImageResource("$DIGITS_DIR/dot.png")
+    private val DOT = loadImage("dot.png")
+
+    private fun loadImage(filename: String): BufferedImage =
+        ImageIO.read(GoldImageOCR::class.java.getResourceAsStream("/img/$filename"))
 
     fun readAmount(img: BufferedImage): Int {
         assert(img.width == 70) { "image width is not 70" }
         assert(img.height == 8) { "image height is not 8" }
-        val digits = splitIntoDigits(img)
-        val sb = StringBuilder()
-        for (digit in digits) {
-            sb.append(recognizeDigitOrDot(digit))
-        }
-        val amountAsText = sb.toString()
-        return try {
-            if (amountAsText == "") {
-                logger.error("OCR failed to recognize anything")
-                return -1
-            }
-            Integer.valueOf(amountAsText.replace(".", ""))
-        } catch (e: NumberFormatException) {
+        val amountAsText = img.splitAroundEmptyColumns().joinToString("") { it.toDigitOrDot() }
+        val amount = amountAsText.replace(".", "").toIntOrNull()
+        if (amount == null) {
             logger.error("Bad OCR result, cannot convert '{}' to a gold amount", amountAsText)
-            -1
+            return -1
         }
+        return amount
     }
 
-    private fun loadInternalImageResource(filename: String): BufferedImage = try {
-        ImageIO.read(GoldImageOCR::class.java.getResourceAsStream(filename))
-    } catch (e: IOException) {
-        throw RuntimeException("Internal image $filename couldn't be loaded")
-    }
-
-    private fun getEmptyColumns(img: BufferedImage): List<Int> {
-        val emptyCols: MutableList<Int> = ArrayList()
-        col_loop@ for (i in 0 until img.width) {
-            for (j in 0 until img.height) {
-                val rgb = img.getRGB(i, j)
-                if (rgb ushr 24 != 0) {
-                    continue@col_loop
-                }
-            }
-            emptyCols.add(i)
-        }
-        return emptyCols
-    }
-
-    private fun getDigitsBounds(img: BufferedImage): List<Array<Int?>> {
-        val emptyCols = getEmptyColumns(img)
-        val digitsBounds: MutableList<Array<Int?>> = ArrayList()
-        var start: Int? = null
-        var end: Int? = null
-        for (i in 0 until img.width) {
-            if (emptyCols.contains(i)) {
-                if (start != null) {
-                    digitsBounds.add(arrayOf(start, end))
-                }
-                start = null
-                end = null
-                continue
-            }
-            if (start == null) {
-                start = i
-            }
-            end = i
-        }
-        return digitsBounds
-    }
-
-    private fun splitIntoDigits(img: BufferedImage): List<BufferedImage> {
-        val digitsBounds = getDigitsBounds(img)
-        val digitsImages: MutableList<BufferedImage> = ArrayList()
-        for (bounds in digitsBounds) {
-            val digitImg = BufferedImage(bounds[1]!! - bounds[0]!! + 1, img.height, BufferedImage.TYPE_INT_ARGB)
-            for (i in 0 until digitImg.width) {
-                for (j in 0 until digitImg.height) {
-                    digitImg.setRGB(i, j, img.getRGB(i + bounds[0]!!, j))
-                }
-            }
-            digitsImages.add(digitImg)
-        }
-        return digitsImages
-    }
-
-    private fun getARGB(argb: Int): IntArray {
-        val res = IntArray(4)
-        res[0] = argb ushr 24 and 0xFF
-        res[1] = argb ushr 16 and 0xFF
-        res[2] = argb ushr 8 and 0xFF
-        res[3] = argb and 0xFF
-        return res
-    }
-
-    private fun areSimilar(recoPixel: Int, refPixel: Int): Boolean {
-        if (recoPixel == refPixel) {
-            return true
-        }
-        val recoARGB = getARGB(recoPixel)
-        val refARGB = getARGB(refPixel)
-        return recoARGB[0] == refARGB[0]
-    }
-
-    private fun areSimilar(candidate: BufferedImage, reference: BufferedImage): Boolean {
-        // check dimensions
-        if (candidate.height != reference.height) {
-            return false
-        }
-        if (candidate.width != reference.width) {
-            return false
-        }
-        // check pixels
-        for (i in 0 until candidate.width) {
-            for (j in 0 until candidate.height) {
-                val recoPixel = candidate.getRGB(i, j)
-                val refPixel = reference.getRGB(i, j)
-                if (!areSimilar(recoPixel, refPixel)) {
-                    return false
-                }
+    private fun BufferedImage.toDigitOrDot(): String {
+        DIGITS.forEachIndexed { digit, digitImg ->
+            if (hasSameAlphaAs(digitImg)) {
+                return digit.toString()
             }
         }
-        return true
-    }
-
-    private fun recognizeDigitOrDot(digitImg: BufferedImage): String {
-        for (i in DIGITS.indices) {
-            if (areSimilar(digitImg, DIGITS[i])) {
-                return i.toString()
-            }
-        }
-        if (areSimilar(digitImg, DOT)) {
+        if (hasSameAlphaAs(DOT)) {
             return "."
         }
         logger.error("Unrecognized digit in gold image")
         return " "
     }
+}
+
+private fun BufferedImage.hasSameAlphaAs(reference: BufferedImage): Boolean {
+    // check dimensions
+    if (height != reference.height) {
+        return false
+    }
+    if (width != reference.width) {
+        return false
+    }
+    // check pixels
+    for (i in 0 until width) {
+        for (j in 0 until height) {
+            val recoPixel = getRGB(i, j)
+            val refPixel = reference.getRGB(i, j)
+            if (recoPixel.alpha != refPixel.alpha) {
+                return false
+            }
+        }
+    }
+    return true
+}
+
+private fun BufferedImage.splitAroundEmptyColumns(): List<BufferedImage> =
+    getNonEmptyColumnRanges().map { colRange -> subImage(colRange) }
+
+@OptIn(ExperimentalStdlibApi::class)
+private fun BufferedImage.getNonEmptyColumnRanges(): List<IntRange> {
+    val rangeBounds = buildList {
+        add(-1)
+        addAll(getEmptyColumnsIndexes())
+        add(width)
+    }
+    return rangeBounds.zipWithNext { s, e -> (s+1) until e }.filter { !it.isEmpty() }
+}
+
+private fun BufferedImage.getEmptyColumnsIndexes(): List<Int> = (0 until width).filter { col -> isEmptyColumn(col) }
+
+private fun BufferedImage.isEmptyColumn(col: Int) = (0 until height).all { row -> getRGB(col, row).alpha == 0 }
+
+val Int.alpha get() = this ushr 24
+
+private fun BufferedImage.subImage(colRange: IntRange): BufferedImage {
+    val digitImg = BufferedImage(colRange.last - colRange.first + 1, height, BufferedImage.TYPE_INT_ARGB)
+    for (i in 0 until digitImg.width) {
+        for (j in 0 until digitImg.height) {
+            digitImg.setRGB(i, j, getRGB(i + colRange.first, j))
+        }
+    }
+    return digitImg
 }
