@@ -1,0 +1,12 @@
+name: Bot schedule
+
+on:
+  schedule:
+    - cron: "0 */12 * * *"
+
+jobs:
+  bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run bot
+        run: docker run -it ${{ github.repository_owner }}/rol-automizer -u ${{ secrets.ROL_USERNAME }} -p ${{ secrets.ROL_PASSWORD }}
