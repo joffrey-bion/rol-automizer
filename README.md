@@ -6,12 +6,15 @@
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/joffrey-bion/rol-automizer/blob/master/LICENSE)
 
 You play RoL, but you're tired of repetitive tasks such as attacking a whole series of players?
+
 This is the solution: a simple sequencer for the game [Rise of Lords](http://www.riseoflords.com/).
 
 ## What does it do?
 
-This program is meant to do the boring task of attacking players for you. All you have to do is setting what kind of players you want to attack (rank and minimum gold). The sequencer takes care of the rest:
-- **attacks players** (up to a maximum that you set)
+This program is meant to do the boring task of attacking players for you.
+All you have to do is setting what kind of players you want to attack (rank and minimum gold).
+The sequencer takes care of the rest:
+- **attacks players** (with customizable ranks range, minimum gold, max number of turns)
 - **repairs weapons** from time to time (can be customized)
 - **stores the gold** in the chest from time to time (can be customized)
  
@@ -19,33 +22,30 @@ Then you only have to focus on the interesting part of the game: how to spend yo
 
 ## Get started in 3 minutes
 
-1. Download the [binary program here](https://dl.bintray.com/joffrey-bion/applications/org/hildan/bots/rol-automizer/1.3.0/rol-automizer-1.3.0.exe)
-2. Create a `.rol` file with a text editor, similar to the following one ([download here](https://raw.githubusercontent.com/joffrey-bion/RiseOfLords/master/dist/template.rol)):
+You can run the program using docker with the following command:
 
-        # credentials for connection
-        account.login=myLogin
-        account.password=myPassword
-        
-        # attack only players within the given bounds
-        filter.minRank=4000
-        filter.maxRank=6500
-        # attack only player with more gold than specified
-        filter.minGold=350000
-        
-        # maximum number of attacks
-        attack.maxTurns=80
-        # store gold into chest as soon as this threshold is reached
-        attack.storageThreshold=300000
-        # repair weapons every N attacks
-        attack.repairPeriod=5
-        
-        # duration in hours to wait between each attack session
-        sequence.hoursBetweenAttacks=1
-        # number of attack sessions to perform
-        sequence.nbOfAttacks=5
+```
+docker run -it -u YOUR_USERNAME hildan/rol-automizer [OPTIONS]
+```
 
-3. You may now open your .rol file with the main program (right click > open with...)
-4. Enjoy the gold
+Here are the program options:
+
+```
+Usage: rol-automizer [OPTIONS]
+
+Options:
+-u, --username TEXT      your Rise of Lords username
+-p, --password TEXT      your Rise of Lords password
+-m, --min-rank INT       the minimum rank of the players to attack
+-M, --max-rank INT       the maximum rank of the players to attack
+-g, --min-gold INT       the minimum gold of the enemy player to consider an attack worth it
+-t, --max-turns INT      the maximum number of turns to use during an attack session
+-r, --repair-period INT  the number of attacks between weapon repairs
+--storage-threshold INT  the threshold above which we need to store the current gold into the chest
+--attacks-count INT      the number of attack sessions to perform
+--rest-time HOURS        the number of hours to wait between attack sessions
+-h, --help               Show this message and exit
+```
 
 ## License
 
