@@ -1,6 +1,8 @@
 package org.hildan.bots.riseoflords
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.context
+import com.github.ajalt.clikt.output.CliktHelpFormatter
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.int
 import org.hildan.bots.riseoflords.config.Account
@@ -19,6 +21,10 @@ fun main(args: Array<String>) = RolAutomizerCommand().main(args)
 private val logger = LoggerFactory.getLogger(RolAutomizer::class.java)
 
 class RolAutomizerCommand : CliktCommand() {
+
+    init {
+        context { helpFormatter = CliktHelpFormatter(showDefaultValues = true) }
+    }
 
     private val username by option(
         "-u",
