@@ -25,8 +25,12 @@ Then you only have to focus on the interesting part of the game: how to spend yo
 You can run the program using docker with the following command:
 
 ```
-docker run -it -u YOUR_USERNAME hildan/rol-automizer [OPTIONS]
+docker run -it hildan/rol-automizer -u YOUR_USERNAME [OPTIONS]
 ```
+
+You will be prompted for your password, unless the `ROL_PASSWORD` environment variable is defined.
+You can also provide your username as the `ROL_USERNAME` environment variable if you don't want to type it on the 
+command line.
 
 Here are the program options:
 
