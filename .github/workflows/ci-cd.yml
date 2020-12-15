@@ -1,9 +1,7 @@
-name: CI Build
+name: CI-CD
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
     branches: [ main ]
 
 env:
