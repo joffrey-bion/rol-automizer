@@ -1,28 +1,22 @@
 # Rise Of Lords Automizer
 
 [![Bintray](https://img.shields.io/bintray/v/joffrey-bion/applications/rol-automizer.svg)](https://bintray.com/joffrey-bion/applications/rol-automizer/_latestVersion)
-[![Travis Build](https://img.shields.io/travis/joffrey-bion/rol-automizer/master.svg)](https://travis-ci.org/joffrey-bion/rol-automizer)
-[![Dependency Status](https://www.versioneye.com/user/projects/56d2f52c157a6913c1e6c83f/badge.svg)](https://www.versioneye.com/user/projects/56d2f52c157a6913c1e6c83f)
+[![Github Build](https://img.shields.io/github/workflow/status/joffrey-bion/rol-automizer/CI%20Build?label=build&logo=github)](https://github.com/joffrey-bion/rol-automizer/actions?query=workflow%3A%22CI+Build%22)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/joffrey-bion/rol-automizer/blob/master/LICENSE)
 
-You play RoL, but you're tired of repetitive tasks such as attacking a whole series of players?
-
-This is the solution: a simple sequencer for the game [Rise of Lords](http://www.riseoflords.com/).
+This is a simple sequencer for the game [Rise of Lords](http://www.riseoflords.com/).
 
 ## What does it do?
 
-This program is meant to do the boring task of attacking players for you.
-All you have to do is setting what kind of players you want to attack (rank and minimum gold).
-The sequencer takes care of the rest:
-- **attacks players** (with customizable ranks range, minimum gold, max number of turns)
-- **repairs weapons** from time to time (can be customized)
-- **stores the gold** in the chest from time to time (can be customized)
- 
-Then you only have to focus on the interesting part of the game: how to spend your gold!
+This program performs a regular routine on your behalf: 
 
-## Get started in 3 minutes
+- attack players to steal gold
+- repair weapons from time to time
+- store the gold in the chest from time to time
 
-You can run the program using docker with the following command:
+## Usage
+
+You can run the program using [Docker](https://www.docker.com/) with the following command:
 
 ```
 docker run -it hildan/rol-automizer -u YOUR_USERNAME [OPTIONS]

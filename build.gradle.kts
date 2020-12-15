@@ -3,7 +3,6 @@ plugins {
     kotlin("jvm") version "1.4.21"
 }
 
-group = "org.hildan.bots"
 description = "An action sequencer to do the boring tasks on the game http://www.riseoflords.com."
 
 application {
