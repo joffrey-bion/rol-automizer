@@ -18,7 +18,7 @@ This program performs a regular routine on your behalf:
 You can run the program using [Docker](https://www.docker.com/) with the following command:
 
 ```
-docker run -it hildan/rol-automizer -u YOUR_USERNAME [OPTIONS]
+docker run --rm -it hildan/rol-automizer -u YOUR_USERNAME [OPTIONS]
 ```
 
 You will be prompted for your password, unless the `ROL_PASSWORD` environment variable is defined.
