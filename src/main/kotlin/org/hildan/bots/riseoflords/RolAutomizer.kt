@@ -44,13 +44,13 @@ class RolAutomizerCommand : CliktCommand() {
         "-m",
         "--min-rank",
         help = "the minimum rank of the players to attack",
-    ).int().default(500)
+    ).int().default(400)
 
     private val maxRank by option(
         "-M",
         "--max-rank",
         help = "the maximum rank of the players to attack",
-    ).int().default(2_000)
+    ).int().default(2_200)
 
     private val minGold by option(
         "-g",
