@@ -3,7 +3,7 @@
 [![Github Build](https://img.shields.io/github/workflow/status/joffrey-bion/rol-automizer/CI-CD?label=build&logo=github)](https://github.com/joffrey-bion/rol-automizer/actions?query=workflow%3A%22CI-CD%22)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/joffrey-bion/rol-automizer/blob/master/LICENSE)
 
-This is a simple sequencer for the game [Rise of Lords](http://www.riseoflords.com/).
+This is a simple bot for the game [Rise of Lords](http://www.riseoflords.com/).
 
 ## What does it do?
 
