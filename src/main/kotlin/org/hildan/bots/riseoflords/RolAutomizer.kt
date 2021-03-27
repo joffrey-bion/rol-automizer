@@ -62,7 +62,7 @@ class RolAutomizerCommand : CliktCommand() {
         "-t",
         "--max-turns",
         help = "the maximum number of turns to use during an attack session",
-    ).int().default(20)
+    ).int().default(40)
 
     private val repairPeriod by option(
         "-r",
