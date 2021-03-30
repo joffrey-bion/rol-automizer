@@ -74,8 +74,7 @@ class RiseOfLordsClient {
     /**
      * Returns a list of 99 users, starting at the specified rank.
      *
-     * @param startRank
-     * the rank of the first user to return
+     * @param startRank the rank of the first user to return
      * @return 99 users at most, starting at the specified rank.
      */
     fun listPlayers(startRank: Int): List<Player> {
@@ -176,8 +175,7 @@ class RiseOfLordsClient {
      * Displays the weapons page. Used to fake a visit on the weapons page before repairing or
      * buying weapons and equipment.
      *
-     * @return the percentage of wornness of the weapons, or [.ERROR_REQUEST] if the request
-     * failed
+     * @return the percentage of wornness of the weapons, or [ERROR_REQUEST] if the request failed
      */
     fun displayWeaponsPage(): Int {
         val response = http.get(URL_GAME, PAGE_WEAPONS) ?: return ERROR_REQUEST
@@ -209,7 +207,7 @@ class RiseOfLordsClient {
     /**
      * Displays the sorcery page. Used to fake a visit on the sorcery page before casting a spell.
      *
-     * @return the available mana, or [.ERROR_REQUEST] if the request failed
+     * @return the available mana, or [ERROR_REQUEST] if the request failed
      */
     fun displaySorceryPage(): Int {
         val response = http.get(URL_GAME, PAGE_SORCERY) ?: return ERROR_REQUEST
