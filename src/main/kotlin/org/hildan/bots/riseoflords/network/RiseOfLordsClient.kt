@@ -220,6 +220,25 @@ class RiseOfLordsClient {
     }
 
     /**
+     * Clones the given [quantity] of sorcerers.
+     *
+     * @return true if the request succeeded, false otherwise
+     */
+    fun cloneSorcerers(quantity: Int): Boolean {
+        val response = http.post(URL_GAME, PAGE_SORCERY, {
+            addParameter("a", "lancer")
+            addParameter("idsort", "1")
+        }, {
+            formParam("clonage_nombre_cible", quantity.toString())
+        })
+        if (response == null || "ont été clonés" !in response) {
+            return false
+        }
+        Parser.updateState(currentState, response)
+        return true
+    }
+
+    /**
      * Casts the dissipation spell to get rid of the protective aura. Useful before self-casting a
      * storm.
      *
@@ -266,6 +285,9 @@ class RiseOfLordsClient {
         private const val PAGE_SORCERY = "main/autel_sorciers"
         const val ERROR_REQUEST = -1
         const val ERROR_STORM_ACTIVE = -2
+
+        const val SORCERER_CLONE_COST_GOLD = 5_000
+        const val SORCERER_CLONE_COST_MANA = 35_000
     }
 }
 

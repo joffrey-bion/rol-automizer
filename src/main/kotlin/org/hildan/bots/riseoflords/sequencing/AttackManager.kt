@@ -19,6 +19,7 @@ class AttackManager(private val config: Config) {
     fun startAttackSession() {
         logger.info("Starting attack session...")
         login(config.account.login, config.account.password)
+        cloneSorcerersIfPossible()
         attackRichest(config.playerFilter, config.attackParams)
         fakeTime.changePageLong()
         logout()
@@ -33,6 +34,25 @@ class AttackManager(private val config: Config) {
         fakeTime.waitAfterLogin()
         rol.displayHomePage()
         fakeTime.actionInPage()
+    }
+
+    private fun cloneSorcerersIfPossible() {
+        val nPossibleClones = minOf(
+            rol.currentState.gold / RiseOfLordsClient.SORCERER_CLONE_COST_GOLD,
+            rol.currentState.mana / RiseOfLordsClient.SORCERER_CLONE_COST_MANA,
+        )
+        if (nPossibleClones > 0) {
+            rol.displaySorceryPage()
+            fakeTime.actionInPage()
+            val success = rol.cloneSorcerers(nPossibleClones)
+            if (success) {
+                logger.info("Cloned $nPossibleClones sorcerers")
+            } else {
+                logger.error("Error when attempting to clone $nPossibleClones sorcerers " +
+                    "(Gold: ${rol.currentState.gold}, Mana: ${rol.currentState.mana})")
+            }
+            fakeTime.changePageLong()
+        }
     }
 
     private fun logout() {
