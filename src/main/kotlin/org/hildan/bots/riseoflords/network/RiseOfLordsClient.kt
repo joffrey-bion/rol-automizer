@@ -18,7 +18,7 @@ import java.util.*
 import kotlin.random.Random
 
 private const val FAKE_USER_AGENT =
-    "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.143 Safari/537.36"
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36"
 
 class LoginException(val username: String, val password: String) : Exception()
 
