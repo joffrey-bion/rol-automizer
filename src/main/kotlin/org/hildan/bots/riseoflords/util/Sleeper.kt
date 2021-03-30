@@ -32,7 +32,7 @@ class Sleeper(private val speed: Speed) {
 
     fun changePageLong() = sleep(1000, 2000)
 
-    fun readPage() = sleep(1200, 2500)
+    fun readPlayerListPage() = sleep(1200, 2500)
 
     fun beforeRepair() = changePage()
 

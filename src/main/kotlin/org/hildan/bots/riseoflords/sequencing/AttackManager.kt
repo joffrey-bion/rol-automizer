@@ -85,7 +85,7 @@ class AttackManager(private val config: Config) {
                 pageMaxRank - filter.minRank + 1,
                 filter.nbPlayersToScan
             )
-            fakeTime.readPage()
+            fakeTime.readPlayerListPage()
             startRank += 99
         }
         val nbMatchingPlayers = matchingPlayers.size
