@@ -20,7 +20,7 @@ import kotlin.random.Random
 private const val FAKE_USER_AGENT =
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36"
 
-class LoginException(val username: String, val password: String) : Exception()
+class LoginException(val username: String) : Exception()
 
 class RiseOfLordsClient {
 
@@ -47,7 +47,7 @@ class RiseOfLordsClient {
             formParam("LogPassword", password)
         }
         if ("Identification r\u00e9ussie!" !in response) {
-            throw LoginException(username, password)
+            throw LoginException(username)
         }
     }
 
