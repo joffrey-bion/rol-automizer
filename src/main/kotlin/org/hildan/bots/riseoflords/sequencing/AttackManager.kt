@@ -10,7 +10,6 @@ import org.hildan.bots.riseoflords.util.Format
 import org.hildan.bots.riseoflords.util.Sleeper
 import org.hildan.bots.riseoflords.util.Sleeper.Speed
 import org.slf4j.LoggerFactory
-import java.util.*
 
 class AttackManager(private val config: Config) {
 
@@ -82,49 +81,33 @@ class AttackManager(private val config: Config) {
             Format.gold(filter.goldThreshold),
             maxTurns
         )
-        logger.info("Searching players matching the config filter...")
-        val matchingPlayers: MutableList<Player> = ArrayList()
-        var startRank = filter.minRank
-        while (startRank < filter.maxRank) {
-            logger.debug("Reading page of players ranked {} to {}...", startRank, startRank + 98)
-            val filteredPage = rol.listPlayers(startRank).asSequence() // stream players
-                .filter { p -> p.gold >= filter.goldThreshold } // above gold threshold
-                .filter { p -> p.rank <= filter.maxRank } // below max rank
-                .sortedByDescending { it.gold } // richest first
-                .take(params.maxTurns) // limit to max turns
-                .take(rol.currentState.turns) // limit to available turns
-                .toList()
-            val pageMaxRank = (startRank + 98).coerceAtMost(filter.maxRank)
-            val nbMatchingPlayers = matchingPlayers.size
-            matchingPlayers.addAll(filteredPage)
-            logger.info(
-                "{} matching player{} found so far, ranked {} to {} ({}/{} players scanned)",
-                if (nbMatchingPlayers > 0) nbMatchingPlayers else "No",
-                if (nbMatchingPlayers > 1) "s" else "",
-                filter.minRank,
-                pageMaxRank,
-                pageMaxRank - filter.minRank + 1,
-                filter.nbPlayersToScan
-            )
-            fakeTime.readPlayerListPage()
-            startRank += 99
+        logger.info("Searching players matching the criteria...")
+        val playersToAttack = listMatchingPlayers(filter)
+            .sortedByDescending { it.gold } // richest first
+            .take(params.maxTurns) // limit to max turns
+            .take(rol.currentState.turns) // limit to available turns
+            .toList()
+        logger.info("{} matching players found", playersToAttack.size)
+        return attackAll(playersToAttack, params)
+    }
+
+    private fun listMatchingPlayers(filter: PlayerFilter) = listPlayers(startRank = filter.minRank)
+        .takeWhile { it.rank <= filter.maxRank }
+        .onEach {
+            if (it.rank % 30 == 0 || it.rank == filter.maxRank) {
+                logger.info("{}/{} players scanned", it.rank - filter.minRank + 1, filter.nbPlayersToScan)
+            }
         }
-        val nbMatchingPlayers = matchingPlayers.size
-        return if (nbMatchingPlayers > maxTurns) {
-            logger.info(
-                "Only {} out of the {} matching players can be attacked, filtering only the richest of them...",
-                maxTurns,
-                matchingPlayers.size
-            )
-            // too many players, select only the richest
-            val playersToAttack = matchingPlayers.asSequence() // stream players
-                .sortedByDescending { it.gold } // richest first
-                .take(params.maxTurns) // limit to max turns
-                .take(rol.currentState.turns) // limit to available turns
-                .toList()
-            attackAll(playersToAttack, params)
-        } else {
-            attackAll(matchingPlayers, params)
+        .filter { p -> p.gold >= filter.goldThreshold }
+
+    private fun listPlayers(startRank: Int): Sequence<Player> = sequence {
+        var currentFirstRank = startRank
+        while (true) {
+            logger.debug("Reading page of players ranked {} to {}...", currentFirstRank, currentFirstRank + 98)
+            val page = rol.displayPlayerListPage(startRank = currentFirstRank)
+            fakeTime.readPlayerListPage()
+            yieldAll(page)
+            currentFirstRank = page.last().rank + 1
         }
     }
 

@@ -77,19 +77,21 @@ class RiseOfLordsClient {
      * @param startRank the rank of the first user to return
      * @return 99 users at most, starting at the specified rank.
      */
-    fun listPlayers(startRank: Int): List<Player> {
-        val repsonse = http.get(URL_GAME, PAGE_USERS_LIST) {
+    fun displayPlayerListPage(startRank: Int): List<Player> {
+        val response = http.get(URL_GAME, PAGE_USERS_LIST) {
             addParameter("Debut", (startRank + 1).toString())
+            // when clicking the OK button (manual rank input), x/y coordinates of the click in the button are passed
+            // when clicking "prev/next" arrows, the coords are not passed
             if (Random.nextBoolean()) {
                 addParameter("x", randomCoord(5, 35))
                 addParameter("y", randomCoord(5, 25))
             }
         }
-        if ("Recherche pseudo:" !in repsonse) {
+        if ("Recherche pseudo:" !in response) {
             error("Unexpected response for player list")
         }
-        Parser.updateState(currentState, repsonse)
-        return Parser.parsePlayerList(repsonse)
+        Parser.updateState(currentState, response)
+        return Parser.parsePlayerList(response)
     }
 
     /**
