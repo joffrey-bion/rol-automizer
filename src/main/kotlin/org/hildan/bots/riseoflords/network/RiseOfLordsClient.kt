@@ -46,7 +46,7 @@ class RiseOfLordsClient {
             formParam("LogPseudo", username)
             formParam("LogPassword", password)
         }
-        if (response == null || !response.contains("Identification r\u00e9ussie!")) {
+        if ("Identification r\u00e9ussie!" !in response) {
             throw LoginException(username, password)
         }
     }
@@ -58,14 +58,14 @@ class RiseOfLordsClient {
      */
     fun logout(): Boolean {
         val response = http.get(URL_INDEX, PAGE_LOGOUT)
-        return response?.contains("D\u00e9j\u00e0 inscrit? Connectez-vous") ?: false
+        return "D\u00e9j\u00e0 inscrit? Connectez-vous" in response
     }
 
     /**
      * Displays the village page, and updates the state.
      */
     fun displayHomePage() {
-        val response = http.get(URL_GAME, PAGE_HOME) ?: error("displayHomePage request failed")
+        val response = http.get(URL_GAME, PAGE_HOME)
         if (response.contains("images/layout2012/carte")) {
             Parser.updateState(currentState, response)
         }
@@ -78,20 +78,18 @@ class RiseOfLordsClient {
      * @return 99 users at most, starting at the specified rank.
      */
     fun listPlayers(startRank: Int): List<Player> {
-        val nullableResponse = http.get(URL_GAME, PAGE_USERS_LIST) {
+        val repsonse = http.get(URL_GAME, PAGE_USERS_LIST) {
             addParameter("Debut", (startRank + 1).toString())
             if (Random.nextBoolean()) {
                 addParameter("x", randomCoord(5, 35))
                 addParameter("y", randomCoord(5, 25))
             }
         }
-        val response = nullableResponse ?: error("listPlayer request failed")
-        return if ("Recherche pseudo:" in response) {
-            Parser.updateState(currentState, response)
-            Parser.parsePlayerList(response)
-        } else {
-            ArrayList()
+        if ("Recherche pseudo:" !in repsonse) {
+            error("Unexpected response for player list")
         }
+        Parser.updateState(currentState, repsonse)
+        return Parser.parsePlayerList(repsonse)
     }
 
     /**
@@ -104,12 +102,11 @@ class RiseOfLordsClient {
         val response = http.get(URL_GAME, PAGE_USER_DETAILS) {
             addParameter("voirpseudo", playerName)
         }
-        return if (response != null && "Seigneur $playerName" in response) {
-            Parser.updateState(currentState, response)
-            Parser.parsePlayerGold(response)
-        } else {
-            ERROR_REQUEST
+        if ("Seigneur $playerName" !in response) {
+            error("Unexpected response for player page of player '$playerName'")
         }
+        Parser.updateState(currentState, response)
+        return Parser.parsePlayerGold(response)
     }
 
     /**
@@ -117,7 +114,7 @@ class RiseOfLordsClient {
      *
      * @return the gold stolen during the attack, or [ERROR_REQUEST] if the request failed
      */
-    fun attack(username: String): Int {
+    fun attack(username: String): AttackResult {
         val response = http.post(URL_GAME, PAGE_ATTACK, {
             addParameter("a", "ok")
         }, {
@@ -125,16 +122,19 @@ class RiseOfLordsClient {
             formParam("NbToursToUse", "1")
         })
         return when {
-            response == null -> ERROR_REQUEST
-            "remporte le combat!" in response || "perd cette bataille!" in response -> {
+            "remporte le combat!" in response -> {
                 Parser.updateState(currentState, response)
-                Parser.parseGoldStolen(response)
+                AttackResult.Victory(Parser.parseGoldStolen(response))
+            }
+            "perd cette bataille!" in response -> {
+                Parser.updateState(currentState, response)
+                AttackResult.Defeat
             }
             "temp\u00eate magique s'abat" in response -> {
                 Parser.updateState(currentState, response)
-                ERROR_STORM_ACTIVE
+                AttackResult.StormActive
             }
-            else -> ERROR_REQUEST
+            else -> error("Invalid response for attack request")
         }
     }
 
@@ -143,16 +143,15 @@ class RiseOfLordsClient {
      * the chest.
      *
      * @return the amount of money that could be stored in the chest, which is the current amount of
-     * gold of the player, or [ERROR_REQUEST] if the request failed
+     * gold of the player
      */
     fun displayChestPage(): Int {
-        val response = http.get(URL_GAME, PAGE_CHEST) ?: return ERROR_REQUEST
-        return if ("ArgentAPlacer" in response) {
-            Parser.updateState(currentState, response)
-            currentState.gold
-        } else {
-            ERROR_REQUEST
+        val response = http.get(URL_GAME, PAGE_CHEST)
+        if ("ArgentAPlacer" !in response) {
+            error("Invalid response for chest page")
         }
+        Parser.updateState(currentState, response)
+        return currentState.gold
     }
 
     /**
@@ -163,11 +162,11 @@ class RiseOfLordsClient {
      */
     fun storeInChest(amount: Int): Boolean {
         val response = http.post(URL_GAME, PAGE_CHEST) {
-            formParam("ArgentAPlacer", amount.toString()) //
-            formParam("x", randomCoord(10, 60)) //
-            formParam("y", randomCoord(10, 60)) //
+            formParam("ArgentAPlacer", amount.toString())
+            formParam("x", randomCoord(10, 60))
+            formParam("y", randomCoord(10, 60))
         }
-        Parser.updateState(currentState, response ?: return false)
+        Parser.updateState(currentState, response)
         return currentState.gold == 0
     }
 
@@ -175,16 +174,15 @@ class RiseOfLordsClient {
      * Displays the weapons page. Used to fake a visit on the weapons page before repairing or
      * buying weapons and equipment.
      *
-     * @return the percentage of wornness of the weapons, or [ERROR_REQUEST] if the request failed
+     * @return the percentage of wornness of the weapons
      */
     fun displayWeaponsPage(): Int {
-        val response = http.get(URL_GAME, PAGE_WEAPONS) ?: return ERROR_REQUEST
-        return if ("Faites votre choix" in response) {
-            Parser.updateState(currentState, response)
-            Parser.parseWeaponsWornness(response)
-        } else {
-            ERROR_REQUEST
+        val response = http.get(URL_GAME, PAGE_WEAPONS)
+        if ("Faites votre choix" !in response) {
+            error("Invalid response for weapons page")
         }
+        Parser.updateState(currentState, response)
+        return Parser.parseWeaponsWornness(response)
     }
 
     /**
@@ -197,8 +195,8 @@ class RiseOfLordsClient {
             addParameter("a", "repair")
             addParameter("onglet", "")
         }
-        if (response == null || "Faites votre choix" !in response) {
-            return false
+        if ("Faites votre choix" !in response) {
+            error("Invalid response for weapons page")
         }
         Parser.updateState(currentState, response)
         return Parser.parseWeaponsWornness(response) == 0
@@ -207,16 +205,14 @@ class RiseOfLordsClient {
     /**
      * Displays the sorcery page. Used to fake a visit on the sorcery page before casting a spell.
      *
-     * @return the available mana, or [ERROR_REQUEST] if the request failed
+     * @return the available mana
      */
-    fun displaySorceryPage(): Int {
-        val response = http.get(URL_GAME, PAGE_SORCERY) ?: return ERROR_REQUEST
-        return if ("Niveau de vos sorciers" in response) {
-            Parser.updateState(currentState, response)
-            currentState.mana
-        } else {
-            ERROR_REQUEST
+    fun displaySorceryPage() {
+        val response = http.get(URL_GAME, PAGE_SORCERY)
+        if ("Niveau de vos sorciers" !in response) {
+            error("Invalid response for sorcerers page")
         }
+        Parser.updateState(currentState, response)
     }
 
     /**
@@ -231,7 +227,7 @@ class RiseOfLordsClient {
         }, {
             formParam("clonage_nombre_cible", quantity.toString())
         })
-        if (response == null || "ont été clonés" !in response) {
+        if ("ont été clonés" !in response) {
             return false
         }
         Parser.updateState(currentState, response)
@@ -249,7 +245,7 @@ class RiseOfLordsClient {
             addParameter("a", "lancer")
             addParameter("idsort", "14")
         }
-        Parser.updateState(currentState, response ?: return false)
+        Parser.updateState(currentState, response)
         return true // TODO handle failure
     }
 
@@ -266,7 +262,7 @@ class RiseOfLordsClient {
         }, {
             formParam("tempete_pseudo_cible", playerName)
         })
-        Parser.updateState(currentState, response ?: return false)
+        Parser.updateState(currentState, response)
         return true // TODO handle failure
     }
 
@@ -283,8 +279,6 @@ class RiseOfLordsClient {
         private const val PAGE_CHEST = "main/tresor"
         private const val PAGE_WEAPONS = "main/arsenal"
         private const val PAGE_SORCERY = "main/autel_sorciers"
-        const val ERROR_REQUEST = -1
-        const val ERROR_STORM_ACTIVE = -2
 
         const val SORCERER_CLONE_COST_GOLD = 5_000
         const val SORCERER_CLONE_COST_MANA = 35_000
@@ -299,14 +293,14 @@ class PostDataBuilder(
     }
 }
 
-private fun CloseableHttpClient.get(baseUrl: String, page: String, configureUri: URIBuilder.() -> Unit = {}): String? {
+private fun CloseableHttpClient.get(baseUrl: String, page: String, configureUri: URIBuilder.() -> Unit = {}): String {
     val request = HttpGet(uri(baseUrl, page, configureUri))
     return executeForText(request)
 }
 
 private fun CloseableHttpClient.post(
     baseUrl: String, page: String, configureUri: URIBuilder.() -> Unit = {}, configureBody: PostDataBuilder.() -> Unit
-): String? {
+): String {
     val request = HttpPost(uri(baseUrl, page, configureUri)).apply {
         entity = UrlEncodedFormEntity(PostDataBuilder().apply(configureBody).postData)
     }
@@ -316,9 +310,15 @@ private fun CloseableHttpClient.post(
 private fun uri(baseUrl: String, page: String, configureUri: URIBuilder.() -> Unit) =
     URIBuilder(baseUrl).addParameter("p", page).apply(configureUri).build()
 
-private fun CloseableHttpClient.executeForText(request: HttpUriRequest?): String? = execute(request) { response ->
-    when (val status = response.statusLine.statusCode) {
-        in 200..299 -> response.entity?.let { EntityUtils.toString(it) }
-        else -> error("Unexpected response status: $status")
+private fun CloseableHttpClient.executeForText(request: HttpUriRequest): String = execute(request) { response ->
+    when (response.statusLine.statusCode) {
+        in 200..299 -> response.entity?.let { EntityUtils.toString(it) } ?: error("No response body for $request")
+        else -> error("Non-OK response status (${response.statusLine}) for $request")
     }
+}
+
+sealed class AttackResult {
+    data class Victory(val goldStolen: Int) : AttackResult()
+    object StormActive : AttackResult()
+    object Defeat : AttackResult()
 }

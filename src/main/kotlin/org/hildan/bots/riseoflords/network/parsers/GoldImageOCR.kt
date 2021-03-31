@@ -1,12 +1,9 @@
 package org.hildan.bots.riseoflords.network.parsers
 
-import org.slf4j.LoggerFactory
 import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
 
 internal object GoldImageOCR {
-
-    private val logger = LoggerFactory.getLogger(GoldImageOCR::class.java)
 
     private val DIGITS = arrayOf(
         loadImage("0.png"),
@@ -27,15 +24,11 @@ internal object GoldImageOCR {
         ImageIO.read(GoldImageOCR::class.java.getResourceAsStream("/img/$filename"))
 
     fun readAmount(img: BufferedImage): Int {
-        assert(img.width == 70) { "image width is not 70" }
-        assert(img.height == 8) { "image height is not 8" }
+        require(img.width == 70) { "image width is not 70" }
+        require(img.height == 8) { "image height is not 8" }
         val amountAsText = img.splitAroundEmptyColumns().joinToString("") { it.toDigitOrDot() }
         val amount = amountAsText.replace(".", "").toIntOrNull()
-        if (amount == null) {
-            logger.error("Bad OCR result, cannot convert '{}' to a gold amount", amountAsText)
-            return -1
-        }
-        return amount
+        return amount ?: error("Bad OCR result, cannot convert '$amountAsText' to a gold amount")
     }
 
     private fun BufferedImage.toDigitOrDot(): String {
@@ -47,8 +40,7 @@ internal object GoldImageOCR {
         if (hasSameAlphaAs(DOT)) {
             return "."
         }
-        logger.error("Unrecognized digit in gold image")
-        return " "
+        error("Unrecognized digit in gold image")
     }
 }
 

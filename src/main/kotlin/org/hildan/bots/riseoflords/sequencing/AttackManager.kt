@@ -4,6 +4,7 @@ import org.hildan.bots.riseoflords.config.AttackParams
 import org.hildan.bots.riseoflords.config.Config
 import org.hildan.bots.riseoflords.config.PlayerFilter
 import org.hildan.bots.riseoflords.model.Player
+import org.hildan.bots.riseoflords.network.AttackResult
 import org.hildan.bots.riseoflords.network.RiseOfLordsClient
 import org.hildan.bots.riseoflords.util.Format
 import org.hildan.bots.riseoflords.util.Sleeper
@@ -146,12 +147,12 @@ class AttackManager(private val config: Config) {
         for (player in playersToAttack) {
             nbConsideredPlayers++
             // attack player
-            val goldStolen = attack(player)
-            if (goldStolen < 0) {
-                // error, player not attacked
+            val result = attack(player)
+            if (result !is AttackResult.Victory) {
+                // no gold stolen (error or skipped)
                 continue
             }
-            totalGoldStolen += goldStolen
+            totalGoldStolen += result.goldStolen
             nbAttackedPlayers++
             val isLastPlayer = nbConsideredPlayers == playersToAttack.size
             // repair weapons as specified
@@ -181,42 +182,30 @@ class AttackManager(private val config: Config) {
      *
      * @return the gold stolen from that player
      */
-    private fun attack(player: Player): Int {
+    private fun attack(player: Player): AttackResult? {
         logger.debug("Attacking player {}...", player.name)
         logger.trace("Displaying player page...")
         val playerGold = rol.displayPlayer(player.name)
-        if (playerGold == RiseOfLordsClient.ERROR_REQUEST) {
-            logger.error("Something's wrong: request failed")
-            return -1
-        } else if (playerGold != player.gold) {
+        if (playerGold != player.gold) {
             logger.warn("Something's wrong: the player does not have the expected gold")
-            return -1
+            return null
         }
         fakeTime.actionInPage()
         logger.trace("Attacking...")
-        val goldStolen = rol.attack(player.name)
-        when {
-            goldStolen > 0 -> {
-                logger.info(
-                    "Victory! {} gold stolen from player {}, current gold: {}",
-                    Format.gold(goldStolen),
-                    player.name,
-                    Format.gold(rol.currentState.gold)
-                )
-            }
-            goldStolen == RiseOfLordsClient.ERROR_STORM_ACTIVE -> {
-                logger.warn("Cannot attack: a storm is raging upon your kingdom!")
-            }
-            goldStolen == RiseOfLordsClient.ERROR_REQUEST -> {
-                logger.error("Attack HTTP request failed, something went wrong")
-            }
-            else -> {
-                logger.warn(
-                    "Defeat! Ach, player {} was too sronk! Current gold: {}", player.name, rol.currentState.gold
-                )
-            }
+        val result = rol.attack(player.name)
+        when (result) {
+            is AttackResult.Victory -> logger.info(
+                "Victory! {} gold stolen from player {}, current gold: {}",
+                Format.gold(result.goldStolen),
+                player.name,
+                Format.gold(rol.currentState.gold)
+            )
+            AttackResult.StormActive -> logger.warn("Cannot attack: a storm is raging upon your kingdom!")
+            AttackResult.Defeat -> logger.warn(
+                "Defeat! Ach, player {} was too stronk! Current gold: {}", player.name, rol.currentState.gold
+            )
         }
-        return goldStolen
+        return result
     }
 
     private fun storeGoldIntoChest(): Int {
@@ -232,9 +221,7 @@ class AttackManager(private val config: Config) {
         } else {
             logger.trace("Something went wrong!")
         }
-        logger.info(
-            "{} gold stored in chest, total: {}", Format.gold(amount), Format.gold(rol.currentState.chestGold)
-        )
+        logger.info("{} gold stored in chest, total: {}", Format.gold(amount), Format.gold(rol.currentState.chestGold))
         return amount
     }
 
