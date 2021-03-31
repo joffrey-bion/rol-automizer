@@ -16,6 +16,12 @@ data class Player(
     val alignment: Alignment,
 )
 
+sealed class AttackResult {
+    data class Victory(val goldStolen: Int) : AttackResult()
+    object StormActive : AttackResult()
+    object Defeat : AttackResult()
+}
+
 enum class Alignment(private val shortName: String) {
     SAINT("Sai."),
     CHEVALERESQUE("Che."),

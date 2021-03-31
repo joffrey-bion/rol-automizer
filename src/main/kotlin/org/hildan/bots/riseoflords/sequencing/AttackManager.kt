@@ -4,7 +4,7 @@ import org.hildan.bots.riseoflords.config.AttackParams
 import org.hildan.bots.riseoflords.config.Config
 import org.hildan.bots.riseoflords.config.PlayerFilter
 import org.hildan.bots.riseoflords.model.Player
-import org.hildan.bots.riseoflords.network.AttackResult
+import org.hildan.bots.riseoflords.model.AttackResult
 import org.hildan.bots.riseoflords.network.RiseOfLordsClient
 import org.hildan.bots.riseoflords.util.Format
 import org.hildan.bots.riseoflords.util.Sleeper

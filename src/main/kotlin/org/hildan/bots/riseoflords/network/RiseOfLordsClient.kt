@@ -12,6 +12,7 @@ import org.apache.http.impl.client.HttpClients
 import org.apache.http.message.BasicNameValuePair
 import org.apache.http.util.EntityUtils
 import org.hildan.bots.riseoflords.model.AccountState
+import org.hildan.bots.riseoflords.model.AttackResult
 import org.hildan.bots.riseoflords.model.Player
 import org.hildan.bots.riseoflords.network.parsers.Parser
 import java.util.*
@@ -72,10 +73,7 @@ class RiseOfLordsClient {
     }
 
     /**
-     * Returns a list of 99 users, starting at the specified rank.
-     *
-     * @param startRank the rank of the first user to return
-     * @return 99 users at most, starting at the specified rank.
+     * Returns one page of the player list, starting at the specified [startRank].
      */
     fun displayPlayerListPage(startRank: Int): List<Player> {
         val response = http.get(URL_GAME, PAGE_USERS_LIST) {
@@ -112,16 +110,14 @@ class RiseOfLordsClient {
     }
 
     /**
-     * Attacks the user with the given [username] using one game turn.
-     *
-     * @return the gold stolen during the attack
+     * Attacks the user with the given [username] using [nTurns] game turns.
      */
-    fun attack(username: String): AttackResult {
+    fun attack(username: String, nTurns: Int = 1): AttackResult {
         val response = http.post(URL_GAME, PAGE_ATTACK, {
             addParameter("a", "ok")
         }, {
             formParam("PseudoDefenseur", username)
-            formParam("NbToursToUse", "1")
+            formParam("NbToursToUse", nTurns.toString())
         })
         return when {
             "remporte le combat!" in response -> {
@@ -317,10 +313,4 @@ private fun CloseableHttpClient.executeForText(request: HttpUriRequest): String 
         in 200..299 -> response.entity?.let { EntityUtils.toString(it) } ?: error("No response body for $request")
         else -> error("Non-OK response status (${response.statusLine}) for $request")
     }
-}
-
-sealed class AttackResult {
-    data class Victory(val goldStolen: Int) : AttackResult()
-    object StormActive : AttackResult()
-    object Defeat : AttackResult()
 }
