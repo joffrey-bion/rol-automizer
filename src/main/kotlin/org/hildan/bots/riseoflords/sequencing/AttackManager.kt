@@ -94,7 +94,7 @@ class AttackManager(private val config: Config) {
     private fun listMatchingPlayers(filter: PlayerFilter) = listPlayers(startRank = filter.minRank)
         .takeWhile { it.rank <= filter.maxRank }
         .onEach {
-            if (it.rank % 30 == 0 || it.rank == filter.maxRank) {
+            if (it.rank % 70 == 0 || it.rank == filter.maxRank) {
                 logger.info("{}/{} players scanned", it.rank - filter.minRank + 1, filter.nbPlayersToScan)
             }
         }
