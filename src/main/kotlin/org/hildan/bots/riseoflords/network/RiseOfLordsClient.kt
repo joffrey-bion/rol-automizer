@@ -96,7 +96,7 @@ class RiseOfLordsClient {
      * Displays the specified player's detail page. Used to fake a visit on the user detail page
      * before an attack.
      *
-     * @return the specified player's current gold, or [ERROR_REQUEST] if the request failed
+     * @return the specified player's current gold
      */
     fun displayPlayer(playerName: String): Int {
         val response = http.get(URL_GAME, PAGE_USER_DETAILS) {
@@ -112,7 +112,7 @@ class RiseOfLordsClient {
     /**
      * Attacks the user with the given [username] using one game turn.
      *
-     * @return the gold stolen during the attack, or [ERROR_REQUEST] if the request failed
+     * @return the gold stolen during the attack
      */
     fun attack(username: String): AttackResult {
         val response = http.post(URL_GAME, PAGE_ATTACK, {
