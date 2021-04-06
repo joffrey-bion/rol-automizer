@@ -9,6 +9,7 @@ This is a simple bot for the game [Rise of Lords](http://www.riseoflords.com/).
 
 This program performs a regular routine on your behalf: 
 
+- clone as many sorcerers as possible given the current gold and mana
 - attack players to steal gold
 - repair weapons from time to time
 - store the gold in the chest from time to time
