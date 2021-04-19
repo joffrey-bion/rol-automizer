@@ -1,4 +1,4 @@
-package org.hildan.bots.riseoflords.network.parsers
+package org.hildan.bots.riseoflords.client.parsers
 
 import java.awt.image.BufferedImage
 import javax.imageio.ImageIO

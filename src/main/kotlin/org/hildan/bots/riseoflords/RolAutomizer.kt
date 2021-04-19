@@ -9,7 +9,7 @@ import org.hildan.bots.riseoflords.config.Account
 import org.hildan.bots.riseoflords.config.AttackParams
 import org.hildan.bots.riseoflords.config.Config
 import org.hildan.bots.riseoflords.config.PlayerFilter
-import org.hildan.bots.riseoflords.network.LoginException
+import org.hildan.bots.riseoflords.client.LoginException
 import org.hildan.bots.riseoflords.sequencing.AttackManager
 import org.slf4j.LoggerFactory
 import java.time.Duration

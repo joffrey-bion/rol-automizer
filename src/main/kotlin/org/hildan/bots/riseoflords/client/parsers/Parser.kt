@@ -1,10 +1,10 @@
-package org.hildan.bots.riseoflords.network.parsers
+package org.hildan.bots.riseoflords.client.parsers
 
 import org.hildan.bots.riseoflords.model.AccountState
 import org.hildan.bots.riseoflords.model.Alignment
 import org.hildan.bots.riseoflords.model.Army
 import org.hildan.bots.riseoflords.model.Player
-import org.hildan.bots.riseoflords.network.RiseOfLordsClient
+import org.hildan.bots.riseoflords.client.RiseOfLordsClient
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import java.net.URL
