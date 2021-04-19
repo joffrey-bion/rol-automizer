@@ -3,61 +3,36 @@ package org.hildan.bots.riseoflords.client.parsers
 import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
 
+private class RefImage(
+    imgName: String,
+    val value: String,
+) {
+    val img: BufferedImage = ImageIO.read(RefImage::class.java.getResourceAsStream("/img/$imgName"))
+}
+
 internal object GoldImageOCR {
 
-    private val DIGITS = arrayOf(
-        loadImage("0.png"),
-        loadImage("1.png"),
-        loadImage("2.png"),
-        loadImage("3.png"),
-        loadImage("4.png"),
-        loadImage("5.png"),
-        loadImage("6.png"),
-        loadImage("7.png"),
-        loadImage("8.png"),
-        loadImage("9.png"),
-    )
-
-    private val DOT = loadImage("dot.png")
-
-    private fun loadImage(filename: String): BufferedImage =
-        ImageIO.read(GoldImageOCR::class.java.getResourceAsStream("/img/$filename"))
+    private val REF_IMGS = (0..9).map { RefImage("$it.png", "$it") } + RefImage("dot.png", ".")
 
     fun readAmount(img: BufferedImage): Int {
         require(img.width == 70) { "image width is not 70" }
         require(img.height == 8) { "image height is not 8" }
-        val amountAsText = img.splitAroundEmptyColumns().joinToString("") { it.toDigitOrDot() }
+        val amountAsText = img.splitOnTransparentColumns().joinToString("") { it.toDigitOrDot() }
         val amount = amountAsText.replace(".", "").toIntOrNull()
         return amount ?: error("Bad OCR result, cannot convert '$amountAsText' to a gold amount")
     }
 
-    private fun BufferedImage.toDigitOrDot(): String {
-        DIGITS.forEachIndexed { digit, digitImg ->
-            if (hasSameAlphaAs(digitImg)) {
-                return digit.toString()
-            }
-        }
-        if (hasSameAlphaAs(DOT)) {
-            return "."
-        }
-        error("Unrecognized digit in gold image")
-    }
+    private fun BufferedImage.toDigitOrDot(): String =
+        REF_IMGS.firstOrNull { hasSameAlphaAs(it.img) }?.value ?: error("Unrecognized digit in gold image")
 }
 
 private fun BufferedImage.hasSameAlphaAs(reference: BufferedImage): Boolean {
-    // check dimensions
-    if (height != reference.height) {
+    if (height != reference.height || width != reference.width) {
         return false
     }
-    if (width != reference.width) {
-        return false
-    }
-    // check pixels
     for (i in 0 until width) {
         for (j in 0 until height) {
-            val recoPixel = getRGB(i, j)
-            val refPixel = reference.getRGB(i, j)
-            if (recoPixel.alpha != refPixel.alpha) {
+            if (getAlphaAt(i, j) != reference.getAlphaAt(i, j)) {
                 return false
             }
         }
@@ -65,24 +40,24 @@ private fun BufferedImage.hasSameAlphaAs(reference: BufferedImage): Boolean {
     return true
 }
 
-private fun BufferedImage.splitAroundEmptyColumns(): List<BufferedImage> =
-    getNonEmptyColumnRanges().map { colRange -> subImage(colRange) }
+private fun BufferedImage.splitOnTransparentColumns(): List<BufferedImage> =
+    getNonTransparentColumnRanges().map { colRange -> subImage(colRange) }
 
 @OptIn(ExperimentalStdlibApi::class)
-private fun BufferedImage.getNonEmptyColumnRanges(): List<IntRange> {
+private fun BufferedImage.getNonTransparentColumnRanges(): List<IntRange> {
     val rangeBounds = buildList {
         add(-1)
-        addAll(getEmptyColumnsIndexes())
+        addAll(getTransparentColumnsIndices())
         add(width)
     }
-    return rangeBounds.zipWithNext { s, e -> (s+1) until e }.filter { !it.isEmpty() }
+    return rangeBounds.zipWithNext { s, e -> (s + 1) until e }.filter { !it.isEmpty() }
 }
 
-private fun BufferedImage.getEmptyColumnsIndexes(): List<Int> = (0 until width).filter { col -> isEmptyColumn(col) }
+private fun BufferedImage.getTransparentColumnsIndices(): List<Int> = (0 until width).filter { isTransparentColumn(it) }
 
-private fun BufferedImage.isEmptyColumn(col: Int) = (0 until height).all { row -> getRGB(col, row).alpha == 0 }
+private fun BufferedImage.isTransparentColumn(col: Int) = (0 until height).all { row -> getAlphaAt(col, row) == 0 }
 
-val Int.alpha get() = this ushr 24
+private fun BufferedImage.getAlphaAt(i: Int, j: Int) = getRGB(i, j) ushr 24
 
 private fun BufferedImage.subImage(colRange: IntRange): BufferedImage {
     val digitImg = BufferedImage(colRange.last - colRange.first + 1, height, BufferedImage.TYPE_INT_ARGB)
