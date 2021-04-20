@@ -1,4 +1,4 @@
-FROM openjdk:15
+FROM openjdk:16-alpine
 
 ARG JAR_FILE=build/libs/rol-automizer.jar
 COPY ${JAR_FILE} app.jar
