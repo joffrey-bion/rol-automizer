@@ -1,25 +1,10 @@
-FROM openjdk:16-jdk-alpine as packager
+FROM openjdk:16-alpine as packager
 
-ENV JAVA_MINIMAL="/opt/java-minimal"
+COPY . project/
 
-# build minimal JRE
-RUN jlink \
-    --verbose \
-    --add-modules java.base \
-    --add-modules java.desktop \
-    --add-modules java.naming \
-    --add-modules java.net.http \
-    --compress 2 --strip-java-debug-attributes --no-header-files --no-man-pages \
-    --output "$JAVA_MINIMAL"
+RUN cd project && ./gradlew jlink
 
-FROM alpine:latest
+FROM alpine:3.7
 
-ENV JAVA_HOME=/opt/java-minimal
-ENV PATH="$PATH:$JAVA_HOME/bin"
-
-COPY --from=packager "$JAVA_HOME" "$JAVA_HOME"
-
-ARG JAR_FILE=build/libs/rol-automizer.jar
-COPY ${JAR_FILE} app.jar
-
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+COPY --from=packager project/build/jlink dist/
+ENTRYPOINT ["dist/bin/rolAutomizer"]
