@@ -29,6 +29,7 @@ dependencies {
 
 // to build a fat jar with all dependencies included
 tasks.jar {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
     manifest { attributes["Main-Class"] = application.mainClass.get() }
     from({
         configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) }
