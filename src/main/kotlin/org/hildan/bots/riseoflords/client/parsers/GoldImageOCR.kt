@@ -59,12 +59,5 @@ private fun BufferedImage.isTransparentColumn(col: Int) = (0 until height).all {
 
 private fun BufferedImage.getAlphaAt(i: Int, j: Int) = getRGB(i, j) ushr 24
 
-private fun BufferedImage.subImage(colRange: IntRange): BufferedImage {
-    val digitImg = BufferedImage(colRange.last - colRange.first + 1, height, BufferedImage.TYPE_INT_ARGB)
-    for (i in 0 until digitImg.width) {
-        for (j in 0 until digitImg.height) {
-            digitImg.setRGB(i, j, getRGB(i + colRange.first, j))
-        }
-    }
-    return digitImg
-}
+private fun BufferedImage.subImage(colRange: IntRange): BufferedImage =
+    getSubimage(colRange.first, 0, colRange.last - colRange.first + 1, height)
