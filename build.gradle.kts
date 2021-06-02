@@ -1,6 +1,6 @@
 plugins {
     application
-    kotlin("jvm") version "1.4.32"
+    kotlin("jvm") version "1.5.10"
 }
 
 description = "An action sequencer to do the boring tasks on the game http://www.riseoflords.com."
