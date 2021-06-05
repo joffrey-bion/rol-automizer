@@ -1,6 +1,6 @@
 package org.hildan.bots.riseoflords.config
 
-import java.time.Duration
+import kotlin.time.Duration
 
 data class Config(
     val account: Account,

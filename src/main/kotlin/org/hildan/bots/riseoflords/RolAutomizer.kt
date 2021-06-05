@@ -5,14 +5,14 @@ import com.github.ajalt.clikt.core.context
 import com.github.ajalt.clikt.output.CliktHelpFormatter
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.int
+import org.hildan.bots.riseoflords.client.LoginException
 import org.hildan.bots.riseoflords.config.Account
 import org.hildan.bots.riseoflords.config.AttackParams
 import org.hildan.bots.riseoflords.config.Config
 import org.hildan.bots.riseoflords.config.PlayerFilter
-import org.hildan.bots.riseoflords.client.LoginException
 import org.hildan.bots.riseoflords.sequencing.AttackManager
 import org.slf4j.LoggerFactory
-import java.time.Duration
+import kotlin.time.Duration
 
 object RolAutomizer
 
@@ -84,7 +84,7 @@ class RolAutomizerCommand : CliktCommand() {
         "--rest-time",
         help = "the number of hours to wait between attack sessions",
         metavar = "HOURS",
-    ).int().convert { Duration.ofHours(it.toLong()) }.default(Duration.ofHours(12))
+    ).int().convert { Duration.hours(it.toLong()) }.default(Duration.hours(12))
 
     override fun run() {
         val config = Config(
@@ -116,12 +116,12 @@ class RolAutomizerCommand : CliktCommand() {
 private fun waitForNextAttack(duration: Duration) {
     var d = duration
     try {
-        val millis = d.toMillis() % 1000
+        val millis = d.inWholeMilliseconds % 1000
         Thread.sleep(millis)
-        d = d.minusMillis(millis)
-        while (!d.isZero && !d.isNegative) {
+        d -= Duration.milliseconds(millis)
+        while (d > Duration.ZERO) {
             Thread.sleep(1000)
-            d = d.minusSeconds(1)
+            d -= Duration.seconds(1)
             printDuration(d)
         }
         print("\r")
@@ -131,13 +131,8 @@ private fun waitForNextAttack(duration: Duration) {
 }
 
 private fun printDuration(d: Duration) {
-    val hours = d.toHours()
-    val minutes = d.minusHours(hours).toMinutes()
-    val seconds = d.minusHours(hours).minusMinutes(minutes).toMillis() / 1000
-    print("\r")
-    print(
-        String.format(
-            "   Next attack session in %s%02d:%02d...", if (hours > 0) "$hours:" else "", minutes, seconds
-        )
-    )
+    d.toComponents { h, m, s, _ ->
+        print("\r")
+        print(String.format("   Next attack session in %s%02d:%02d...", if (h > 0) "$h:" else "", m, s))
+    }
 }
