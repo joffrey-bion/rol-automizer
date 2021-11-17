@@ -21,7 +21,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 }
 
 dependencies {
-    implementation("com.github.ajalt.clikt:clikt:3.0.1")
+    implementation("com.github.ajalt.clikt:clikt:3.3.0")
     implementation("org.jsoup:jsoup:1.9.2")
     implementation("ch.qos.logback:logback-classic:1.2.3")
     implementation("javax.mail:mail:1.4.3") // to send emails with logback
