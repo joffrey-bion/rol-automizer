@@ -1,4 +1,4 @@
-FROM openjdk:16-jdk-alpine as packager
+FROM openjdk:17-jdk-alpine as packager
 
 ENV JAVA_MINIMAL="/opt/java-minimal"
 

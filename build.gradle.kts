@@ -15,7 +15,7 @@ repositories {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     kotlinOptions {
-        jvmTarget = "15"
+        jvmTarget = "17"
     }
 }
 
