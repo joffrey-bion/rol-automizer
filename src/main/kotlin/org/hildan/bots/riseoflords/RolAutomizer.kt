@@ -14,6 +14,8 @@ import org.hildan.bots.riseoflords.config.PlayerFilter
 import org.hildan.bots.riseoflords.sequencing.AttackManager
 import org.slf4j.LoggerFactory
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.seconds
 
 object RolAutomizer
 
@@ -85,7 +87,7 @@ class RolAutomizerCommand : CliktCommand() {
         "--rest-time",
         help = "the number of hours to wait between attack sessions",
         metavar = "HOURS",
-    ).int().convert { Duration.hours(it.toLong()) }.default(Duration.hours(12))
+    ).int().convert { it.toLong().hours }.default(12.hours)
 
     override fun run() {
         val config = Config(
@@ -115,15 +117,13 @@ class RolAutomizerCommand : CliktCommand() {
 }
 
 private fun waitForNextAttack(duration: Duration) {
-    var d = duration
+    var remaining = duration
     try {
-        val millis = d.inWholeMilliseconds % 1000
-        Thread.sleep(millis)
-        d -= Duration.milliseconds(millis)
-        while (d > Duration.ZERO) {
+        printDuration(remaining)
+        repeat(duration.inWholeSeconds.toInt()) {
             Thread.sleep(1000)
-            d -= Duration.seconds(1)
-            printDuration(d)
+            remaining -= 1.seconds
+            printDuration(remaining)
         }
         print("\r")
     } catch (e: InterruptedException) {

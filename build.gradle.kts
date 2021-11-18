@@ -1,6 +1,6 @@
 plugins {
     application
-    kotlin("jvm") version "1.5.10"
+    kotlin("jvm") version "1.6.0"
 }
 
 description = "An action sequencer to do the boring tasks on the game http://www.riseoflords.com."
@@ -16,7 +16,6 @@ repositories {
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     kotlinOptions {
         jvmTarget = "15"
-        freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn", "-Xopt-in=kotlin.time.ExperimentalTime")
     }
 }
 

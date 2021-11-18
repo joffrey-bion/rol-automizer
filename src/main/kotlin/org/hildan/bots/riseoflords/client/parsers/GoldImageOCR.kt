@@ -43,7 +43,6 @@ private fun BufferedImage.hasSameAlphaAs(reference: BufferedImage): Boolean {
 private fun BufferedImage.splitOnTransparentColumns(): List<BufferedImage> =
     getNonTransparentColumnRanges().map { colRange -> subImage(colRange) }
 
-@OptIn(ExperimentalStdlibApi::class)
 private fun BufferedImage.getNonTransparentColumnRanges(): List<IntRange> {
     val rangeBounds = buildList {
         add(-1)
