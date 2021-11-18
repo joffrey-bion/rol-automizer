@@ -40,9 +40,9 @@ object Parser {
         val body = Jsoup.parse(playerListPageResponse).body()
         val elts = body.getElementsByAttributeValueContaining("href", "main/fiche&voirpseudo=")
         return elts.map {
-            val usernameCell = it.parent()
+            val usernameCell = it.parent() ?: error("username cell element not found")
             require(usernameCell.tagName() == "td")
-            val userRow = usernameCell.parent()
+            val userRow = usernameCell.parent() ?: error("user row element not found")
             require(userRow.tagName() == "tr")
             parsePlayer(userRow)
         }
@@ -79,7 +79,7 @@ object Parser {
     fun parseGoldStolen(attackReportResponse: String): Int {
         val body = Jsoup.parse(attackReportResponse).body()
         val victoryText = body.getElementsByAttributeValue("class", "combat_gagne").single()
-        val divVictory = victoryText.parent().parent()
+        val divVictory = victoryText.parent()?.parent() ?: error("Victory div element not found")
         return divVictory.getElementsByTag("b")[0].textAsNumber()
     }
 
