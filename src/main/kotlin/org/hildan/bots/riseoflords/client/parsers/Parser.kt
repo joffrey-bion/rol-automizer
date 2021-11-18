@@ -17,20 +17,19 @@ object Parser {
      */
     fun updateState(state: AccountState, response: String) {
         val body = Jsoup.parse(response).body()
-        state.gold = findValueInTag(body, "onmouseover", "A chaque tour de jeu")
-        state.chestGold = findValueInTag(body, "onmouseover", "Votre coffre magique")
-        state.mana = findValueInTag(body, "onmouseover", "Votre mana repr\u00e9sente")
-        state.turns = findValueInTag(body, "onmouseover", "Un nouveau tour de jeu")
-        state.adventurins = findValueInTag(body, "href", "main/aventurines_detail")
+        state.gold = findValueInTag(body, "onmouseover", "A chaque tour de jeu").toLong()
+        state.chestGold = findValueInTag(body, "onmouseover", "Votre coffre magique").toLong()
+        state.mana = findValueInTag(body, "onmouseover", "Votre mana repr\u00e9sente").toInt()
+        state.turns = findValueInTag(body, "onmouseover", "Un nouveau tour de jeu").toInt()
+        state.adventurins = findValueInTag(body, "href", "main/aventurines_detail").toInt()
     }
 
-    private fun findValueInTag(root: Element, attrKey: String, attrContains: String): Int {
+    private fun findValueInTag(root: Element, attrKey: String, attrContains: String): String {
         val elts = root.getElementsByAttributeValueContaining(attrKey, attrContains)
         val imgSrc = elts[0].child(0).attr("src")
         return imgSrc.substringAfter("num=", "0")
             .substringBefore('&')
             .replace(".", "")
-            .toInt()
     }
 
     /**
@@ -55,11 +54,11 @@ object Parser {
         require(playerRow.tagName() == "tr")
         val fields = playerRow.getElementsByTag("td")
 
-        val rank = fields[0].textAsNumber()
+        val rank = fields[0].textAsLong().toInt()
         val name = fields[2].child(0).text().trim()
 
         val goldElt = fields[3]
-        val gold = if (goldElt.hasText()) goldElt.textAsNumber() else getGoldFromImgElement(goldElt.child(0))
+        val gold = if (goldElt.hasText()) goldElt.textAsLong() else getGoldFromImgElement(goldElt.child(0))
 
         val army = Army[fields[4].text().trim()]
         val alignment = Alignment[fields[5].child(0).text().trim()]
@@ -76,17 +75,17 @@ object Parser {
     /**
      * Gets the amount of stolen golden from the given [attackReportResponse], or null in case of read error.
      */
-    fun parseGoldStolen(attackReportResponse: String): Int {
+    fun parseGoldStolen(attackReportResponse: String): Long {
         val body = Jsoup.parse(attackReportResponse).body()
         val victoryText = body.getElementsByAttributeValue("class", "combat_gagne").single()
         val divVictory = victoryText.parent()?.parent() ?: error("Victory div element not found")
-        return divVictory.getElementsByTag("b")[0].textAsNumber()
+        return divVictory.getElementsByTag("b")[0].textAsLong()
     }
 
     /**
      * Gets and parses this element's text as an [Int].
      */
-    private fun Element.textAsNumber(): Int = text().trim().replace(".", "").toInt()
+    private fun Element.textAsLong(): Long = text().trim().replace(".", "").toLong()
 
     /**
      * Parses the [weaponsPageResponse] to return the current state of wornness of the weapons (in percents).
@@ -102,7 +101,7 @@ object Parser {
     /**
      * Parses the amount of gold on the specified [playerPageResponse], or -1 in case of error.
      */
-    fun parsePlayerGold(playerPageResponse: String): Int {
+    fun parsePlayerGold(playerPageResponse: String): Long {
         val body = Jsoup.parse(playerPageResponse).body()
         val elts = body.getElementsByAttributeValueContaining("src", "aff_montant")
         val img = elts[0]
@@ -112,7 +111,7 @@ object Parser {
     /**
      * Uses an OCR to recognize a number in the specified `<img>` element [goldImageElement], or -1 in case of error.
      */
-    private fun getGoldFromImgElement(goldImageElement: Element): Int {
+    private fun getGoldFromImgElement(goldImageElement: Element): Long {
         require(goldImageElement.tagName() == "img")
         val goldImgUrl = goldImageElement.attr("src")
         require(goldImgUrl.isNotEmpty()) { "empty gold image url" }

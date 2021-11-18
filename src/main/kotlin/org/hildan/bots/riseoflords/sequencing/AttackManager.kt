@@ -38,7 +38,7 @@ class AttackManager(private val config: Config) {
 
     private fun cloneSorcerersIfPossible() {
         val nPossibleClones = minOf(
-            rol.currentState.gold / RiseOfLordsClient.SORCERER_CLONE_COST_GOLD,
+            (rol.currentState.gold / RiseOfLordsClient.SORCERER_CLONE_COST_GOLD).toInt(),
             rol.currentState.mana / RiseOfLordsClient.SORCERER_CLONE_COST_MANA,
         )
         if (nPossibleClones > 0) {
@@ -68,7 +68,7 @@ class AttackManager(private val config: Config) {
     /**
      * Attacks the richest players matching the [filter], respecting the given [params], and returns the total
      */
-    private fun attackRichest(filter: PlayerFilter, params: AttackParams): Int {
+    private fun attackRichest(filter: PlayerFilter, params: AttackParams): Long {
         val maxTurns = rol.currentState.turns.coerceAtMost(params.maxTurns)
         if (maxTurns <= 0) {
             logger.info("No more turns to spend, aborting attack.")
@@ -115,7 +115,7 @@ class AttackManager(private val config: Config) {
      * Attacks all the specified [playersToAttack], following the given [params], and returns the total amount of
      * gold stolen.
      */
-    private fun attackAll(playersToAttack: List<Player>, params: AttackParams): Int {
+    private fun attackAll(playersToAttack: List<Player>, params: AttackParams): Long {
         logger.info("{} players to attack", playersToAttack.size)
         if (rol.currentState.turns == 0) {
             logger.error("No turns available, impossible to attack")
@@ -124,7 +124,7 @@ class AttackManager(private val config: Config) {
             logger.error("Not enough turns to attack this many players, attack aborted")
             return 0
         }
-        var totalGoldStolen = 0
+        var totalGoldStolen = 0L
         var nbConsideredPlayers = 0
         var nbAttackedPlayers = 0
         for (player in playersToAttack) {
@@ -191,7 +191,7 @@ class AttackManager(private val config: Config) {
         return result
     }
 
-    private fun storeGoldIntoChest(): Int {
+    private fun storeGoldIntoChest(): Long {
         logger.trace("Storing gold into the chest...")
         logger.trace("Displaying chest page...")
         val amount = rol.displayChestPage()

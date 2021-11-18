@@ -94,7 +94,7 @@ class RiseOfLordsClient {
      *
      * @return the specified player's current gold
      */
-    fun displayPlayer(playerName: String): Int {
+    fun displayPlayer(playerName: String): Long {
         val response = http.get(URL_GAME, PAGE_USER_DETAILS) {
             queryParam("voirpseudo", playerName)
         }
@@ -139,7 +139,7 @@ class RiseOfLordsClient {
      * @return the amount of money that could be stored in the chest, which is the current amount of
      * gold of the player
      */
-    fun displayChestPage(): Int {
+    fun displayChestPage(): Long {
         val response = http.get(URL_GAME, PAGE_CHEST)
         if ("ArgentAPlacer" !in response) {
             error("Invalid response for chest page")
@@ -154,14 +154,14 @@ class RiseOfLordsClient {
      *
      * @return true if the request succeeded, false otherwise
      */
-    fun storeInChest(amount: Int): Boolean {
+    fun storeInChest(amount: Long): Boolean {
         val response = http.post(URL_GAME, PAGE_CHEST) {
             formParam("ArgentAPlacer", amount.toString())
             formParam("x", randomCoord(10, 60))
             formParam("y", randomCoord(10, 60))
         }
         Parser.updateState(currentState, response)
-        return currentState.gold == 0
+        return currentState.gold == 0L
     }
 
     /**

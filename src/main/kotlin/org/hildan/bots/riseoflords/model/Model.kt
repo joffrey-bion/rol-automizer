@@ -1,8 +1,8 @@
 package org.hildan.bots.riseoflords.model
 
 data class AccountState(
-    var gold: Int = 0,
-    var chestGold: Int = 0,
+    var gold: Long = 0,
+    var chestGold: Long = 0,
     var mana: Int = 0,
     var adventurins: Int = 0,
     var turns: Int = 0,
@@ -11,13 +11,13 @@ data class AccountState(
 data class Player(
     val rank: Int,
     val name: String,
-    val gold: Int,
+    val gold: Long,
     val army: Army,
     val alignment: Alignment,
 )
 
 sealed class AttackResult {
-    data class Victory(val goldStolen: Int) : AttackResult()
+    data class Victory(val goldStolen: Long) : AttackResult()
     object StormActive : AttackResult()
     object Defeat : AttackResult()
 }

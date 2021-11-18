@@ -34,7 +34,7 @@ class PlayerFilter(
     /** The maximum rank to attack.  */
     val maxRank: Int,
     /** Only players with at least this much gold will be attacked.  */
-    val goldThreshold: Int
+    val goldThreshold: Long,
 ) {
     val nbPlayersToScan: Int
         get() = maxRank - minRank + 1

@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.core.context
 import com.github.ajalt.clikt.output.CliktHelpFormatter
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.int
+import com.github.ajalt.clikt.parameters.types.long
 import org.hildan.bots.riseoflords.client.LoginException
 import org.hildan.bots.riseoflords.config.Account
 import org.hildan.bots.riseoflords.config.AttackParams
@@ -56,7 +57,7 @@ class RolAutomizerCommand : CliktCommand() {
         "-g",
         "--min-gold",
         help = "the minimum gold of the enemy player to consider an attack worth it",
-    ).int().default(400_000)
+    ).long().default(400_000L)
 
     private val maxTurns by option(
         "-t",

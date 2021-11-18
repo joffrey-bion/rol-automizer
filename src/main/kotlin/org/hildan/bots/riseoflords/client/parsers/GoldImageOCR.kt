@@ -14,11 +14,11 @@ internal object GoldImageOCR {
 
     private val REF_IMGS = (0..9).map { RefImage("$it.png", "$it") } + RefImage("dot.png", ".")
 
-    fun readAmount(img: BufferedImage): Int {
+    fun readAmount(img: BufferedImage): Long {
         require(img.width == 70) { "image width is not 70" }
         require(img.height == 8) { "image height is not 8" }
         val amountAsText = img.splitOnTransparentColumns().joinToString("") { it.toDigitOrDot() }
-        val amount = amountAsText.replace(".", "").toIntOrNull()
+        val amount = amountAsText.replace(".", "").toLongOrNull()
         return amount ?: error("Bad OCR result, cannot convert '$amountAsText' to a gold amount")
     }
 

@@ -7,5 +7,5 @@ object Format {
     private val symbols = DecimalFormatSymbols.getInstance().apply { groupingSeparator = '.' }
     private val fmt: DecimalFormat = DecimalFormat("###,###.##", symbols)
 
-    fun gold(amount: Int): String = fmt.format(amount.toLong())
+    fun gold(amount: Long): String = fmt.format(amount)
 }
