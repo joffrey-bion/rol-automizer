@@ -14,9 +14,6 @@ import java.net.http.HttpResponse
 import java.nio.charset.StandardCharsets
 import kotlin.random.Random
 
-private const val FAKE_USER_AGENT =
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36"
-
 class LoginException(val username: String) : Exception()
 
 class RiseOfLordsClient {
@@ -274,63 +271,5 @@ class RiseOfLordsClient {
 
         const val SORCERER_CLONE_COST_GOLD = 5_000
         const val SORCERER_CLONE_COST_MANA = 35_000
-    }
-}
-
-private class UriBuilder(val baseUrl: String) {
-    private val queryParams: MutableList<Pair<String, String>> = ArrayList()
-
-    fun queryParam(key: String, value: String): UriBuilder {
-        queryParams.add(key to value)
-        return this
-    }
-
-    fun build(): URI = URI("$baseUrl?${queryParams.urlEncodedString()}")
-}
-
-private class PostDataBuilder {
-    private val formParams: MutableList<Pair<String, String>> = ArrayList()
-
-    fun formParam(key: String, value: String) {
-        formParams.add(key to value)
-    }
-
-    fun build() = formParams.urlEncodedString()
-}
-
-fun List<Pair<String, String>>.urlEncodedString() = joinToString("&") { (key, value) ->
-    buildString {
-        append(URLEncoder.encode(key, StandardCharsets.UTF_8))
-        append("=")
-        append(URLEncoder.encode(value, StandardCharsets.UTF_8))
-    }
-}
-
-private fun HttpClient.get(baseUrl: String, page: String, configureUri: UriBuilder.() -> Unit = {}): String {
-    val request = HttpRequest.newBuilder(uri(baseUrl, page, configureUri)).GET()
-    return executeForText(request)
-}
-
-private fun HttpClient.post(
-    baseUrl: String,
-    page: String,
-    configureUri: UriBuilder.() -> Unit = {},
-    configureBody: PostDataBuilder.() -> Unit,
-): String {
-    val request = HttpRequest.newBuilder(uri(baseUrl, page, configureUri))
-        .POST(BodyPublishers.ofString(PostDataBuilder().apply(configureBody).build()))
-        .header("Content-Type", "application/x-www-form-urlencoded")
-    return executeForText(request)
-}
-
-private fun uri(baseUrl: String, page: String, configure: UriBuilder.() -> Unit) =
-    UriBuilder(baseUrl).queryParam("p", page).apply(configure).build()
-
-private fun HttpClient.executeForText(requestBuilder: HttpRequest.Builder): String {
-    val request = requestBuilder.header("User-Agent", FAKE_USER_AGENT).build()
-    val response = send(request, HttpResponse.BodyHandlers.ofString())
-    return when (response.statusCode()) {
-        in 200..299 -> response.body() ?: error("No response body for $request")
-        else -> error("Non-OK response status (${response.statusCode()}) for $request")
     }
 }
