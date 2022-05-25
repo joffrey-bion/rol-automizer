@@ -1,10 +1,7 @@
 package org.hildan.bots.riseoflords.client.parsers
 
-import org.hildan.bots.riseoflords.model.AccountState
-import org.hildan.bots.riseoflords.model.Alignment
-import org.hildan.bots.riseoflords.model.Army
-import org.hildan.bots.riseoflords.model.Player
 import org.hildan.bots.riseoflords.client.RiseOfLordsClient
+import org.hildan.bots.riseoflords.model.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import java.net.URL
@@ -17,19 +14,38 @@ object Parser {
      */
     fun updateState(state: AccountState, response: String) {
         val body = Jsoup.parse(response).body()
-        state.gold = findValueInTag(body, "onmouseover", "A chaque tour de jeu").toLong()
-        state.chestGold = findValueInTag(body, "onmouseover", "Votre coffre magique").toLong()
-        state.mana = findValueInTag(body, "onmouseover", "Votre mana repr\u00e9sente").toInt()
-        state.turns = findValueInTag(body, "onmouseover", "Un nouveau tour de jeu").toInt()
-        state.adventurins = findValueInTag(body, "href", "main/aventurines_detail").toInt()
+        state.gold = body.findValueInImgTagUnder("onmouseover", "A chaque tour de jeu").toLong()
+        state.chestGold = body.findValueInImgTagUnder("onmouseover", "Votre coffre magique").toLong()
+        state.mana = body.findValueInImgTagUnder("onmouseover", "Votre mana repr\u00e9sente").toInt()
+        state.turns = body.findValueInImgTagUnder("onmouseover", "Un nouveau tour de jeu").toInt()
+        state.adventurins = body.findValueInImgTagUnder("href", "main/aventurines_detail").toInt()
     }
 
-    private fun findValueInTag(root: Element, attrKey: String, attrContains: String): String {
-        val elts = root.getElementsByAttributeValueContaining(attrKey, attrContains)
-        val imgSrc = elts[0].child(0).attr("src")
-        return imgSrc.substringAfter("num=", "0")
-            .substringBefore('&')
-            .replace(".", "")
+    private fun Element.findValueInImgTagUnder(attrKey: String, attrContains: String): String {
+        val nestedImgTag = getElementByAttributeValueContaining(attrKey, attrContains).child(0)
+        val imgSrc = nestedImgTag.attr("src")
+        return imgSrc.substringAfter("num=", "0").substringBefore('&').replace(".", "")
+    }
+
+    /**
+     * Updates the specified [state] based on the top elements of the specified page [response].
+     */
+    fun parseCastle(response: String): Castle {
+        val body = Jsoup.parse(response).body()
+        return Castle(
+            nMessages = body.findIntTextInElementByAttrValueContaining("onmouseover", "Nouvelles missives reçues"),
+            nExpectedAdventureStones = body.findIntTextInElementByAttrValueContaining("onmouseover", "Prévision du nombre d\\'aventurines générées à la prochaine journée"),
+            nPrisoners = body.findIntTextInElementByAttrValueContaining("onmouseover", "Nombre de prisonniers dans vos geoles"),
+        )
+    }
+
+    private fun Element.findIntTextInElementByAttrValueContaining(attrKey: String, attrContains: String): Int {
+        val element = getElementByAttributeValueContaining(attrKey, attrContains)
+        return element.text().toInt()
+    }
+
+    private fun Element.getElementByAttributeValueContaining(attrKey: String, attrContains: String): Element {
+        return getElementsByAttributeValueContaining(attrKey, attrContains).single()
     }
 
     /**
@@ -117,5 +133,11 @@ object Parser {
         require(goldImgUrl.isNotEmpty()) { "empty gold image url" }
         val img = ImageIO.read(URL(RiseOfLordsClient.BASE_URL + "/" + goldImgUrl))
         return GoldImageOCR.readAmount(img)
+    }
+
+    fun parseExcaliburState(response: String) = when {
+        "Tentez votre chance" in response -> ExcaliburState.AVAILABLE
+        "Vous avez déjà tenté votre chance aujourd'hui" in response -> ExcaliburState.ALREADY_TRIED_TODAY
+        else -> error("Unknown excalibur status")
     }
 }

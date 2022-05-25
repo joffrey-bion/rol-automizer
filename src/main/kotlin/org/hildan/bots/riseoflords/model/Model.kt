@@ -16,6 +16,12 @@ data class Player(
     val alignment: Alignment,
 )
 
+data class Castle(
+    val nMessages: Int,
+    val nExpectedAdventureStones: Int,
+    val nPrisoners: Int,
+)
+
 sealed class AttackResult {
     data class Victory(val goldStolen: Long) : AttackResult()
     object StormActive : AttackResult()
@@ -56,4 +62,9 @@ enum class Army(
         operator fun get(shortName: String): Army =
             ARMIES[shortName] ?: throw IllegalArgumentException("No army corresponds to the short name '$shortName'")
     }
+}
+
+enum class ExcaliburState {
+    AVAILABLE,
+    ALREADY_TRIED_TODAY,
 }

@@ -1,17 +1,9 @@
 package org.hildan.bots.riseoflords.client
 
 import org.hildan.bots.riseoflords.client.parsers.Parser
-import org.hildan.bots.riseoflords.model.AccountState
-import org.hildan.bots.riseoflords.model.AttackResult
-import org.hildan.bots.riseoflords.model.Player
+import org.hildan.bots.riseoflords.model.*
 import java.net.CookieManager
-import java.net.URI
-import java.net.URLEncoder
 import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpRequest.BodyPublishers
-import java.net.http.HttpResponse
-import java.nio.charset.StandardCharsets
 import kotlin.random.Random
 
 class LoginException(val username: String) : Exception()
@@ -59,10 +51,18 @@ class RiseOfLordsClient {
      * Displays the village page, and updates the state.
      */
     fun displayHomePage() {
-        val response = http.get(URL_GAME, PAGE_HOME)
+        val response = http.get(URL_GAME, PAGE_VILLAGE)
         if (response.contains("images/layout2012/carte")) {
             Parser.updateState(currentState, response)
         }
+    }
+
+    /**
+     * Displays the keep page, showing info about prisoners, messages, adventure stones - and updates the state.
+     */
+    fun displayCastlePage(): Castle {
+        val response = http.get(URL_GAME, PAGE_CASTLE)
+        return Parser.parseCastle(response)
     }
 
     /**
@@ -255,13 +255,38 @@ class RiseOfLordsClient {
         return true // TODO handle failure
     }
 
+    /**
+     * Displays the Excalibur page. Used to try and pull it from its anchor to win 10M gold.
+     */
+    fun displayExcaliburPage(): ExcaliburState {
+        val response = http.get(URL_GAME, PAGE_EXCALIBUR)
+        Parser.updateState(currentState, response)
+        return Parser.parseExcaliburState(response)
+    }
+
+    /**
+     * Tries to pull Excalibur from its anchor and win 10M gold.
+     *
+     * @return true if it succeeded, false otherwise
+     */
+    fun tryExcalibur(): Boolean {
+        val response = http.get(URL_GAME, PAGE_EXCALIBUR) {
+            queryParam("try", "1")
+        }
+        Parser.updateState(currentState, response)
+        val failure = response.contains("Sans doute votre coeur n'était-il pas assez pur sur ce coup là")
+        return !failure
+    }
+
     companion object {
         const val BASE_URL = "https://www.riseoflords.com"
         private const val URL_INDEX = "$BASE_URL/index.php"
         private const val URL_GAME = "$BASE_URL/jeu.php"
         private const val PAGE_LOGIN = "verifpass"
         private const val PAGE_LOGOUT = "logout"
-        private const val PAGE_HOME = "main/carte_village"
+        private const val PAGE_CASTLE = "main/donjon"
+        private const val PAGE_EXCALIBUR = "main/excalibur"
+        private const val PAGE_VILLAGE = "main/carte_village"
         private const val PAGE_USERS_LIST = "main/conseil_de_guerre"
         private const val PAGE_USER_DETAILS = "main/fiche"
         private const val PAGE_ATTACK = "main/combats"
