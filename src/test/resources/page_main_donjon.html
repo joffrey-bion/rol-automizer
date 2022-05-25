@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-15">
+    <!--<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">-->
+    <title>Jeu de rôle et de combat médiéval massivement multijoueurs MMORPG</title>
+    <link href='layout/css/design.css' rel='stylesheet' type='text/css'>
+    <link href='layout/css/design2012.css' rel='stylesheet' type='text/css'>
+    <link href='layout/css/dock.css' rel='stylesheet' type='text/css'>
+    <script type="text/javascript" src="javascript/jquery-1.5.1.min.js"></script>
+    <script type="text/javascript" src="javascript/interface.js"></script>
+    <script type="text/javascript" src="javascript/ajax.js"></script>
+    <script type="text/javascript" src="javascript/fonctions.js"></script>
+    <script type="text/javascript" src="javascript/allopass.js"></script>
+    <script type="text/javascript" src="pay/js/pay.js"></script>
+    <script LANGUAGE="JavaScript" SRC="javascript/overlib/overlib.js"></script>
+    <noscript>Si vous voyez ce message, vous devez activer le javascript sur votre navigateur ou le mettre à jour pour afficher correctement le site.</noscript>
+</head>
+<body>
+
+<div style='position:absolute; width:100%; height:1500px; padding:0px; background-color:black; background-image:url("layout/images/2012/main/fond2.jpg"); background-position:center top; background-repeat:no-repeat;'>
+
+    <div style='position:relative; width:956px; height:900px; margin:auto; bckground-color: blue;'>
+        <!--<div style='position:relative; width:956px; height:900px; margin:auto; background-image:url("images/layout2012/buzz/header-st-patrick.jpg"); background-repeat: no-repeat;'>-->
+
+        <div style='position:absolute; top:15px; left:950px;'><a href='index.php?p=logout' title='Déconnexion'><img src='images/icone_fermer_fenetre.png'></a></div>
+
+        <div style='position:absolute; top:278px; left:52px; width:126px; height:18px;'>
+            <a href='#' onClick='popup_pay("darklink", "Audiotel0");' onMouseOver="return overlib('A chaque tour de jeu, vous touchez un nombre d\'écus équivalent au surplus de votre production. Plus d\'infos dans ECONOMIE. Tant que vos écus ne sont pas dans votre coffre, ils ne sont pas protégés et peuvent être pillés!', FGCOLOR, '#EAE4B2', BGCOLOR, '#FFFFFF');" onmouseout="return nd();"><img src='scripts/getNum.php?num=140.000'></a>			</div>
+        <div style='position:absolute; top:278px; left:274px; width:126px; height:18px;'>
+            <a href='?p=main/tresor' onMouseOver="return overlib('Votre coffre magique est le seul endroit sécurisé pour vos écus. Veillez à remplir régulièrement votre coffre pour éviter de vous faire piller les écus que vous avez.', FGCOLOR, '#EAE4B2', BGCOLOR, '#FFFFFF');" onmouseout="return nd();"><img src='scripts/getNum.php?num=5.090.080.575'></a>			</div>
+        <div style='position:absolute; top:278px; left:720px; width:50px; height:18px;'>
+            <a href='?p=main/aventurines_detail'><img src='scripts/getNum.php?larg=3&num=65'></a>			</div>
+        <div style='position:absolute; top:278px; left:860px; width:50px; height:18px;'>
+            <a href='#' onClick='popup_pay("darklink", "Audiotel2");' onMouseOver="return overlib('Un nouveau tour de jeu commence toutes les 45 minutes.<br><br>Le prochain tour de jeu se déclenchera dans <b>9</b> minutes. Vous devez être au niveau 4 minimum pour commencer à accumuler les tours.', FGCOLOR, '#EAE4B2', BGCOLOR, '#FFFFFF');" onmouseout="return nd();"><img src='scripts/getNum.php?larg=3&num=8'></a>
+        </div>
+        <div style='position:absolute; top:278px; left:495px; width:126px; height:18px;'>
+            <a href='#' onClick='popup_pay("darklink", "Audiotel1");' onMouseOver="return overlib('Votre mana représente votre réserve magique pour lancer les sorts et invoquer les créatures mystérieuses. Ce sont vos sorciers qui produisent le mana à chaque tour. Veillez donc à en recruter en suffisance.', FGCOLOR, '#EAE4B2', BGCOLOR, '#FFFFFF');" onmouseout="return nd();"><img src='scripts/getNum.php?num=8.388.607'></a>			</div>
+
+
+        <div style='position:absolute; top:38px; left:18px; width:194px; height:152px; padding-top:3px; padding-left:3px;
+                            color:white; background-image:url("layout/images/2012/main/infos_compte.png");'>
+
+            <div style='position:absolute; top:-8px; left:20px; width:150px; height:60px;'>
+                <img src='scripts/getTxt.php?num=Darklink'>                                </div>
+
+            <div style='position:absolute; top:0px; left:57px; width:150px; height:60px; color:white;'>
+                <br>Classement: <b>285</b><br>aucun don en cours<br><br>                                </div>
+            <div style='position:absolute; top:20px; left:10px; width:40px; height:40px;'>
+                <a href='?p=main/compte'><img src='images/avatars/darklink.jpg' border=0></a>                                    <!--<br><br><center><a href='?p=buzz/buzz_halloween'><img src='images/buzz/buzz_halloween.jpg' width="170"></a>--></center>
+            </div>
+
+        </div>
+
+
+        <div style='position:absolute; top:30px; left:730px; width:190px; height:150px;
+                padding-top:16px; padding-left:5px;
+                color:white; background:url("images/layout2012/fond_carre_premium.png");'>
+            <table cellspacing=4><tr><td class=Contenu width=50%><font class=titre_speedlinks>Favoris</font><br><a class=jauges href='jeu.php?p=main/conseil_de_guerre&Debut=463'>#1 : CONSEIL_DE_GUERRE</a> <a href='jeu.php?p=main/donjon&changer_speed=1&id_speed_a_changer=1'> <img src='images/etoilefavori.png' border=0></a><br><a class=jauges href='jeu.php?p=main/arsenal'>#2 : ARSENAL</a> <a href='jeu.php?p=main/donjon&changer_speed=1&id_speed_a_changer=2'> <img src='images/etoilefavori.png' border=0></a><br><a class=jauges href='jeu.php?p=main/tresor'>#3 : TRESOR</a> <a href='jeu.php?p=main/donjon&changer_speed=1&id_speed_a_changer=3'> <img src='images/etoilefavori.png' border=0></a></td></tr><tr><td class=Contenu valign=top>
+                <form action='?' method='GET'>
+                    <font class=titre_speedlinks>Recherche rapide</font><br>
+                    <font class=speedlinks>
+                        Seigneur: <input type=hidden name=p value='main/fiche'>
+                        <input class='input_carre_premium' type=text size=10 maxlength=20 name='voirpseudo'> <input class='input_carre_premium' type=submit value='ok'></form>
+                <br><br>
+                <center><b>23</b> seigneurs online</font></center>
+            </td></form></tr></table>
+            </td></tr></table>
+        </div>
+
+        <div style='position:absolute; top:320px; left:0px; width:966px; height:885px; overflow:auto;'>
+
+            <div style='position:absolute; top:0px; left:0px; width:353px; height:157px; background-image:url("layout/images/2012/main/donjon_2/donjon_rang.png");'>
+                <div style='position:absolute; top:58px; left:171px; color:white; font-weight:bold; font-size:11px;'>
+                    285e / 2975
+                </div>
+                <div style='position:absolute; top:110px; left:80px; color:white; font-weight:bold; font-size:11px;'>
+                    Att: 282e
+                </div>
+                <div style='position:absolute; top:110px; left:245px; color:white; font-weight:bold; font-size:11px;'>
+                    Déf: 263e
+                </div>
+            </div>
+
+            <div style='position:absolute; top:0px; left:370px; width:568px; height:400px; background-image:url("layout/images/2012/main/donjon_2/donjon_infos_royaume.png");'>
+                <div style='position:absolute; top:40px; left:11px;'>
+                    <img src='layout/images/2012/main/donjon_2/persos/H1.png'>
+                </div>
+                <div style='position:absolute; top:50px; left:250px; width:320px; height:420px; color:white;'>
+                    Aucune progression depuis la dernière journée...
+                    <br>
+                    <table><tr><td><table width=100%><tr><td colspan=2 class=Contenu_Clair>Royaume créé il y a <b>5564 jour(s)</b></td></tr><tr><td class=Contenu_Clair colspan=2>Prochaine journée dans <b>3 heure(s) </b> <a HREF='javascript:popupfaq("monroyaume-journeessurrol")'><i><img src='images/info.gif' border=0></i></a></td></tr><tr><td colspan=2 class=Contenu_Clair>Alignement: <b>Démoniaque</b> (IND -32768) <a HREF='javascript:popupfaq("monroyaume-alignement")'><i><img src='images/info.gif' border=0></i></a></td></tr><tr><td colspan=2 class=Contenu_Clair>Don en cours (durée): <b>aucun</b></td></tr><tr><td colspan=2><hr></td></tr><tr><td colspan=2 class=Contenu_Clair>Nombre de vassaux: <b>0</b> <a HREF='javascript:popupfaq("monroyaume-vassaux")'><i><img src='images/info.gif' border=0></i></a></td></tr>
+                        <tr><td colspan=2 class=Contenu_Clair>Puissance des renforts: <b>0</b></td></tr><tr><td colspan=2 class=Contenu_Clair>Combats (renforts) restants: <b>5</b></td><td class=Contenu_Clair>
+                            <!--<table cellpadding='0' cellspacing='0' width='110' height='22' class='bouton' onMouseOver="className='boutonhover'" onMouseOut="className='bouton'" valign=top><tr><td align=center>
+                            <a HREF='?p=main/vassaux' class=Contenu_Clair>Mes vassaux</a>
+                            </td></tr></table>-->
+                        </td></tr><tr><td class=Contenu_Clair colspan=2>Vous n'êtes le vassal de personne</td></tr></table></td></tr></table>
+                </div>
+                <div style='position:absolute; top:320px; left:90px;'>
+                    <a href='?p=main/compte'><img src='layout/images/2012/main/donjon/changer_avatar.png'></a>
+                    <a href='?p=main/compte'><img src='layout/images/2012/main/donjon/changer_profil.png'></a>
+                    <a href='?p=main/compte'><img src='layout/images/2012/main/donjon/changer_mot_de_passe.png'></a>
+                </div>
+            </div>
+
+            <div style='position:absolute; top:410px; left:380px; width:557px; height:98px; background-image:url("layout/images/2012/main/donjon_2/donjon_coalitions_croisades.png"); overflow:auto;'>
+                <div style='position:absolute; top:25px; left:20px;'>
+                    Informations coalitions / croisades prochainement ici
+                </div>
+            </div>
+
+            <div style='position:absolute; top:510px; left:370px; width:562px; height:254px; background-image:url("layout/images/2012/main/donjon_2/donjon_logs.png"); overflow:auto;'>
+                <div style='position:absolute; top:25px; left:15px;'>
+                    <table cellpadding=4><tr><td class=Contenu nowrap valign=top width=170><b>25 Mai (15:17:28)</b></td><td class=Contenu>Conversion de geoles terminée pour : 12 serf(s) 35 soldat(s) 7 sorcier(s) 57 mercenaire(s) 49 cavalier(s) 12 dragon(s) 19 démon(s) </td></tr><tr><td class=Contenu nowrap valign=top width=170><b>24 Mai (22:34:48)</b></td><td class=Contenu>Vos combats d'hier vous rapportent <b>2</b> aventurines.</td></tr><tr><td class=Contenu nowrap valign=top width=170><b>24 Mai (22:34:48)</b></td><td class=Contenu>Conso troupes: 27832080 Prod fenil: 162712550</td></tr><tr><td class=Contenu nowrap valign=top width=170><b>24 Mai (22:34:48)</b></td><td class=Contenu>Vos vassaux vous rapportent <b>0</b> soldats aujourd'hui</td></tr><tr><td class=Contenu nowrap valign=top width=170><b>24 Mai (22:34:48)</b></td><td class=Contenu><b>18</b> soldats sans spécialité ont rejoint votre armée.</td></tr><tr><td class=Contenu nowrap valign=top width=170><b>23 Mai (22:33:42)</b></td><td class=Contenu><b>18</b> soldats sans spécialité ont rejoint votre armée.</td></tr><tr><td class=Contenu nowrap valign=top width=170><b>23 Mai (22:33:42)</b></td><td class=Contenu>Vos vassaux vous rapportent <b>0</b> soldats aujourd'hui</td></tr><tr><td class=Contenu nowrap valign=top width=170><b>23 Mai (22:33:42)</b></td><td class=Contenu>Conso troupes: 27828020 Prod fenil: 162712550</td></tr><tr><td class=Contenu colspan=2 align=center><a href='?p=main/donjon&aff_histo=1'><font color='black'><b>VOIR TOUT L'HISTORIQUE</b></font></a></td></tr></table>
+                </div>
+            </div>
+
+            <div style='position:absolute; top:180px; left:0px; width:353px; height:193px; background-image:url("layout/images/2012/main/donjon_2/donjon_argumentaire.png"); overflow:auto;'>
+                <div style='position:absolute; top:20px; left:20px;'>
+                    <!--<a href='?p=buzz/buzz_avent'><img src='layout/images/2012/page_accueil/argumentaires/arg_calendrier_de_l_avent.jpg'></a>-->
+                    <!--<a href='?p=buzz/buzz_st_valentin'><img src='layout/images/2012/page_accueil/argumentaires/arg_st_valentin.jpg'></a>-->
+                    <!--<img src='layout/images/2012/page_accueil/argumentaires/arg_crane_bientot.jpg'>-->
+                    <!--<img src='layout/images/2012/page_accueil/argumentaires/arg_mega_hh_1000_likes.jpg'>-->
+                    <!--<a href='?p=buzz/buzz_halloween'><img src='layout/images/2012/page_accueil/argumentaires/arg_halloween.jpg'></a>-->
+                    <a href="http://www.facebook.com/pages/Rise-Of-Lords/167798613247122"><img width="308" height="163" src="layout/images/2012/page_accueil/argumentaires/arg_rejoignez_la_communaute_facebook.jpg" title=""/></a>
+                    <!--<a href="#"><img width="308" height="163" src="layout/images/2012/page_accueil/argumentaires/arg_saint_patrick.jpg" title=""/></a>-->
+                </div>
+            </div>
+
+            <div style='position:absolute; top:395px; left:0px; width:353px; height:59px; background-image:url("layout/images/2012/main/donjon_2/donjon_temoins.png"); overflow:auto;'>
+                <div style='position:absolute; top:40px; left:40px; width:20px; height:14px; background-image:url("layout/images/2012/main/donjon_2/donjon_temoin_rouge.png"); overflow:auto; color:white; font-weight:bold; text-align:center;' onMouseOver="return overlib('Nombre de tours utilisés depuis le dernier décompte aventurines', FGCOLOR, '#EAE4B2', BGCOLOR, '#FFFFFF');" onmouseout="return nd();">44</div>
+                <div style='position:absolute; top:40px; left:98px; width:20px; height:14px; background-image:url("layout/images/2012/main/donjon_2/donjon_temoin_rouge.png"); overflow:auto; color:white; font-weight:bold; text-align:center;' onMouseOver="return overlib('Prévision du nombre d\'aventurines générées à la prochaine journée', FGCOLOR, '#EAE4B2', BGCOLOR, '#FFFFFF');" onmouseout="return nd();">2</div>
+                <div style='position:absolute; top:40px; left:154px; width:20px; height:14px; background-image:url("layout/images/2012/main/donjon_2/donjon_temoin_rouge.png"); overflow:auto; color:white; font-weight:bold; text-align:center;' onMouseOver="return overlib('Nombre de prisonniers dans vos geoles', FGCOLOR, '#EAE4B2', BGCOLOR, '#FFFFFF');" onmouseout="return nd();">0</div>
+                <div style='position:absolute; top:15px; left:184px; width:40px; height:33px; background-image:url("layout/images/2012/main/donjon_2/donjon_temoin_rouge.png"); overflow:auto; color:white; font-weight:bold; text-align:center;' onMouseOver="return overlib('Les conditions météo au dessus de votre royaume: <b>Pluvieux</b>', FGCOLOR, '#EAE4B2', BGCOLOR, '#FFFFFF');" onmouseout="return nd();"><img src='layout/images/2012/main/donjon_2/meteo/icone_meteo_2.jpg'></div>
+                <div style='position:absolute; top:40px; left:268px; width:20px; height:14px; background-image:url("layout/images/2012/main/donjon_2/donjon_temoin_rouge.png"); overflow:auto; color:white; font-weight:bold; text-align:center;' onMouseOver="return overlib('Nouvelles missives reçues', FGCOLOR, '#EAE4B2', BGCOLOR, '#FFFFFF');" onmouseout="return nd();">0</div>
+            </div>
+
+            <div style='position:absolute; top:460px; left:0px; width:354px; height:303px; background-image:url("layout/images/2012/main/donjon_2/donjon_dynastie.png"); overflow:auto;'>
+                <div style='position:absolute; top:31px; left:246px;'>
+                    <!-- parrain -->
+                    <img src='images/pasdavatar.jpg' width=40 height=40 border=1 bordercolor=black>
+                </div>
+                <div style='position:absolute; top:46px; left:158px;'>
+                    <!-- moi -->
+                    <img src='images/avatars/darklink.jpg' width=40 height=40>
+                </div>
+                <div style='position:absolute; top:121px; left:84px;'>
+                    <!-- vassal direct 1 -->
+                    <img src='images/pasdavatar.jpg' width=40 height=40 border=1 bordercolor=black>
+                </div>
+                <div style='position:absolute; top:121px; left:158px;'>
+                    <!-- vassal direct 2 -->
+                    <img src='images/pasdavatar.jpg' width=40 height=40 border=1 bordercolor=black>
+                </div>
+                <div style='position:absolute; top:121px; left:232px;'>
+                    <!-- vassal direct 3 -->
+                    <img src='images/pasdavatar.jpg' width=40 height=40 border=1 bordercolor=black>
+                </div>
+                <div style='position:absolute; top:188px; left:58px;'>
+                    <!-- vassal 2e génération 1 -->
+                    <img src='images/pasdavatar.jpg' width=40 height=40 border=1 bordercolor=black>
+                </div>
+                <div style='position:absolute; top:188px; left:120px;'>
+                    <!-- vassal 2e génération 2 -->
+                    <img src='images/pasdavatar.jpg' width=40 height=40 border=1 bordercolor=black>
+                </div>
+                <div style='position:absolute; top:188px; left:188px;'>
+                    <!-- vassal 2e génération 3 -->
+                    <img src='images/pasdavatar.jpg' width=40 height=40 border=1 bordercolor=black>
+                </div>
+                <div style='position:absolute; top:188px; left:254px;'>
+                    <!-- vassal 2e génération 4 -->
+                    <img src='images/pasdavatar.jpg' width=40 height=40 border=1 bordercolor=black>
+                </div>
+
+                <div style='position:absolute; top:40px; left:10px;'>
+
+                </div>
+                <div style='position:absolute; top:250px; left:10px;'>
+                    <b><font color=white>Lien de recrutement de vassaux:</font></b><br>
+                    <textarea style='width:320px; height:20px;'>http://www.riseoflords.com?seigneur=darklink</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div style='position:absolute; top:1215px; left:0px; width:946px; min-height:80px;'>
+        </div>
+
+
+        <div style='position:absolute; top:170px; left:237px; width:480px; height:93px; text-align:center'>
+            <!-- PUB OU OUTILS PREMIUM -->
+            <div style='position:relative; top:5px; left:0px; padding:10px; width:514px; height:80px;'>
+                <table><tr><td align=left width=170>
+                    <img src='images/layout2012/puce_menu.png'> <a class=menu href='?p=main/donjon'>Donjon</a><br>
+                    <img src='images/layout2012/puce_menu.png'> <a class=menu href='?p=main/enceinte'>Enceinte</a><br>
+                    <img src='images/layout2012/puce_menu.png'> <a class=menu href='?p=main/fenil'>Fenil</a><br>
+                    <img src='images/layout2012/puce_menu.png'> <a class=menu href='?p=main/tresor'>Trésor</a><br>
+                    <!--                <img src='images/layout2012/puce_menu.png'> <a class=menu href='#' onClick='popup_pay("darklink", "");'>Boutique Premium</a>-->
+                </td><td align=left width=240>
+                    <!--                <img src='images/layout2012/puce_menu.png'> <a class=menu href='?p=main/forum'>Forum</a><br>-->
+                    <img src='images/layout2012/puce_menu.png'> <a class=menu href='?p=main/place_publique'>Place publique</a><br>
+                    <img src='images/layout2012/puce_menu.png'> <a class=menu href='?p=main/conseil_de_guerre&Debut=moi'>Conseil de guerre</a><br>
+                    <img src='images/layout2012/puce_menu.png'> <a class=menu href='?p=main/autel_sorciers'>Autel des sorciers</a><br>
+                    <img src='images/layout2012/puce_menu.png'> <a class=menu href='?p=main/bureau_coalitions'>Bureau des coalitions</a><br>
+                </td><td align=left width=170>
+                    <img src='images/layout2012/puce_menu.png'> <a class=menu href='?p=main/caserne'>Caserne</a><br>
+                    <img src='images/layout2012/puce_menu.png'> <a class=menu href='?p=main/arsenal'>Arsenal</a><br>
+                    <img src='images/layout2012/puce_menu.png'> <a class=menu href='?p=main/siege'>Armes de siège</a><br>
+                    <img src='images/layout2012/puce_menu.png'> <a class=menu href='?p=main/geole'>Geoles</a><br>
+                    <!--                <img src='images/layout2012/puce_menu.png'> <a class=menu href='javascript:popupfaq("generalites-reglesdujeu");'>Règles du jeu</a>-->
+                </td></tr></table>
+
+            </div>			</div>
+
+        <div style='position:absolute; top:10px; left:280px;'><a href='?p=main/carte_village'><img src='layout/images/2012/main/menu/icone_carte.png'></a></div>
+        <div style='position:absolute; top:90px; left:560px;'><a href='?p=main/forum'><img src='layout/images/2012/main/menu/icone_forum.png'></a></div>
+        <div style='position:absolute; top:10px; left:580px;'><a href='javascript:popupfaq("generalites-reglesdujeu");'><img src='layout/images/2012/main/menu/icone_regles.png'></a></div>
+        <div style='position:absolute; top:90px; left:300px;'><a href='#' onClick='popup_pay("darklink", "");'><img src='layout/images/2012/main/menu/icone_premium.png'></a></div>
+
+
+
+    </div>
+
+</div>
+
+
+
+<!--<div id="overDiv" style="position:absolute; visibility:hidden; z-index:1000; z-order=1000;"></div>-->
+</body>
+</html>

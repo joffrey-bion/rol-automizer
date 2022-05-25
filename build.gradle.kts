@@ -24,6 +24,9 @@ dependencies {
     implementation("org.jsoup:jsoup:1.14.3")
     implementation("ch.qos.logback:logback-classic:1.2.7")
     implementation("javax.mail:mail:1.4.7") // to send emails with logback
+
+    testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit"))
 }
 
 // to build a fat jar with all dependencies included
