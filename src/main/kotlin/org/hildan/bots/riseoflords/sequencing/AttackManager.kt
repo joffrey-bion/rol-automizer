@@ -55,6 +55,17 @@ class AttackManager(private val config: Config) {
         }
     }
 
+    private fun sendEmailIfMissive() {
+        val castle = rol.displayCastlePage()
+        if (castle.nMessages > 0) {
+            sendEmailAboutMissives(castle.nMessages)
+        }
+    }
+
+    private fun sendEmailAboutMissives(nMessages: Int) {
+
+    }
+
     private fun logout() {
         logger.debug("Logging out...")
         val success = rol.logout()
