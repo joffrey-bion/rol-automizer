@@ -1,6 +1,6 @@
 plugins {
+    kotlin("jvm") version "1.7.20"
     application
-    kotlin("jvm") version "1.6.0"
 }
 
 description = "An action sequencer to do the boring tasks on the game http://www.riseoflords.com."
@@ -20,9 +20,9 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 }
 
 dependencies {
-    implementation("com.github.ajalt.clikt:clikt:3.3.0")
-    implementation("org.jsoup:jsoup:1.14.3")
-    implementation("ch.qos.logback:logback-classic:1.2.7")
+    implementation("com.github.ajalt.clikt:clikt:3.5.0")
+    implementation("org.jsoup:jsoup:1.15.3")
+    implementation("ch.qos.logback:logback-classic:1.4.3")
     implementation("javax.mail:mail:1.4.7") // to send emails with logback
 
     testImplementation(kotlin("test"))
