@@ -22,8 +22,8 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 dependencies {
     implementation("com.github.ajalt.clikt:clikt:3.5.0")
     implementation("org.jsoup:jsoup:1.15.3")
-    implementation("ch.qos.logback:logback-classic:1.4.3")
-    implementation("javax.mail:mail:1.4.7") // to send emails with logback
+    implementation("ch.qos.logback:logback-classic:1.4.5")
+    runtimeOnly("org.eclipse.angus:angus-mail:1.1.0") // implem of Jakarta Mail API to send emails with logback
 
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit"))

@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk-alpine as packager
+FROM azul/zulu-openjdk-alpine:17-latest as packager
 
 ENV JAVA_MINIMAL="/opt/java-minimal"
 
