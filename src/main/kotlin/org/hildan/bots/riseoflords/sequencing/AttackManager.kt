@@ -106,6 +106,9 @@ class AttackManager(private val config: Config) {
             logger.debug("Reading page of players ranked {} to {}...", currentFirstRank, currentFirstRank + 98)
             val page = rol.displayPlayerListPage(startRank = currentFirstRank)
             fakeTime.readPlayerListPage()
+            if (page.isEmpty()) {
+                break
+            }
             yieldAll(page)
             currentFirstRank = page.last().rank + 1
         }
