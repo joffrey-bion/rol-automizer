@@ -1,6 +1,6 @@
 # Rise Of Lords Automizer
 
-[![Github Build](https://img.shields.io/github/workflow/status/joffrey-bion/rol-automizer/CI-CD?label=build&logo=github)](https://github.com/joffrey-bion/rol-automizer/actions?query=workflow%3A%22CI-CD%22)
+[![Github Build](https://img.shields.io/github/actions/workflow/status/joffrey-bion/rol-automizer/ci-cd.yml?branch=main&logo=github)](https://github.com/joffrey-bion/rol-automizer/actions/workflows/ci-cd.yml)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/joffrey-bion/rol-automizer/blob/master/LICENSE)
 
 This is a simple bot for the game [Rise of Lords](http://www.riseoflords.com/).
