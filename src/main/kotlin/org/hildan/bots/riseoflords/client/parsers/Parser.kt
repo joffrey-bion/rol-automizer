@@ -15,7 +15,7 @@ object Parser {
     fun updateState(state: AccountState, response: String) {
         val body = Jsoup.parse(response).body()
         state.gold = body.findValueInImgTagUnder("onmouseover", "A chaque tour de jeu").toLong()
-        state.chestGold = body.findValueInImgTagUnder("onmouseover", "Votre coffre magique").toLong()
+        state.chestGold = body.findValueInImgTagUnder("onmouseover", "Votre coffre magique est le seul").toLong()
         state.mana = body.findValueInImgTagUnder("onmouseover", "Votre mana repr\u00e9sente").toInt()
         state.turns = body.findValueInImgTagUnder("onmouseover", "Un nouveau tour de jeu").toInt()
         state.adventurins = body.findValueInImgTagUnder("href", "main/aventurines_detail").toInt()
