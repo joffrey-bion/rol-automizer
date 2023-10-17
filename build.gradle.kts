@@ -20,6 +20,7 @@ kotlin {
 dependencies {
     implementation(libs.clikt)
     implementation(libs.jsoup)
+    implementation(libs.simple.ocr)
     implementation(libs.logback.classic)
     runtimeOnly(libs.angus.mail) // implem of Jakarta Mail API to send emails with logback
 

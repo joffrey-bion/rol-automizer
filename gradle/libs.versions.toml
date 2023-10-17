@@ -5,6 +5,7 @@ clikt = "3.5.0"
 jsoup = "1.15.3"
 kotlin = "1.9.10"
 logback-classic = "1.4.5"
+simple-ocr = "1.0.0"
 
 [libraries]
 
@@ -12,6 +13,7 @@ angus-mail = { module = "org.eclipse.angus:angus-mail", version.ref = "angus-mai
 clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt"}
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup"}
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback-classic"}
+simple-ocr = { module = "org.hildan.ocr:simple-ocr", version.ref = "simple-ocr"}
 
 [plugins]
 
