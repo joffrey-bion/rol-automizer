@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.8.0"
+    alias(libs.plugins.kotlin.jvm)
     application
 }
 
@@ -18,10 +18,10 @@ kotlin {
 }
 
 dependencies {
-    implementation("com.github.ajalt.clikt:clikt:3.5.0")
-    implementation("org.jsoup:jsoup:1.15.3")
-    implementation("ch.qos.logback:logback-classic:1.4.5")
-    runtimeOnly("org.eclipse.angus:angus-mail:1.1.0") // implem of Jakarta Mail API to send emails with logback
+    implementation(libs.clikt)
+    implementation(libs.jsoup)
+    implementation(libs.logback.classic)
+    runtimeOnly(libs.angus.mail) // implem of Jakarta Mail API to send emails with logback
 
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit"))

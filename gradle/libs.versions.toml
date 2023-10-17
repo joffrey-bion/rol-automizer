@@ -1,0 +1,18 @@
+[versions]
+
+angus-mail = "1.1.0"
+clikt = "3.5.0"
+jsoup = "1.15.3"
+kotlin = "1.8.0"
+logback-classic = "1.4.5"
+
+[libraries]
+
+angus-mail = { module = "org.eclipse.angus:angus-mail", version.ref = "angus-mail"}
+clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt"}
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup"}
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback-classic"}
+
+[plugins]
+
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin"}
