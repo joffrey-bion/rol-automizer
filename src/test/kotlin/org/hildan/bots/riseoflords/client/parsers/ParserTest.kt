@@ -8,6 +8,18 @@ import kotlin.test.*
 class ParserTest {
 
     @Test
+    fun login_success() {
+        val html = readTextFromResource("/response_verifpass_success.html")
+        assertTrue(Parser.isSuccessfulAuth(html))
+    }
+
+    @Test
+    fun logout_success() {
+        val html = readTextFromResource("/response_logout.html")
+        assertTrue(Parser.isSuccessfulLogout(html))
+    }
+
+    @Test
     fun home() {
         val html = readTextFromResource("/page_home.html")
         val state = AccountState()

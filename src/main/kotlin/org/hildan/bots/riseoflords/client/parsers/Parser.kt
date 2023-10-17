@@ -10,6 +10,16 @@ import javax.imageio.ImageIO
 object Parser {
 
     /**
+     * Returns true if [response] contains an authentication success message.
+     */
+    fun isSuccessfulAuth(response: String): Boolean = "Identification r&eacute;ussie!" in response
+
+    /**
+     * Returns true if [response] is the home with login form.
+     */
+    fun isSuccessfulLogout(response: String): Boolean = "D&eacute;j&agrave; inscrit? Connectez-vous" in response
+
+    /**
      * Updates the specified [state] based on the top elements of the specified page [response].
      */
     fun updateState(state: AccountState, response: String) {
