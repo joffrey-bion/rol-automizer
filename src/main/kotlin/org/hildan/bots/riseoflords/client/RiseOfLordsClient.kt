@@ -32,7 +32,7 @@ class RiseOfLordsClient {
             formParam("LogPseudo", username)
             formParam("LogPassword", password)
         }
-        if ("Identification r\u00e9ussie!" !in response) {
+        if (Parser.isSuccessfulAuth(response)) {
             throw LoginException(username)
         }
     }
@@ -44,7 +44,7 @@ class RiseOfLordsClient {
      */
     fun logout(): Boolean {
         val response = http.get(URL_INDEX, PAGE_LOGOUT)
-        return "D\u00e9j\u00e0 inscrit? Connectez-vous" in response
+        return Parser.isSuccessfulLogout(response)
     }
 
     /**
