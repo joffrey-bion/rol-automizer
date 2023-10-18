@@ -1,8 +1,6 @@
 name: CI-CD
 
-on:
-  push:
-    branches: [ main ]
+on: push
 
 env:
   DOCKER_IMAGE_NAME: rol-automizer
