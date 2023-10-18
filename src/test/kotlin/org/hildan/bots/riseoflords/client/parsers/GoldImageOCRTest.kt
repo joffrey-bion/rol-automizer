@@ -1,6 +1,8 @@
 package org.hildan.bots.riseoflords.client.parsers
 
 import org.hildan.ocr.reference.*
+import org.junit.jupiter.params.*
+import org.junit.jupiter.params.provider.*
 import javax.imageio.*
 import kotlin.io.path.*
 import kotlin.test.*
@@ -16,18 +18,12 @@ fun main() {
 
 class GoldImageOCRTest {
 
-    @Test
-    fun tests() {
-        assertGoldAmountEquals(50_690_425, "50.690.425.png")
-        assertGoldAmountEquals(103_810_000, "103.810.000.png")
-        assertGoldAmountEquals(174_900, "174.900.png")
-        assertGoldAmountEquals(280_000, "280.000.png")
-        assertGoldAmountEquals(350_000, "350.000.png")
-    }
-
-    private fun assertGoldAmountEquals(expected: Long, imgName: String) {
-        val img = ImageIO.read(javaClass.getResourceAsStream("/gold-img-samples/$imgName"))
-        val amount = GoldImageOCR.readAmount(img)
-        assertEquals(expected, amount)
+    @ParameterizedTest
+    @ValueSource(strings = ["50.690.425.png", "103.810.000.png", "174.900.png", "280.000.png", "350.000.png"])
+    fun readAmountImage(imageName: String) {
+        val image = ImageIO.read(javaClass.getResourceAsStream("/gold-img-samples/$imageName"))
+        val actualAmount = GoldImageOCR.readAmount(image)
+        val expectedAmount = imageName.removeSuffix(".png").replace(".", "").toLong()
+        assertEquals(expectedAmount, actualAmount)
     }
 }

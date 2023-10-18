@@ -25,5 +25,11 @@ dependencies {
     runtimeOnly(libs.angus.mail) // implem of Jakarta Mail API to send emails with logback
 
     testImplementation(kotlin("test"))
-    testImplementation(kotlin("test-junit"))
+    testImplementation(kotlin("test-junit5"))
+    testImplementation(libs.junit.jupiter.params)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
