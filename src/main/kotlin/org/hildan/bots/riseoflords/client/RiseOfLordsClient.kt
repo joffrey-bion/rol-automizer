@@ -274,8 +274,7 @@ class RiseOfLordsClient {
             queryParam("try", "1")
         }
         Parser.updateState(currentState, response)
-        val failure = response.contains("Sans doute votre coeur n'était-il pas assez pur sur ce coup là")
-        return !failure
+        return !Parser.isExcaliburFailure(response)
     }
 
     companion object {

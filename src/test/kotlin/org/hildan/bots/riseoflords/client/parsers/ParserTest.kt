@@ -52,6 +52,12 @@ class ParserTest {
         assertEquals(Parser.parseExcaliburState(html), ExcaliburState.ALREADY_TRIED_TODAY)
     }
 
+    @Test
+    fun excalibur_failure() {
+        val html = readTextFromResource("/page_main_excalibur_result_fail.html")
+        assertTrue(Parser.isExcaliburFailure(html))
+    }
+
     private fun readTextFromResource(resourceName: String) =
         javaClass.getResource(resourceName)?.readText(charset = Charset.forName("ISO-8859-15"))
             ?: error("Missing resource $resourceName")

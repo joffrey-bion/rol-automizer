@@ -147,7 +147,12 @@ object Parser {
 
     fun parseExcaliburState(response: String) = when {
         "Tentez votre chance" in response -> ExcaliburState.AVAILABLE
-        "Vous avez déjà tenté votre chance aujourd'hui" in response -> ExcaliburState.ALREADY_TRIED_TODAY
+        "Vous avez d&eacute;j&agrave; tent&eacute; votre chance" in response -> ExcaliburState.ALREADY_TRIED_TODAY
         else -> error("Unknown excalibur status")
     }
+
+    /**
+     * Returns true if [response] is the excalibur page after a failed attempt.
+     */
+    fun isExcaliburFailure(response: String) = "Sans doute votre coeur n'&eacute;tait-il pas assez pur" in response
 }
