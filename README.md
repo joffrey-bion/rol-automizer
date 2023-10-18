@@ -29,28 +29,28 @@ command line.
 Here are the program options:
 
 ```
-Usage: rol-automizer [OPTIONS]
+Usage: rol-automizer [<options>]
 
 Options:
-  -u, --username TEXT      your Rise of Lords username
-  -p, --password TEXT      your Rise of Lords password
-  -m, --min-rank INT       the minimum rank of the players to attack (default:
-                           500)
-  -M, --max-rank INT       the maximum rank of the players to attack (default:
-                           2000)
-  -g, --min-gold INT       the minimum gold of the enemy player to consider an
-                           attack worth it (default: 400000)
-  -t, --max-turns INT      the maximum number of turns to use during an attack
-                           session (default: 20)
-  -r, --repair-period INT  the number of attacks between weapon repairs
-                           (default: every 5 attacks)
-  --storage-threshold INT  the threshold above which we need to store the
-                           current gold into the chest (default: 300000)
-  --attacks-count INT      the number of attack sessions to perform (default:
-                           1)
-  --rest-time HOURS        the number of hours to wait between attack sessions
-                           (default: PT12H)
-  -h, --help               Show this message and exit
+  -u, --username=<text>      your Rise of Lords username
+  -p, --password=<text>      your Rise of Lords password
+  -m, --min-rank=<int>       the minimum rank of the players to attack
+                             (default: 400)
+  -M, --max-rank=<int>       the maximum rank of the players to attack
+                             (default: 2200)
+  -g, --min-gold=<int>       the minimum gold of the enemy player to consider
+                             an attack worth it (default: 400000)
+  -t, --max-turns=<int>      the maximum number of turns to use during an
+                             attack session (default: 40)
+  -r, --repair-period=<int>  the number of attacks between weapon repairs
+                             (default: every 5 attacks)
+  --storage-threshold=<int>  the threshold above which we need to store the
+                             current gold into the chest (default: 300000)
+  --attacks-count=<int>      the number of attack sessions to perform (default:
+                             1)
+  --rest-time=<hours>        the number of hours to wait between attack
+                             sessions (default: 12h)
+  -h, --help                 Show this message and exit
 ```
 
 ## License

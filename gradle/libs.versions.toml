@@ -1,7 +1,7 @@
 [versions]
 
 angus-mail = "2.0.2"
-clikt = "3.5.0"
+clikt = "4.2.1"
 jsoup = "1.16.1"
 kotlin = "1.9.10"
 logback-classic = "1.4.11"

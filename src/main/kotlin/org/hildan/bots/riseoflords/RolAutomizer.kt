@@ -2,7 +2,7 @@ package org.hildan.bots.riseoflords
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.context
-import com.github.ajalt.clikt.output.CliktHelpFormatter
+import com.github.ajalt.clikt.output.*
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.long
@@ -26,7 +26,9 @@ private val logger = LoggerFactory.getLogger(RolAutomizer::class.java)
 class RolAutomizerCommand : CliktCommand() {
 
     init {
-        context { helpFormatter = CliktHelpFormatter(showDefaultValues = true) }
+        context {
+            helpFormatter = { MordantHelpFormatter(it, showDefaultValues = true) }
+        }
     }
 
     private val username by option(
