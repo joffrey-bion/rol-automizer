@@ -2,7 +2,7 @@
 
 angus-mail = "2.0.2"
 clikt = "4.2.1"
-jsoup = "1.16.1"
+jsoup = "1.16.2"
 junit5 = "5.10.0"
 kotlin = "1.9.10"
 logback-classic = "1.4.11"
