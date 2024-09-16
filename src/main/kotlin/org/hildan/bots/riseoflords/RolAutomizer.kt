@@ -1,19 +1,14 @@
 package org.hildan.bots.riseoflords
 
-import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.core.context
+import com.github.ajalt.clikt.core.*
 import com.github.ajalt.clikt.output.*
 import com.github.ajalt.clikt.parameters.options.*
-import com.github.ajalt.clikt.parameters.types.int
-import com.github.ajalt.clikt.parameters.types.long
-import org.hildan.bots.riseoflords.client.LoginException
-import org.hildan.bots.riseoflords.config.Account
-import org.hildan.bots.riseoflords.config.AttackParams
-import org.hildan.bots.riseoflords.config.Config
-import org.hildan.bots.riseoflords.config.PlayerFilter
-import org.hildan.bots.riseoflords.sequencing.AttackManager
-import org.slf4j.LoggerFactory
-import kotlin.time.Duration
+import com.github.ajalt.clikt.parameters.types.*
+import org.hildan.bots.riseoflords.client.*
+import org.hildan.bots.riseoflords.config.*
+import org.hildan.bots.riseoflords.sequencing.*
+import org.slf4j.*
+import kotlin.time.*
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
