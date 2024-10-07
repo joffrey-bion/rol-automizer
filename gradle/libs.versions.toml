@@ -1,7 +1,7 @@
 [versions]
 
 angus-mail = "2.0.3"
-clikt = "5.0.0"
+clikt = "5.0.1"
 jsoup = "1.18.1"
 junit5 = "5.11.1"
 kotlin = "2.0.20"
