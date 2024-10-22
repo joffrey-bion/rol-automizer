@@ -3,7 +3,7 @@
 angus-mail = "2.0.3"
 clikt = "5.0.1"
 jsoup = "1.18.1"
-junit5 = "5.11.2"
+junit5 = "5.11.3"
 kotlin = "2.0.21"
 logback-classic = "1.5.11"
 simple-ocr = "1.3.0"
