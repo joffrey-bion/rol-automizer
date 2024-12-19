@@ -5,7 +5,7 @@ clikt = "5.0.2"
 jsoup = "1.18.3"
 junit5 = "5.11.3"
 kotlin = "2.1.0"
-logback-classic = "1.5.12"
+logback-classic = "1.5.13"
 simple-ocr = "1.4.0"
 
 [libraries]
