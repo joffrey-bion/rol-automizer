@@ -1,6 +1,6 @@
 [versions]
 
-angus-mail = "2.0.3"
+angus-mail = "2.0.4"
 clikt = "5.0.3"
 jsoup = "1.21.1"
 junit5 = "5.13.4"
